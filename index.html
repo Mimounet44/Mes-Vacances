@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>🌴 MesVacances - Ultimate</title>
+<title>🌴 MesVacances - Ultra-Complète</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.11.3/main.min.css" />
@@ -12,7 +12,6 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.11.3/main.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 :root {
   --sand:#f5ede0;--sand-dark:#e8d9c4;--ocean:#2c6e8a;--ocean-light:#4a9bbe;
@@ -21,8 +20,6 @@
   --white:#fffdf9;--shadow:0 4px 24px rgba(44,30,15,.10);
   --shadow-lg:0 12px 48px rgba(44,30,15,.16);--radius:18px;--radius-sm:10px;
   --qty-color: #d35f5f;
-  --primary: #3498db;
-  --secondary: #2ecc71;
 }
 
 * {
@@ -39,10 +36,9 @@ body {
   background-image: 
     radial-gradient(ellipse at 80% 0%, rgba(44,110,138,.08) 0%, transparent 60%),
     radial-gradient(ellipse at 0% 100%, rgba(232,115,90,.07) 0%, transparent 50%);
-  -webkit-tap-highlight-color: transparent;
 }
 
-/* ═══ MOBILE BOTTOM NAV ═══ */
+/* MOBILE NAV */
 .mobile-nav {
   display: none;
   position: fixed;
@@ -82,7 +78,6 @@ body {
   font-size: .7rem;
   cursor: pointer;
   transition: all .2s;
-  border-radius: 8px;
 }
 
 .mobile-nav-btn:hover {
@@ -91,7 +86,6 @@ body {
 
 .mobile-nav-btn.active {
   color: var(--ocean-dark);
-  background: rgba(44, 110, 138, 0.1);
   font-weight: 600;
 }
 
@@ -99,7 +93,7 @@ body {
   font-size: 1.4rem;
 }
 
-/* ═══ LOGIN ═══ */
+/* LOGIN */
 #login-screen {
   display: flex;
   align-items: center;
@@ -183,11 +177,11 @@ body {
   display: none;
 }
 
-/* ═══ APP SHELL ═══ */
+/* APP SHELL */
 #app {
   display: none;
   min-height: 100vh;
-  padding-bottom: 70px; /* Espace pour le menu mobile */
+  padding-bottom: 70px;
 }
 
 .app-nav {
@@ -234,7 +228,7 @@ body {
 }
 
 .nav-tabs {
-  display: none; /* Masqué sur mobile */
+  display: none;
 }
 
 .nav-right {
@@ -291,7 +285,7 @@ body {
   animation: fadeUp .35s ease both;
 }
 
-/* ═══ SECTION TITLES ═══ */
+/* SECTION TITLES */
 .section-title {
   font-family: 'Playfair Display', serif;
   font-size: 1.1rem;
@@ -299,7 +293,7 @@ body {
   margin-bottom: 14px;
 }
 
-/* ═══ TYPE SELECTOR (multi) ═══ */
+/* TYPE SELECTOR */
 .type-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
@@ -347,45 +341,14 @@ body {
   background: #edf6fa;
 }
 
-.type-btn.active[data-type="camping"] {
-  border-color: var(--green);
-  background: #edf6f0;
-}
-
-.type-btn.active[data-type="plage"] {
-  border-color: var(--coral);
-  background: #fdf1ee;
-}
-
-.type-btn.active[data-type="montagne"] {
-  border-color: var(--mountain);
-  background: #f0ecf5;
-}
-
-.type-btn.active[data-type="campagne"] {
-  border-color: #8a7a3a;
-  background: #f7f5e8;
-}
-
-.type-btn.active[data-type="sejour"] {
-  border-color: var(--sun);
-  background: #fdf8e8;
-}
-
-.type-btn.active[data-type="etranger"] {
-  border-color: var(--sun);
-  background: #fff8e8;
-}
-
-.type-btn.active[data-type="croi"] {
-  border-color: #8a7a3a;
-  background: #f7f5e8;
-}
-
-.type-btn.active[data-type="roadtrip"] {
-  border-color: var(--ocean);
-  background: #edf6fa;
-}
+.type-btn.active[data-type="camping"] { border-color: var(--green); background: #edf6f0; }
+.type-btn.active[data-type="plage"] { border-color: var(--coral); background: #fdf1ee; }
+.type-btn.active[data-type="montagne"] { border-color: var(--mountain); background: #f0ecf5; }
+.type-btn.active[data-type="campagne"] { border-color: #8a7a3a; background: #f7f5e8; }
+.type-btn.active[data-type="sejour"] { border-color: var(--sun); background: #fdf8e8; }
+.type-btn.active[data-type="etranger"] { border-color: var(--sun); background: #fff8e8; }
+.type-btn.active[data-type="croi"] { border-color: #8a7a3a; background: #f7f5e8; }
+.type-btn.active[data-type="roadtrip"] { border-color: var(--ocean); background: #edf6fa; }
 
 .type-check {
   position: absolute;
@@ -422,7 +385,7 @@ body {
   color: var(--text);
 }
 
-/* Transport Selection */
+/* TRANSPORT SELECTION */
 .transport-section {
   background: var(--white);
   border-radius: var(--radius);
@@ -490,7 +453,7 @@ body {
   display: block;
 }
 
-/* ═══ DESTINATION ═══ */
+/* DESTINATION */
 .dest-section {
   background: var(--white);
   border-radius: var(--radius);
@@ -534,7 +497,7 @@ body {
   background: var(--white);
 }
 
-/* Map Section */
+/* MAP SECTION */
 .map-section {
   background: var(--white);
   border-radius: var(--radius);
@@ -576,7 +539,7 @@ body {
   outline: none;
 }
 
-/* Calendar Section */
+/* CALENDAR SECTION */
 .calendar-section {
   background: var(--white);
   border-radius: var(--radius);
@@ -596,7 +559,7 @@ body {
   margin-bottom: 10px;
 }
 
-/* Reminders Section */
+/* REMINDERS SECTION */
 .reminders-section {
   background: var(--white);
   border-radius: var(--radius);
@@ -697,7 +660,7 @@ body {
   font-size: .8rem;
 }
 
-/* Documents Section */
+/* DOCUMENTS SECTION */
 .documents-section {
   background: var(--white);
   border-radius: var(--radius);
@@ -734,7 +697,7 @@ body {
   font-size: 14px;
 }
 
-/* ═══ PROGRESS ═══ */
+/* PROGRESS */
 .progress-section {
   background: var(--white);
   border-radius: var(--radius);
@@ -774,7 +737,7 @@ body {
   transition: width .5s cubic-bezier(.4, 0, .2, 1);
 }
 
-/* ═══ ACTION BAR ═══ */
+/* ACTION BAR */
 .action-bar {
   display: flex;
   gap: 8px;
@@ -827,7 +790,7 @@ body {
   border-color: var(--ocean-dark);
 }
 
-/* ═══ CATEGORIES ═══ */
+/* CATEGORIES */
 .categories-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -904,7 +867,7 @@ body {
   display: none;
 }
 
-/* ═══ ITEMS ═══ */
+/* ITEMS */
 .item-row {
   display: flex;
   align-items: center;
@@ -986,7 +949,7 @@ body {
   display: none !important;
 }
 
-/* ═══ ADD ROW ═══ */
+/* ADD ROW */
 .add-row {
   display: flex;
   gap: 6px;
@@ -1027,7 +990,7 @@ body {
   background: var(--ocean-dark);
 }
 
-/* ═══ NOTES ═══ */
+/* NOTES */
 .notes-section {
   background: var(--white);
   border-radius: var(--radius);
@@ -1062,7 +1025,7 @@ body {
   border-color: var(--ocean-light);
 }
 
-/* ═══ MA LISTE PAGE ═══ */
+/* MA LISTE PAGE */
 .mylist-header {
   background: var(--white);
   border-radius: var(--radius);
@@ -1143,7 +1106,7 @@ body {
   margin-bottom: 10px;
 }
 
-/* ═══ ADMIN PAGE ═══ */
+/* ADMIN PAGE */
 .admin-card {
   background: var(--white);
   border-radius: var(--radius);
@@ -1208,20 +1171,9 @@ body {
   font-weight: 700;
 }
 
-.role-admin {
-  background: #ece8f4;
-  color: var(--mountain);
-}
-
-.role-editor {
-  background: #edf6fa;
-  color: var(--ocean-dark);
-}
-
-.role-viewer {
-  background: #f7f5e8;
-  color: #6a5c20;
-}
+.role-admin { background: #ece8f4; color: var(--mountain); }
+.role-editor { background: #edf6fa; color: var(--ocean-dark); }
+.role-viewer { background: #f7f5e8; color: #6a5c20; }
 
 .admin-form {
   display: grid;
@@ -1273,9 +1225,7 @@ body {
   grid-column: span 2;
 }
 
-.btn-admin:hover {
-  background: #9b85ab;
-}
+.btn-admin:hover { background: #9b85ab; }
 
 .btn-danger-sm {
   padding: 4px 8px;
@@ -1325,7 +1275,7 @@ body {
   margin-bottom: 8px;
 }
 
-/* ═══ QTY MODAL ═══ */
+/* QTY MODAL */
 .modal-overlay {
   display: none;
   position: fixed;
@@ -1434,71 +1384,26 @@ body {
   background: var(--ocean-dark);
 }
 
-/* ═══ PRINT ═══ */
+/* PRINT */
 @media print {
-  #login-screen,
-  #app .app-nav,
-  .mobile-nav,
-  .action-bar,
-  .add-row,
-  .item-delete,
-  .type-grid,
-  .dest-section,
-  .progress-section,
-  .types-selected-bar,
-  .transport-section,
-  .documents-section,
-  .map-section,
-  .calendar-section,
-  .reminders-section,
-  .notes-section,
-  .btn-sm,
-  .nav-tabs,
-  .nav-right,
-  #page-liste .action-bar {
-    display: none !important;
-  }
+  #login-screen, #app .app-nav, .mobile-nav, .action-bar, .add-row, .item-delete,
+  .type-grid, .dest-section, .progress-section, .types-selected-bar,
+  .transport-section, .documents-section, .map-section, .calendar-section,
+  .reminders-section, .notes-section, .btn-sm, .nav-tabs, .nav-right,
+  #page-liste .action-bar { display: none !important; }
   
-  #page-liste {
-    display: block !important;
-    padding: 0 !important;
-  }
-  
-  .mylist-header {
-    box-shadow: none !important;
-    border: 1px solid #ddd;
-  }
-  
-  .mylist-cat h3 {
-    border-bottom: 1px solid #ddd;
-  }
-  
-  body {
-    background: #fff !important;
-  }
-  
-  .app-nav {
-    display: none !important;
-  }
-  
-  .item-row.checked .item-label {
-    color: #999 !important;
-  }
-  
-  .item-row.checked {
-    opacity: 0.6;
-  }
-  
-  .mylist-item.checked span {
-    color: #999 !important;
-  }
-  
-  .mylist-item.checked {
-    opacity: 0.6;
-  }
+  #page-liste { display: block !important; padding: 0 !important; }
+  .mylist-header { box-shadow: none !important; border: 1px solid #ddd; }
+  .mylist-cat h3 { border-bottom: 1px solid #ddd; }
+  body { background: #fff !important; }
+  .app-nav { display: none !important; }
+  .item-row.checked .item-label { color: #999 !important; }
+  .item-row.checked { opacity: 0.6; }
+  .mylist-item.checked span { color: #999 !important; }
+  .mylist-item.checked { opacity: 0.6; }
 }
 
-/* ═══ TOAST ═══ */
+/* TOAST */
 .toast {
   position: fixed;
   bottom: 80px;
@@ -1513,24 +1418,15 @@ body {
   transition: transform .3s cubic-bezier(.4, 0, .2, 1);
   z-index: 999;
   pointer-events: none;
-  max-width: 90%;
-  text-align: center;
 }
 
 .toast.show {
   transform: translateX(-50%) translateY(0);
 }
 
-/* FullCalendar Custom Styles */
-.fc {
-  font-family: inherit;
-  font-size: .8rem;
-}
-
-.fc-today {
-  background-color: rgba(44, 110, 138, 0.1) !important;
-}
-
+/* FullCalendar */
+.fc { font-family: inherit; font-size: .8rem; }
+.fc-today { background-color: rgba(44, 110, 138, 0.1) !important; }
 .fc-event {
   background-color: var(--ocean);
   border-color: var(--ocean);
@@ -1538,170 +1434,58 @@ body {
   font-size: .7rem !important;
   padding: 2px 4px !important;
 }
+.fc-event:hover { background-color: var(--ocean-dark) !important; }
 
-.fc-event:hover {
-  background-color: var(--ocean-dark) !important;
-}
+/* Leaflet */
+.leaflet-container { background: var(--sand); border-radius: 10px; }
+.leaflet-control-attribution { background: white; font-size: 10px; }
 
-/* Leaflet Map Custom Styles */
-.leaflet-container {
-  background: var(--sand);
-  border-radius: 10px;
-  font-size: .8rem;
-}
-
-.leaflet-control-attribution {
-  background: white;
-  font-size: 10px;
-}
-
-/* Mobile-specific adjustments */
+/* RESPONSIVE */
 @media (max-width: 768px) {
-  .nav-tabs {
-    display: none !important;
-  }
-  
-  .mobile-nav {
-    display: flex !important;
-  }
-  
-  .page {
-    padding-bottom: 80px;
-  }
-  
-  .type-grid {
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    gap: 8px;
-  }
-  
-  .type-btn {
-    padding: 10px 4px;
-  }
-  
-  .type-btn .emoji {
-    font-size: 20px;
-  }
-  
-  .type-btn .label {
-    font-size: .7rem;
-  }
-  
-  .type-btn .sub {
-    display: none;
-  }
-  
-  .transport-grid {
-    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-    gap: 6px;
-  }
-  
-  .transport-btn {
-    padding: 6px 4px;
-  }
-  
-  .transport-btn .emoji {
-    font-size: 18px;
-  }
-  
-  .transport-btn .label {
-    font-size: .65rem;
-  }
-  
-  .dest-section {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  
-  .dest-field {
-    min-width: 100%;
-    margin-bottom: 8px;
-  }
-  
-  .map-actions {
-    flex-direction: column;
-  }
-  
-  .map-actions input {
-    width: 100%;
-    margin-bottom: 8px;
-  }
-  
-  .add-reminder {
-    flex-direction: column;
-  }
-  
+  .nav-tabs { display: none !important; }
+  .mobile-nav { display: flex !important; }
+  .page { padding-bottom: 80px; }
+  .type-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; }
+  .type-btn { padding: 10px 4px; }
+  .type-btn .emoji { font-size: 20px; }
+  .type-btn .label { font-size: .7rem; }
+  .type-btn .sub { display: none; }
+  .transport-grid { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 6px; }
+  .transport-btn { padding: 6px 4px; }
+  .transport-btn .emoji { font-size: 18px; }
+  .transport-btn .label { font-size: .65rem; }
+  .dest-section { flex-direction: column; align-items: stretch; }
+  .dest-field { min-width: 100%; margin-bottom: 8px; }
+  .map-actions { flex-direction: column; }
+  .map-actions input { width: 100%; margin-bottom: 8px; }
+  .add-reminder { flex-direction: column; }
   .add-reminder input[type="text"],
-  .add-reminder input[type="date"] {
-    width: 100%;
-    margin-bottom: 8px;
-  }
-  
-  .admin-form {
-    grid-template-columns: 1fr;
-  }
-  
-  .btn-admin {
-    grid-column: span 1;
-  }
-  
-  #map-container {
-    height: 200px;
-  }
+  .add-reminder input[type="date"] { width: 100%; margin-bottom: 8px; }
+  .admin-form { grid-template-columns: 1fr; }
+  .btn-admin { grid-column: span 1; }
+  #map-container { height: 200px; }
+  .categories-grid { grid-template-columns: 1fr; }
 }
 
 @media (min-width: 769px) {
-  .mobile-nav {
-    display: none !important;
-  }
-  
-  .nav-tabs {
-    display: flex !important;
-  }
-  
-  .type-grid {
-    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  }
-  
-  .type-btn .sub {
-    display: block;
-  }
-  
-  .categories-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-  
-  .dest-section {
-    flex-direction: row;
-    flex-wrap: wrap;
-  }
-  
-  .map-actions {
-    flex-direction: row;
-  }
-  
-  .add-reminder {
-    flex-direction: row;
-  }
+  .mobile-nav { display: none !important; }
+  .nav-tabs { display: flex !important; }
+  .type-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+  .type-btn .sub { display: block; }
+  .categories-grid { grid-template-columns: 1fr 1fr; }
+  .dest-section { flex-direction: row; flex-wrap: wrap; }
+  .map-actions { flex-direction: row; }
+  .add-reminder { flex-direction: row; }
 }
 
 @keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(18px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 </style>
 </head>
@@ -1767,7 +1551,6 @@ body {
   <div class="page active" id="page-liste-prep">
     <div style="height:8px"></div>
     
-    <!-- Types de vacances -->
     <div class="section-title">📍 Type(s) de vacances</div>
     <div class="type-grid" id="type-grid">
       <button class="type-btn" data-type="camping" onclick="toggleType('camping',this)">
@@ -1800,7 +1583,7 @@ body {
       </button>
       <button class="type-btn" data-type="croi" onclick="toggleType('croi',this)">
         <span class="type-check">✓</span><span class="emoji">🚢</span>
-        <div class="label">Croisière</div><div class="sub">Bateau</div>
+        <div class="label">Croisière</div><div class="sub">Bateau / paquebot</div>
       </button>
       <button class="type-btn" data-type="roadtrip" onclick="toggleType('roadtrip',this)">
         <span class="type-check">✓</span><span class="emoji">🚐</span>
@@ -1808,12 +1591,11 @@ body {
       </button>
     </div>
     <div class="types-selected-bar" id="types-bar">
-      <span>🗺️</span> <span id="types-bar-text" style="color:var(--text)">Sélectionnez un type de vacances</span>
+      <span>🗺️</span> <span id="types-bar-text" style="color:var(--text)">Sélectionnez un ou plusieurs types</span>
     </div>
 
-    <!-- Types de transport -->
     <div class="transport-section">
-      <h3>🚗 Transport</h3>
+      <h3>🚗 Type(s) de transport</h3>
       <div class="transport-grid" id="transport-grid">
         <button class="transport-btn" data-transport="voiture" onclick="toggleTransport('voiture',this)">
           <span class="transport-check">✓</span><span class="emoji">🚗</span>
@@ -1838,25 +1620,21 @@ body {
       </div>
     </div>
 
-    <!-- Carte du lieu de vacances -->
     <div class="map-section">
       <h3>🗺️ Carte de la destination</h3>
       <div id="map-container"></div>
       <div class="map-actions">
-        <input type="text" id="address-input" placeholder="Adresse..." 
-               style="flex:1; padding:8px; border:2px solid var(--sand-dark); border-radius:8px; background:var(--sand);">
+        <input type="text" id="address-input" placeholder="Adresse...">
         <button class="btn-sm accent" onclick="geocodeAddress()">🔍</button>
         <button class="btn-sm" onclick="resetMap()">🔄</button>
       </div>
     </div>
 
-    <!-- Calendrier -->
     <div class="calendar-section">
       <h3>📅 Rappels</h3>
       <div id="calendar-container"></div>
     </div>
 
-    <!-- Rappels -->
     <div class="reminders-section">
       <h3>⏰ Mes rappels</h3>
       <div class="reminder-list" id="reminder-list"></div>
@@ -1867,7 +1645,6 @@ body {
       </div>
     </div>
 
-    <!-- Documents recommandés -->
     <div class="documents-section" id="documents-section">
       <h3>📄 Documents à emporter</h3>
       <div class="documents-list" id="documents-list"></div>
@@ -2038,7 +1815,6 @@ try {
   firebase.initializeApp(firebaseConfig);
   db = firebase.firestore();
   auth = firebase.auth();
-  console.log("Firebase initialisé avec succès");
 } catch (e) {
   console.log("Firebase non initialisé :", e);
 }
@@ -2141,23 +1917,32 @@ const TRANSPORT_DOCUMENTS = {
   ]
 };
 
-// Catégories par défaut
+// Catégories par défaut (COMPLÈTES)
 const DEFAULT_CATEGORIES = [
   {
     id: 'administratif',
     emoji: '📄',
     name: 'Documents & Administratif',
     items: [
-      {id: 'a1', label: "Carte nationale d'identité / Passeport", types: ['tous', 'etranger', 'croi'], qty: 0},
-      {id: 'a2', label: "Contrat de location / confirmation", types: ['location', 'camping'], qty: 0},
-      {id: 'a3', label: "Billets de train / avion / ferry", types: ['tous', 'croi'], qty: 0},
-      {id: 'a4', label: "Carte bancaire (sans frais à l'étranger)", types: ['tous', 'etranger', 'croi'], qty: 0},
-      {id: 'a5', label: "Espèces / monnaie locale", types: ['tous', 'etranger', 'croi'], qty: 0},
+      {id: 'a1', label: "Carte nationale d'identité / Passeport", types: ['tous'], qty: 0},
+      {id: 'a2', label: "Contrat de location / confirmation réservation", types: ['tous'], qty: 0},
+      {id: 'a3', label: "Billets de train / avion / ferry", types: ['tous'], qty: 0},
+      {id: 'a4', label: "Carte bancaire (sans frais à l'étranger)", types: ['tous'], qty: 0},
+      {id: 'a5', label: "Espèces / monnaie locale", types: ['tous'], qty: 0},
       {id: 'a6', label: "Carte Vitale / attestation mutuelle", types: ['tous'], qty: 0},
       {id: 'a7', label: "Carnet de santé enfants", types: ['tous'], qty: 0},
-      {id: 'a8', label: "Permis de conduire", types: ['tous', 'roadtrip'], qty: 0},
-      {id: 'a9', label: "Carte grise du véhicule", types: ['tous', 'roadtrip'], qty: 0},
-      {id: 'a10', label: "Assurance véhicule / voyage", types: ['tous', 'roadtrip', 'etranger'], qty: 0}
+      {id: 'a8', label: "Permis de conduire", types: ['tous'], qty: 0},
+      {id: 'a9', label: "Carte grise du véhicule", types: ['tous'], qty: 0},
+      {id: 'a10', label: "Assurance véhicule / voyage", types: ['tous'], qty: 0},
+      {id: 'a11', label: "Chèque(s) de caution", types: ['location', 'camping'], qty: 0},
+      {id: 'a12', label: "Guide touristique / plan de ville", types: ['tous'], qty: 0},
+      {id: 'a13', label: "Visa (si nécessaire)", types: ['etranger', 'croi'], qty: 0},
+      {id: 'a14', label: "Carte d'embarquement imprimée", types: ['croi', 'etranger'], qty: 0},
+      {id: 'a15', label: "Assurance rapatriement", types: ['etranger', 'croi', 'montagne'], qty: 0},
+      {id: 'a16', label: "Numéros d'urgence locaux notés", types: ['etranger', 'croi', 'roadtrip', 'montagne'], qty: 0},
+      {id: 'a17', label: "Copie des réservations hôtels / hébergements", types: ['sejour', 'etranger', 'croi', 'roadtrip'], qty: 0},
+      {id: 'a18', label: "Abonnement télépéage / vignette autoroute", types: ['roadtrip', 'etranger', 'campagne'], qty: 0},
+      {id: 'a19', label: "Certificat de vaccination (si exigé)", types: ['etranger', 'croi'], qty: 0}
     ]
   },
   {
@@ -2168,13 +1953,23 @@ const DEFAULT_CATEGORIES = [
       {id: 'v1', label: "T-shirts / hauts légers", types: ['tous'], qty: 0},
       {id: 'v2', label: "Pantalons / shorts", types: ['tous'], qty: 0},
       {id: 'v3', label: "Sous-vêtements", types: ['tous'], qty: 0},
-      {id: 'v4', label: "Chaussettes", types: ['tous'], qty: 0},
+      {id: 'v4', label: "Chaussettes (dont chaussettes de sport)", types: ['tous'], qty: 0},
       {id: 'v5', label: "Pyjamas", types: ['tous'], qty: 0},
       {id: 'v6', label: "Veste légère / polaire", types: ['tous'], qty: 0},
-      {id: 'v7', label: "Imperméable / K-way", types: ['camping', 'montagne', 'campagne', 'etranger', 'roadtrip'], qty: 0},
-      {id: 'v8', label: "Maillot de bain (x2)", types: ['plage', 'camping', 'location', 'etranger', 'croi'], qty: 0},
-      {id: 'v9', label: "Casquette / chapeau de soleil", types: ['plage', 'campagne', 'camping', 'etranger', 'roadtrip'], qty: 0},
-      {id: 'v10', label: "Lunettes de soleil (UV400)", types: ['tous'], qty: 0}
+      {id: 'v7', label: "Imperméable / K-way", types: ['tous'], qty: 0},
+      {id: 'v8', label: "Maillot de bain", types: ['plage', 'camping', 'location', 'etranger', 'croi', 'montagne', 'sejour', 'campagne'], qty: 0},
+      {id: 'v9', label: "Casquette / chapeau de soleil", types: ['tous'], qty: 0},
+      {id: 'v10', label: "Lunettes de soleil (UV400)", types: ['tous'], qty: 0},
+      {id: 'v11', label: "Chaussures de randonnée / marche", types: ['montagne', 'campagne', 'camping', 'roadtrip', 'etranger'], qty: 0},
+      {id: 'v12', label: "Tongs / sandales", types: ['plage', 'camping', 'location', 'etranger', 'croi', 'sejour', 'campagne'], qty: 0},
+      {id: 'v13', label: "Vêtements chauds (pull, doudoune)", types: ['montagne', 'camping', 'campagne', 'croi', 'etranger', 'roadtrip'], qty: 0},
+      {id: 'v14', label: "Pantalon de ski / vêtements techniques ski", types: ['montagne'], qty: 0},
+      {id: 'v15', label: "Sous-vêtements thermiques", types: ['montagne', 'camping', 'campagne'], qty: 0},
+      {id: 'v16', label: "Gants / bonnet / écharpe", types: ['montagne', 'camping', 'campagne', 'roadtrip'], qty: 0},
+      {id: 'v17', label: "Tenue élégante (dîner, soirée)", types: ['croi', 'sejour', 'etranger'], qty: 0},
+      {id: 'v18', label: "Chaussures de ville / habillées", types: ['croi', 'sejour', 'etranger'], qty: 0},
+      {id: 'v19', label: "Salopette / combinaison de ski enfant", types: ['montagne'], qty: 0},
+      {id: 'v20', label: "Guêtres de randonnée", types: ['montagne', 'campagne', 'camping'], qty: 0}
     ]
   },
   {
@@ -2186,10 +1981,19 @@ const DEFAULT_CATEGORIES = [
       {id: 't2', label: "Shampoing + après-shampoing", types: ['tous'], qty: 0},
       {id: 't3', label: "Gel douche / savon", types: ['tous'], qty: 0},
       {id: 't4', label: "Déodorant", types: ['tous'], qty: 0},
-      {id: 't5', label: "Crème solaire (indice 30-50)", types: ['plage', 'montagne', 'camping', 'etranger', 'croi', 'roadtrip'], qty: 0},
-      {id: 't6', label: "After-sun / aloe vera", types: ['plage', 'camping', 'etranger', 'croi'], qty: 0},
+      {id: 't5', label: "Crème solaire (indice 30-50)", types: ['tous'], qty: 0},
+      {id: 't6', label: "After-sun / aloe vera", types: ['plage', 'camping', 'etranger', 'croi', 'montagne', 'campagne', 'roadtrip', 'sejour', 'location'], qty: 0},
       {id: 't7', label: "Lingettes rafraîchissantes", types: ['tous'], qty: 0},
-      {id: 't8', label: "Gel hydroalcoolique", types: ['tous'], qty: 0}
+      {id: 't8', label: "Gel hydroalcoolique", types: ['tous'], qty: 0},
+      {id: 't9', label: "Rasoir / mousse à raser", types: ['tous'], qty: 0},
+      {id: 't10', label: "Coton-tiges / cotons démaquillants", types: ['tous'], qty: 0},
+      {id: 't11', label: "Maquillage / démaquillant", types: ['tous'], qty: 0},
+      {id: 't12', label: "Serviettes de bain / plage", types: ['tous'], qty: 0},
+      {id: 't13', label: "Anti-moustiques / répulsifs insectes", types: ['camping', 'etranger', 'campagne', 'montagne', 'croi', 'plage', 'location'], qty: 0},
+      {id: 't14', label: "Sèche-cheveux de voyage", types: ['etranger', 'sejour', 'croi', 'location', 'montagne'], qty: 0},
+      {id: 't15', label: "Pince à épiler / ciseaux à ongles", types: ['tous'], qty: 0},
+      {id: 't16', label: "Stick lèvres hydratant / protection solaire", types: ['tous'], qty: 0},
+      {id: 't17', label: "Miroir de voyage", types: ['camping', 'roadtrip', 'montagne', 'etranger'], qty: 0}
     ]
   },
   {
@@ -2197,12 +2001,62 @@ const DEFAULT_CATEGORIES = [
     emoji: '💊',
     name: 'Pharmacie & Santé',
     items: [
-      {id: 'ph1', label: "Ordonnances + médicaments habituels", types: ['tous', 'etranger', 'croi'], qty: 0},
+      {id: 'ph1', label: "Ordonnances + médicaments habituels", types: ['tous'], qty: 0},
       {id: 'ph2', label: "Paracétamol / ibuprofène", types: ['tous'], qty: 0},
-      {id: 'ph3', label: "Anti-diarrhéiques", types: ['tous', 'etranger', 'croi'], qty: 0},
-      {id: 'ph4', label: "Anti-nausées / mal des transports", types: ['tous', 'etranger', 'croi', 'roadtrip'], qty: 0},
-      {id: 'ph5', label: "Pansements / compresses", types: ['tous'], qty: 0},
-      {id: 'ph6', label: "Antiseptique (Bétadine)", types: ['tous'], qty: 0}
+      {id: 'ph3', label: "Anti-diarrhéiques", types: ['tous'], qty: 0},
+      {id: 'ph4', label: "Anti-nausées / mal des transports", types: ['tous'], qty: 0},
+      {id: 'ph5', label: "Pansements / compresses stériles", types: ['tous'], qty: 0},
+      {id: 'ph6', label: "Antiseptique (Bétadine / Biseptine)", types: ['tous'], qty: 0},
+      {id: 'ph7', label: "Thermomètre", types: ['tous'], qty: 0},
+      {id: 'ph8', label: "Crème anti-inflammatoire / anti-brûlure", types: ['tous'], qty: 0},
+      {id: 'ph9', label: "Médicaments contre le mal des montagnes", types: ['montagne', 'etranger'], qty: 0},
+      {id: 'ph10', label: "Traitement antipaludéen (si zone à risque)", types: ['etranger', 'croi'], qty: 0},
+      {id: 'ph11', label: "Collyres / gouttes pour les yeux", types: ['tous'], qty: 0},
+      {id: 'ph12', label: "Bandes élastiques / attelles de cheville", types: ['montagne', 'camping', 'campagne', 'roadtrip'], qty: 0},
+      {id: 'ph13', label: "Antihistaminiques (allergie)", types: ['tous'], qty: 0},
+      {id: 'ph14', label: "Crème anti-méduse / piqûre marine", types: ['plage', 'croi', 'etranger'], qty: 0}
+    ]
+  },
+  {
+    id: 'cuisine',
+    emoji: '🍳',
+    name: 'Cuisine & Repas',
+    items: [
+      {id: 'c1', label: "Casseroles / faitout", types: ['camping', 'location', 'montagne', 'campagne'], qty: 0},
+      {id: 'c2', label: "Poêle(s)", types: ['camping', 'location', 'montagne', 'campagne'], qty: 0},
+      {id: 'c3', label: "Couteaux de cuisine", types: ['camping', 'location', 'montagne', 'campagne', 'roadtrip'], qty: 0},
+      {id: 'c4', label: "Planche à découper", types: ['camping', 'location', 'montagne', 'campagne', 'roadtrip'], qty: 0},
+      {id: 'c5', label: "Ouvre-boîte / tire-bouchon", types: ['camping', 'location', 'montagne', 'campagne', 'roadtrip', 'plage', 'croi'], qty: 0},
+      {id: 'c6', label: "Barbecue / plancha + charbon", types: ['camping', 'location', 'campagne', 'roadtrip', 'plage'], qty: 0},
+      {id: 'c7', label: "Réchaud de camping + cartouches gaz", types: ['camping', 'roadtrip', 'montagne'], qty: 0},
+      {id: 'c8', label: "Sel, poivre, huile, sucre, épices", types: ['camping', 'location', 'montagne', 'campagne'], qty: 0},
+      {id: 'c9', label: "Torchons / essuie-tout", types: ['camping', 'location', 'montagne', 'campagne', 'roadtrip', 'plage'], qty: 0},
+      {id: 'c10', label: "Liquide vaisselle / éponge", types: ['camping', 'location', 'montagne', 'campagne'], qty: 0},
+      {id: 'c11', label: "Couverts / assiettes / verres réutilisables", types: ['camping', 'roadtrip', 'plage', 'montagne', 'campagne'], qty: 0},
+      {id: 'c12', label: "Glacière / sac isotherme", types: ['camping', 'plage', 'roadtrip', 'campagne', 'location', 'montagne', 'sejour', 'etranger'], qty: 0},
+      {id: 'c13', label: "Thermos / gourde isotherme", types: ['tous'], qty: 0},
+      {id: 'c14', label: "Sacs de congélation / boîtes hermétiques", types: ['camping', 'location', 'roadtrip', 'plage', 'montagne', 'campagne'], qty: 0},
+      {id: 'c15', label: "Nappe de pique-nique", types: ['camping', 'plage', 'campagne', 'roadtrip', 'montagne', 'location'], qty: 0}
+    ]
+  },
+  {
+    id: 'epicerie',
+    emoji: '🛒',
+    name: 'Épicerie & Boissons',
+    items: [
+      {id: 'e1', label: "Eau (bouteilles / bonbonnes)", types: ['camping', 'location', 'roadtrip', 'montagne', 'campagne', 'plage', 'etranger', 'sejour'], qty: 0},
+      {id: 'e2', label: "Jus de fruits / sodas", types: ['tous'], qty: 0},
+      {id: 'e3', label: "Café / thé / infusions", types: ['camping', 'location', 'montagne', 'campagne', 'roadtrip', 'sejour'], qty: 0},
+      {id: 'e4', label: "Petit-déjeuner (céréales, confiture, pain…)", types: ['camping', 'location', 'montagne', 'campagne', 'roadtrip'], qty: 0},
+      {id: 'e5', label: "Conserves (légumes, poisson, sauce…)", types: ['camping', 'location', 'roadtrip', 'montagne', 'campagne'], qty: 0},
+      {id: 'e6', label: "Pâtes / riz / semoule / quinoa", types: ['camping', 'location', 'montagne', 'campagne'], qty: 0},
+      {id: 'e7', label: "Snacks & biscuits / barres de céréales", types: ['tous'], qty: 0},
+      {id: 'e8', label: "Fruits & légumes de départ", types: ['camping', 'location', 'roadtrip', 'plage', 'montagne', 'campagne'], qty: 0},
+      {id: 'e9', label: "Vin / bière / apéritif", types: ['camping', 'location', 'montagne', 'campagne', 'croi', 'plage', 'sejour'], qty: 0},
+      {id: 'e10', label: "Produits enfants (goûters, compotes, gourdes…)", types: ['tous'], qty: 0},
+      {id: 'e11', label: "Barres énergétiques / fruits secs / noix", types: ['montagne', 'campagne', 'camping', 'roadtrip', 'plage', 'etranger'], qty: 0},
+      {id: 'e12', label: "Sandwichs / repas de voyage (jour J)", types: ['roadtrip', 'etranger', 'plage', 'sejour', 'croi', 'montagne'], qty: 0},
+      {id: 'e13', label: "Glaces / sucettes de voyage enfants", types: ['plage', 'campagne', 'camping', 'location', 'roadtrip'], qty: 0}
     ]
   },
   {
@@ -2211,19 +2065,159 @@ const DEFAULT_CATEGORIES = [
     name: 'Matériel de Camping',
     items: [
       {id: 'cm1', label: "Tente + sardines + masses", types: ['camping'], qty: 0},
-      {id: 'cm2', label: "Sacs de couchage", types: ['camping', 'montagne'], qty: 0},
-      {id: 'cm3', label: "Matelas / tapis de sol", types: ['camping'], qty: 0},
-      {id: 'cm4', label: "Oreillers de camping", types: ['camping'], qty: 0},
-      {id: 'cm5', label: "Draps", types: ['camping', 'location'], qty: 0},
-      {id: 'cm6', label: "Ventilateur portable", types: ['camping', 'location', 'roadtrip'], qty: 0},
-      {id: 'cm7', label: "Charbon pour grillades", types: ['camping', 'location', 'campagne'], qty: 0}
+      {id: 'cm2', label: "Sacs de couchage", types: ['camping', 'montagne', 'campagne'], qty: 0},
+      {id: 'cm3', label: "Matelas gonflable / tapis de sol", types: ['camping', 'montagne'], qty: 0},
+      {id: 'cm4', label: "Oreillers de camping", types: ['camping', 'roadtrip', 'montagne'], qty: 0},
+      {id: 'cm5', label: "Draps / housse de couette", types: ['camping', 'location', 'montagne', 'campagne'], qty: 0},
+      {id: 'cm6', label: "Ventilateur portable", types: ['camping', 'location', 'roadtrip', 'plage'], qty: 0},
+      {id: 'cm7', label: "Charbon / allume-feu pour grillades", types: ['camping', 'location', 'campagne'], qty: 0},
+      {id: 'cm8', label: "Lampes frontales + piles", types: ['camping', 'montagne', 'campagne'], qty: 0},
+      {id: 'cm9', label: "Lanternes / guirlandes solaires", types: ['camping', 'campagne', 'location'], qty: 0},
+      {id: 'cm10', label: "Corde à linge + pinces", types: ['camping', 'location', 'etranger', 'roadtrip'], qty: 0},
+      {id: 'cm11', label: "Bâches / auvents", types: ['camping'], qty: 0},
+      {id: 'cm12', label: "Tables & chaises de camping", types: ['camping', 'roadtrip', 'plage'], qty: 0}
+    ]
+  },
+  {
+    id: 'plage_mer',
+    emoji: '🏖️',
+    name: 'Plage & Mer',
+    items: [
+      {id: 'pl1', label: "Serviettes de plage (grandes)", types: ['plage', 'croi', 'etranger', 'camping', 'sejour'], qty: 0},
+      {id: 'pl2', label: "Parasol de plage", types: ['plage', 'croi', 'camping', 'etranger'], qty: 0},
+      {id: 'pl3', label: "Chaises longues / matelas de plage", types: ['plage', 'camping', 'croi', 'location'], qty: 0},
+      {id: 'pl4', label: "Jouets de plage (seau, râteau, château…)", types: ['plage', 'camping'], qty: 0},
+      {id: 'pl5', label: "Bouées / brassards / gilet enfant", types: ['plage', 'camping', 'croi', 'location'], qty: 0},
+      {id: 'pl6', label: "Palmes / masque / tuba", types: ['plage', 'croi', 'etranger'], qty: 0},
+      {id: 'pl7', label: "Crème solaire waterproof haute protection", types: ['plage', 'croi', 'montagne', 'etranger', 'camping'], qty: 0},
+      {id: 'pl8', label: "Sac de plage imperméable", types: ['plage', 'croi', 'camping'], qty: 0},
+      {id: 'pl9', label: "Combinaison néoprène / shorty", types: ['plage'], qty: 0},
+      {id: 'pl10', label: "Planche de surf / bodyboard", types: ['plage'], qty: 0},
+      {id: 'pl11', label: "Lunettes de natation", types: ['plage', 'croi', 'sejour', 'location', 'camping'], qty: 0},
+      {id: 'pl12', label: "Tente de plage anti-UV bébé", types: ['plage', 'camping'], qty: 0},
+      {id: 'pl13', label: "Raquettes de plage / volant", types: ['plage', 'camping', 'campagne'], qty: 0},
+      {id: 'pl14', label: "Waterproof pour téléphone", types: ['plage', 'croi', 'camping'], qty: 0}
+    ]
+  },
+  {
+    id: 'montagne_ski',
+    emoji: '⛷️',
+    name: 'Montagne & Ski',
+    items: [
+      {id: 'ms1', label: "Skis / snowboard + fixations", types: ['montagne'], qty: 0},
+      {id: 'ms2', label: "Chaussures de ski", types: ['montagne'], qty: 0},
+      {id: 'ms3', label: "Casque de ski / snowboard", types: ['montagne'], qty: 0},
+      {id: 'ms4', label: "Forfait de remontées mécaniques (réservé)", types: ['montagne'], qty: 0},
+      {id: 'ms5', label: "Masque de ski / lunettes de glacier", types: ['montagne'], qty: 0},
+      {id: 'ms6', label: "Bâtons de randonnée / ski", types: ['montagne', 'campagne'], qty: 0},
+      {id: 'ms7', label: "Crampons / surbottes / guêtres", types: ['montagne'], qty: 0},
+      {id: 'ms8', label: "Sac à dos de randonnée (30-50L)", types: ['montagne', 'campagne', 'camping'], qty: 0},
+      {id: 'ms9', label: "Carte IGN / topoguide / application rando", types: ['montagne', 'campagne'], qty: 0},
+      {id: 'ms10', label: "Couverture de survie", types: ['montagne', 'camping', 'campagne'], qty: 0},
+      {id: 'ms11', label: "Sifflet de sécurité + boussole", types: ['montagne', 'campagne', 'camping'], qty: 0},
+      {id: 'ms12', label: "Kit de réparation matériel de ski", types: ['montagne'], qty: 0},
+      {id: 'ms13', label: "DVA / sonde / pelle (hors-piste)", types: ['montagne'], qty: 0}
+    ]
+  },
+  {
+    id: 'activites',
+    emoji: '🎯',
+    name: 'Activités & Loisirs',
+    items: [
+      {id: 'ac1', label: "Jeux de société / cartes / dominos", types: ['tous'], qty: 0},
+      {id: 'ac2', label: "Livres / romans / BD / magazines", types: ['tous'], qty: 0},
+      {id: 'ac3', label: "Tablette / liseuse + chargeur", types: ['tous'], qty: 0},
+      {id: 'ac4', label: "Casque audio / écouteurs", types: ['tous'], qty: 0},
+      {id: 'ac5', label: "Enceinte Bluetooth portable", types: ['tous'], qty: 0},
+      {id: 'ac6', label: "Vélos / trottinettes (ou location)", types: ['camping', 'location', 'campagne', 'roadtrip', 'plage', 'sejour'], qty: 0},
+      {id: 'ac7', label: "Pétanque", types: ['camping', 'campagne', 'location', 'plage', 'sejour'], qty: 0},
+      {id: 'ac8', label: "Frisbee / ballon de foot / volant", types: ['plage', 'camping', 'campagne', 'location', 'montagne'], qty: 0},
+      {id: 'ac9', label: "Jumelles", types: ['montagne', 'campagne', 'croi', 'etranger', 'roadtrip'], qty: 0},
+      {id: 'ac10', label: "Appareil photo + carte mémoire + batteries", types: ['tous'], qty: 0},
+      {id: 'ac11', label: "Drone (si autorisé)", types: ['montagne', 'plage', 'etranger', 'campagne', 'roadtrip'], qty: 0},
+      {id: 'ac12', label: "Kit de pêche", types: ['camping', 'plage', 'campagne', 'location'], qty: 0},
+      {id: 'ac13', label: "Kayak / paddle gonflable", types: ['plage', 'camping', 'location', 'campagne'], qty: 0},
+      {id: 'ac14', label: "Telescope / guide des étoiles", types: ['camping', 'campagne', 'montagne'], qty: 0}
+    ]
+  },
+  {
+    id: 'enfants',
+    emoji: '🧸',
+    name: 'Bébé & Enfants',
+    items: [
+      {id: 'en1', label: "Poussette / siège auto enfant", types: ['tous'], qty: 0},
+      {id: 'en2', label: "Jouets / doudou bébé", types: ['tous'], qty: 0},
+      {id: 'en3', label: "Couches + lingettes bébé", types: ['tous'], qty: 0},
+      {id: 'en4', label: "Lait maternisé / biberons", types: ['tous'], qty: 0},
+      {id: 'en5', label: "Crème change / crème solaire bébé", types: ['tous'], qty: 0},
+      {id: 'en6', label: "Babyphone / moniteur", types: ['location', 'camping', 'campagne', 'montagne', 'sejour'], qty: 0},
+      {id: 'en7', label: "Gilet de sauvetage enfant", types: ['plage', 'croi', 'camping', 'campagne'], qty: 0},
+      {id: 'en8', label: "Casque vélo / trottinette enfant", types: ['camping', 'location', 'campagne', 'plage', 'sejour'], qty: 0},
+      {id: 'en9', label: "Harnais de portage bébé", types: ['montagne', 'campagne', 'etranger', 'roadtrip'], qty: 0}
+    ]
+  },
+  {
+    id: 'logistique',
+    emoji: '🔧',
+    name: 'Logistique & Voiture',
+    items: [
+      {id: 'l1', label: "Chargeurs téléphone / câbles USB-C", types: ['tous'], qty: 0},
+      {id: 'l2', label: "Multiprise / adaptateur secteur", types: ['tous'], qty: 0},
+      {id: 'l3', label: "Batterie externe (power bank)", types: ['tous'], qty: 0},
+      {id: 'l4', label: "Valises / sacs à dos", types: ['tous'], qty: 0},
+      {id: 'l5', label: "Cadenas pour bagage", types: ['tous'], qty: 0},
+      {id: 'l6', label: "Glacière voiture / sac isotherme", types: ['tous'], qty: 0},
+      {id: 'l7', label: "Support téléphone voiture + chargeur", types: ['tous'], qty: 0},
+      {id: 'l8', label: "Gilets de sécurité + triangles", types: ['tous'], qty: 0},
+      {id: 'l9', label: "Carte routière / GPS / application offline", types: ['tous'], qty: 0},
+      {id: 'l10', label: "Carte d'abonnement péage", types: ['tous'], qty: 0},
+      {id: 'l11', label: "Adaptateur prise électrique (pays étranger)", types: ['etranger', 'croi', 'sejour'], qty: 0},
+      {id: 'l12', label: "Lampe de poche / frontale + piles", types: ['tous'], qty: 0},
+      {id: 'l13', label: "Couverture de voyage / plaid voiture", types: ['roadtrip', 'camping', 'montagne', 'etranger'], qty: 0},
+      {id: 'l14', label: "Kit de premier secours voiture", types: ['tous'], qty: 0}
+    ]
+  },
+  {
+    id: 'maison',
+    emoji: '🏠',
+    name: 'Maison avant de partir',
+    items: [
+      {id: 'm1', label: "Arroser les plantes / prévoir arrosage", types: ['tous'], qty: 0},
+      {id: 'm2', label: "Prévenir un voisin / confier clé", types: ['tous'], qty: 0},
+      {id: 'm3', label: "Couper eau / gaz", types: ['tous'], qty: 0},
+      {id: 'm4', label: "Débrancher appareils électriques", types: ['tous'], qty: 0},
+      {id: 'm5', label: "Vider / nettoyer réfrigérateur", types: ['tous'], qty: 0},
+      {id: 'm6', label: "Sortir les poubelles", types: ['tous'], qty: 0},
+      {id: 'm7', label: "Fermer volets / verrouiller portes et fenêtres", types: ['tous'], qty: 0},
+      {id: 'm8', label: "Suspendre le courrier / faire suivre", types: ['tous'], qty: 0},
+      {id: 'm9', label: "Confier les animaux / prévoir la garde", types: ['tous'], qty: 0},
+      {id: 'm10', label: "Programmer l'alarme / vérifier caméras", types: ['tous'], qty: 0},
+      {id: 'm11', label: "Laisser numéros d'urgence au gardien", types: ['tous'], qty: 0},
+      {id: 'm12', label: "Souscrire assurance habitation vacances", types: ['tous'], qty: 0}
+    ]
+  },
+  {
+    id: 'divers',
+    emoji: '🎒',
+    name: 'Divers & Accessoires',
+    items: [
+      {id: 'd1', label: "Lunettes de rechange", types: ['tous'], qty: 0},
+      {id: 'd2', label: "Montre / réveil portable", types: ['tous'], qty: 0},
+      {id: 'd3', label: "Parapluie compact", types: ['tous'], qty: 0},
+      {id: 'd4', label: "Sac à main / porte-documents", types: ['tous'], qty: 0},
+      {id: 'd5', label: "Porte-monnaie / porte-cartes", types: ['tous'], qty: 0},
+      {id: 'd6', label: "Clés de rechange", types: ['tous'], qty: 0},
+      {id: 'd7', label: "Cadenas pour valise", types: ['tous'], qty: 0},
+      {id: 'd8', label: "Carnet de voyage / journal", types: ['tous'], qty: 0},
+      {id: 'd9', label: "Stylos / crayons", types: ['tous'], qty: 0},
+      {id: 'd10', label: "Couteau suisse / multioutil", types: ['camping', 'montagne', 'roadtrip', 'campagne'], qty: 0},
+      {id: 'd11', label: "Boules Quies / masque de nuit", types: ['tous'], qty: 0},
+      {id: 'd12', label: "Sac poubelles / sachets plastiques", types: ['camping', 'roadtrip', 'plage', 'montagne', 'campagne'], qty: 0}
     ]
   }
 ];
 
-// ═══════════════════════════════════════════════
 // DEFAULT USERS
-// ═══════════════════════════════════════════════
 const DEFAULT_USERS = [
   { login: 'yves', pass: 'vacances2024', role: 'admin' },
   { login: 'famille', pass: 'ete2024', role: 'editor' },
@@ -2231,13 +2225,11 @@ const DEFAULT_USERS = [
 ];
 
 const USERS_KEY = 'vac_users_v3';
-const STATE_KEY = 'vac_state_v7';
+const STATE_KEY = 'vac_state_v8'; // v8 : nouvelles catégories complètes
 const SESSION_KEY = 'vac_session';
 let useFirebase = false;
 
-// ═══════════════════════════════════════════════
 // QTY MODAL
-// ═══════════════════════════════════════════════
 let qtyModalItemId = null, qtyModalCurrent = 1;
 
 function openQtyModal(itemId, label) {
@@ -2271,9 +2263,7 @@ document.getElementById('qty-modal').addEventListener('click', function (e) {
   if (e.target === this) closeQtyModal();
 });
 
-// ═══════════════════════════════════════════════
 // AUTH
-// ═══════════════════════════════════════════════
 async function getUsers() {
   if (useFirebase) {
     try {
@@ -2345,18 +2335,15 @@ async function bootApp(u) {
   document.getElementById('app').style.display = 'block';
   document.getElementById('mobile-nav').classList.add('active');
 
-  // Badge
   const badge = document.getElementById('user-badge');
   badge.textContent = u.login + (u.role === 'admin' ? ' 🔑' : u.role === 'viewer' ? ' 👁️' : ' ✏️');
   badge.className = 'user-badge' + (u.role === 'admin' ? ' admin' : '');
 
-  // Admin tab
   if (u.role === 'admin') {
     document.getElementById('tab-admin').style.display = '';
     document.getElementById('mobile-btn-admin').style.display = 'flex';
   }
 
-  // Load state
   await loadState();
   
   if (!state.categories || !state.categories.length) {
@@ -2388,40 +2375,27 @@ async function bootApp(u) {
   updateSyncStatus();
 }
 
-// ═══════════════════════════════════════════════
 // MOBILE NAVIGATION
-// ═══════════════════════════════════════════════
 function showMobilePage(pageId) {
-  // Masquer toutes les pages
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  
-  // Masquer tous les boutons du menu mobile
   document.querySelectorAll('.mobile-nav-btn').forEach(btn => btn.classList.remove('active'));
   
-  // Afficher la page demandée
   document.getElementById('page-' + pageId).classList.add('active');
-  
-  // Activer le bouton correspondant
   document.getElementById('mobile-btn-' + pageId).classList.add('active');
   
-  // Faire défiler vers le haut
   window.scrollTo({ top: 0, behavior: 'smooth' });
   
-  // Mettre à jour le calendrier si on va sur la page calendrier
   if (pageId === 'calendrier') {
     renderFullCalendar();
     renderFullReminders();
   }
   
-  // Mettre à jour la liste si on va sur ma-liste
   if (pageId === 'ma-liste') {
     renderMyList();
   }
 }
 
-// ═══════════════════════════════════════════════
 // PAGES NAV (Desktop)
-// ═══════════════════════════════════════════════
 function showPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
@@ -2433,7 +2407,6 @@ function showPage(id) {
     }
   });
 
-  // Mettre à jour le menu mobile
   document.querySelectorAll('.mobile-nav-btn').forEach(btn => btn.classList.remove('active'));
   document.getElementById('mobile-btn-' + id).classList.add('active');
 
@@ -2447,9 +2420,7 @@ function showPage(id) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// ═══════════════════════════════════════════════
 // STATE PERSIST
-// ═══════════════════════════════════════════════
 async function saveState() {
   state.dest.name = document.getElementById('dest-name').value;
   state.dest.dates = document.getElementById('dest-dates').value;
@@ -2519,9 +2490,7 @@ async function loadState() {
   }
 }
 
-// ═══════════════════════════════════════════════
 // SYNC WITH FIREBASE
-// ═══════════════════════════════════════════════
 function toggleFirebaseSync() {
   const select = document.getElementById('sync-status');
   useFirebase = select.value === 'enabled';
@@ -2572,9 +2541,7 @@ function updateSyncStatus() {
   }
 }
 
-// ═══════════════════════════════════════════════
-// TYPE SELECTION (multi)
-// ═══════════════════════════════════════════════
+// TYPE SELECTION
 function toggleType(type, btn) {
   const idx = state.types.indexOf(type);
   if (idx >= 0) {
@@ -2611,7 +2578,7 @@ const TYPE_LABELS = {
 function updateTypesBar() {
   const bar = document.getElementById('types-bar-text');
   if (!state.types.length) {
-    bar.innerHTML = 'Sélectionnez un type de vacances';
+    bar.innerHTML = 'Sélectionnez un ou plusieurs types de vacances';
     bar.style.color = 'var(--text-light)';
   } else {
     bar.innerHTML = state.types.map(t => `<span class="type-pill">${TYPE_LABELS[t] || t}</span>`).join(' ');
@@ -2619,9 +2586,7 @@ function updateTypesBar() {
   }
 }
 
-// ═══════════════════════════════════════════════
 // TRANSPORT SELECTION
-// ═══════════════════════════════════════════════
 function toggleTransport(transport, btn) {
   const idx = state.transports.indexOf(transport);
   if (idx >= 0) {
@@ -2641,9 +2606,7 @@ function renderTransportButtons() {
   });
 }
 
-// ═══════════════════════════════════════════════
 // DOCUMENTS LIST
-// ═══════════════════════════════════════════════
 function updateDocumentsList() {
   const documentsList = document.getElementById('documents-list');
   let documents = [];
@@ -2676,9 +2639,7 @@ function updateDocumentsList() {
   }
 }
 
-// ═══════════════════════════════════════════════
 // MAP FUNCTIONS
-// ═══════════════════════════════════════════════
 function initMap() {
   if (map) return;
   
@@ -2786,9 +2747,7 @@ function reverseGeocode(lat, lng) {
     });
 }
 
-// ═══════════════════════════════════════════════
 // CALENDAR FUNCTIONS
-// ═══════════════════════════════════════════════
 function initCalendar() {
   const calendarEl = document.getElementById('calendar-container');
   
@@ -2860,9 +2819,7 @@ function renderFullCalendar() {
   }
 }
 
-// ═══════════════════════════════════════════════
 // REMINDERS FUNCTIONS
-// ═══════════════════════════════════════════════
 function addReminder() {
   if (currentUser && currentUser.role === 'viewer') return;
   
@@ -2998,19 +2955,15 @@ function renderFullReminders() {
   `).join('');
 }
 
-// ═══════════════════════════════════════════════
 // ITEM VISIBILITY
-// ═══════════════════════════════════════════════
 function itemVisible(item) {
-  if (!state.types.length && !state.transports.length) return true;
-  const typeMatch = state.types.length === 0 ||
-    state.types.some(t => item.types.includes(t) || item.types.includes('tous'));
-  return typeMatch;
+  if (!state.types.length) return true;
+  // Visible si tagué 'tous' ou si un de ses types correspond à un type sélectionné
+  return item.types.includes('tous') ||
+    state.types.some(t => item.types.includes(t));
 }
 
-// ═══════════════════════════════════════════════
 // RENDER PREPARATION PAGE
-// ═══════════════════════════════════════════════
 function renderAll() {
   const grid = document.getElementById('cat-grid');
   grid.innerHTML = '';
@@ -3069,9 +3022,7 @@ function renderItemHTML(item) {
     </div>`;
 }
 
-// ═══════════════════════════════════════════════
 // INTERACTIONS
-// ═══════════════════════════════════════════════
 function toggleCat(catId) {
   state.collapsed[catId] = !state.collapsed[catId];
   const body = document.getElementById('body-' + catId);
@@ -3202,9 +3153,7 @@ function resetAll() {
   showToast('🔄 Réinitialisé');
 }
 
-// ═══════════════════════════════════════════════
 // MA LISTE PAGE
-// ═══════════════════════════════════════════════
 function renderMyList() {
   const wrap = document.getElementById('mylist-content');
   let hasAny = false;
@@ -3254,9 +3203,7 @@ function renderMyList() {
   wrap.innerHTML = html;
 }
 
-// ═══════════════════════════════════════════════
 // ADMIN PAGE
-// ═══════════════════════════════════════════════
 async function renderAdmin() {
   if (!currentUser || currentUser.role !== 'admin') {
     document.getElementById('admin-denied').style.display = 'block';
@@ -3354,9 +3301,7 @@ async function changeMyPassword() {
   showToast('✅ Mot de passe modifié');
 }
 
-// ═══════════════════════════════════════════════
 // TOAST
-// ═══════════════════════════════════════════════
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -3364,9 +3309,7 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2300);
 }
 
-// ═══════════════════════════════════════════════
 // AUTO BOOT
-// ═══════════════════════════════════════════════
 (function () {
   const s = sessionStorage.getItem(SESSION_KEY);
   if (s) {
