@@ -1507,11 +1507,11 @@ body {
 <!-- MOBILE NAV -->
 <div class="mobile-nav" id="mobile-nav">
   <div class="mobile-nav-inner">
-    <button class="mobile-nav-btn active" onclick="showMobilePage('liste-prep')" id="mobile-btn-prep">
+    <button class="mobile-nav-btn active" onclick="showMobilePage('liste-prep')" id="mobile-btn-liste-prep">
       <span class="icon">📋</span>
       <span>Préparation</span>
     </button>
-    <button class="mobile-nav-btn" onclick="showMobilePage('ma-liste')" id="mobile-btn-liste">
+    <button class="mobile-nav-btn" onclick="showMobilePage('ma-liste')" id="mobile-btn-ma-liste">
       <span class="icon">🎒</span>
       <span>Ma Liste</span>
     </button>
@@ -2380,8 +2380,10 @@ function showMobilePage(pageId) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.mobile-nav-btn').forEach(btn => btn.classList.remove('active'));
   
-  document.getElementById('page-' + pageId).classList.add('active');
-  document.getElementById('mobile-btn-' + pageId).classList.add('active');
+  const page = document.getElementById('page-' + pageId);
+  if (page) page.classList.add('active');
+  const btn = document.getElementById('mobile-btn-' + pageId);
+  if (btn) btn.classList.add('active');
   
   window.scrollTo({ top: 0, behavior: 'smooth' });
   
@@ -2399,7 +2401,8 @@ function showMobilePage(pageId) {
 function showPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('page-' + id).classList.add('active');
+  const page = document.getElementById('page-' + id);
+  if (page) page.classList.add('active');
 
   document.querySelectorAll('.nav-tab').forEach(t => {
     if (t.getAttribute('onclick') && t.getAttribute('onclick').includes(id)) {
@@ -2408,7 +2411,8 @@ function showPage(id) {
   });
 
   document.querySelectorAll('.mobile-nav-btn').forEach(btn => btn.classList.remove('active'));
-  document.getElementById('mobile-btn-' + id).classList.add('active');
+  const mobileBtn = document.getElementById('mobile-btn-' + id);
+  if (mobileBtn) mobileBtn.classList.add('active');
 
   if (id === 'ma-liste') renderMyList();
   if (id === 'admin') renderAdmin();
