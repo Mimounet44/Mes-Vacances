@@ -1737,22 +1737,27 @@ body {
       </div>
 
       <div class="admin-card">
-        <h3>☁️ Synchronisation Firebase</h3>
-        <p style="color:var(--text-light); margin-bottom:12px;">Activez la synchronisation pour partager vos listes.</p>
+        <h3>☁️ Synchronisation temps réel</h3>
+        <p style="color:var(--text-light); margin-bottom:12px;">
+          Toutes vos modifications sont synchronisées instantanément entre tous les appareils (Netlify, GitHub Pages, téléphone…).
+        </p>
         <div class="admin-form">
           <div class="form-field">
             <label>Statut</label>
             <select id="sync-status" onchange="toggleFirebaseSync()">
-              <option value="disabled">❌ Désactivé</option>
-              <option value="enabled">✅ Activé</option>
+              <option value="disabled">❌ Désactivé (local uniquement)</option>
+              <option value="enabled">✅ Temps réel activé</option>
             </select>
           </div>
           <div class="form-field">
             <label>Dernière synchronisation</label>
             <input type="text" id="last-sync" readonly style="background:var(--sand);">
           </div>
-          <button class="btn-admin" onclick="forceSync()" style="grid-column: span 2; margin-top:8px;">🔄 Synchroniser</button>
+          <button class="btn-admin" onclick="forceSync()" style="grid-column: span 2; margin-top:8px;">⬆️ Pousser mes données maintenant</button>
         </div>
+        <p style="font-size:.78rem; color:var(--text-light); margin-top:10px;">
+          💡 La sync temps réel utilise Firebase Firestore. Dès qu'un appareil modifie un article, tous les autres sont mis à jour automatiquement.
+        </p>
       </div>
 
       <div class="admin-card">
@@ -2227,7 +2232,9 @@ const DEFAULT_USERS = [
 const USERS_KEY = 'vac_users_v3';
 const STATE_KEY = 'vac_state_v8'; // v8 : nouvelles catégories complètes
 const SESSION_KEY = 'vac_session';
-let useFirebase = false;
+// Firebase activé par défaut si non explicitement désactivé
+let useFirebase = localStorage.getItem('vac_firebase_enabled') !== 'false';
+let realtimeUnsubscribe = null; // pour arrêter le listener onSnapshot
 
 // QTY MODAL
 let qtyModalItemId = null, qtyModalCurrent = 1;
@@ -2373,6 +2380,11 @@ async function bootApp(u) {
   }
 
   updateSyncStatus();
+
+  // Démarrer l'écoute temps réel Firebase si activée
+  if (useFirebase) {
+    startRealtimeSync();
+  }
 }
 
 // MOBILE NAVIGATION
@@ -2494,25 +2506,87 @@ async function loadState() {
   }
 }
 
+// SYNC TEMPS RÉEL — écoute les changements Firebase depuis n'importe quel appareil
+function startRealtimeSync() {
+  if (realtimeUnsubscribe) {
+    realtimeUnsubscribe(); // arrêter l'ancien listener si existant
+    realtimeUnsubscribe = null;
+  }
+  if (!useFirebase || !currentUser || !db) return;
+
+  const docRef = db.collection('users').doc(currentUser.login).collection('states').doc('current');
+
+  // Flag pour ignorer le premier snapshot (chargement initial déjà fait)
+  let isFirstSnapshot = true;
+
+  realtimeUnsubscribe = docRef.onSnapshot((doc) => {
+    if (isFirstSnapshot) { isFirstSnapshot = false; return; }
+    if (!doc.exists) return;
+
+    const remote = doc.data().state;
+    if (!remote) return;
+
+    // Appliquer l'état distant
+    state.types       = remote.types       || [];
+    state.transports  = remote.transports  || [];
+    state.checked     = remote.checked     || {};
+    state.quantities  = remote.quantities  || {};
+    state.collapsed   = remote.collapsed   || {};
+    state.dest        = remote.dest        || {};
+    state.notes       = remote.notes       || '';
+    state.reminders   = remote.reminders   || [];
+    state.map         = remote.map         || { lat: null, lng: null, zoom: 13 };
+    if (remote.categories && remote.categories.length) {
+      state.categories = remote.categories;
+    }
+
+    // Mettre à jour localStorage local
+    localStorage.setItem(STATE_KEY, JSON.stringify(state));
+
+    // Rafraîchir l'interface
+    renderAll();
+    renderTypeButtons();
+    updateTypesBar();
+    updateProgress();
+    updateDocumentsList();
+    if (document.getElementById('dest-name'))
+      document.getElementById('dest-name').value = state.dest.name || '';
+    if (document.getElementById('dest-dates'))
+      document.getElementById('dest-dates').value = state.dest.dates || '';
+    if (document.getElementById('dest-people'))
+      document.getElementById('dest-people').value = state.dest.people || '';
+    if (document.getElementById('notes-area'))
+      document.getElementById('notes-area').value = state.notes || '';
+
+    const syncTime = new Date().toLocaleTimeString();
+    if (document.getElementById('last-sync'))
+      document.getElementById('last-sync').value = '🔄 Sync ' + syncTime;
+    showToast('🔄 Données mises à jour depuis un autre appareil');
+  }, (error) => {
+    console.error('Erreur listener temps réel :', error);
+  });
+}
+
 // SYNC WITH FIREBASE
 function toggleFirebaseSync() {
   const select = document.getElementById('sync-status');
   useFirebase = select.value === 'enabled';
-  
+
+  // Persister le choix dans localStorage
+  localStorage.setItem('vac_firebase_enabled', useFirebase ? 'true' : 'false');
+
   if (useFirebase) {
     document.getElementById('sync-status').value = 'enabled';
-    document.getElementById('last-sync').value = new Date().toLocaleString();
-    showToast('✅ Synchronisation Firebase activée');
-    
+    showToast('✅ Synchronisation temps réel activée');
     const users = JSON.parse(localStorage.getItem(USERS_KEY) || JSON.stringify(DEFAULT_USERS));
     saveUsers(users);
-    saveState();
+    saveState().then(() => startRealtimeSync());
   } else {
-    useFirebase = false;
+    if (realtimeUnsubscribe) { realtimeUnsubscribe(); realtimeUnsubscribe = null; }
     document.getElementById('sync-status').value = 'disabled';
-    showToast('❌ Synchronisation Firebase désactivée');
+    showToast('❌ Synchronisation désactivée — mode local uniquement');
   }
-  
+
   updateSyncStatus();
 }
 
@@ -2536,12 +2610,14 @@ async function forceSync() {
 
 function updateSyncStatus() {
   const select = document.getElementById('sync-status');
+  const lastSync = document.getElementById('last-sync');
+  if (!select) return;
   if (useFirebase) {
     select.value = 'enabled';
-    document.getElementById('last-sync').value = new Date().toLocaleString();
+    if (lastSync) lastSync.value = '🟢 Connecté – ' + new Date().toLocaleTimeString();
   } else {
     select.value = 'disabled';
-    document.getElementById('last-sync').value = 'Mode local (localStorage)';
+    if (lastSync) lastSync.value = '🔴 Mode local (non synchronisé)';
   }
 }
 
