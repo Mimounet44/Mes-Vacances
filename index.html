@@ -3,10 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>🌴 MesVacances - Ultra-Complète</title>
+<title>🌴 MesVacances</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.11.3/main.min.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.11.3/main.min.css"/>
+<!-- Firebase v9 compat -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -19,1575 +20,389 @@
   --mountain:#6b5b7b;--sun:#f0b429;--text:#2a2118;--text-light:#7a6a58;
   --white:#fffdf9;--shadow:0 4px 24px rgba(44,30,15,.10);
   --shadow-lg:0 12px 48px rgba(44,30,15,.16);--radius:18px;--radius-sm:10px;
-  --qty-color: #d35f5f;
-}
-
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  font-family: 'DM Sans', sans-serif;
-  background: var(--sand);
-  color: var(--text);
-  min-height: 100vh;
-  background-image: 
-    radial-gradient(ellipse at 80% 0%, rgba(44,110,138,.08) 0%, transparent 60%),
-    radial-gradient(ellipse at 0% 100%, rgba(232,115,90,.07) 0%, transparent 50%);
-}
-
-/* MOBILE NAV */
-.mobile-nav {
-  display: none;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: var(--white);
-  border-top: 2px solid var(--sand-dark);
-  box-shadow: 0 -2px 12px rgba(44,30,15,.08);
-  z-index: 1000;
-  padding: 8px 0;
-}
-
-.mobile-nav.active {
-  display: flex;
-}
-
-.mobile-nav-inner {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.mobile-nav-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  padding: 8px 12px;
-  background: none;
-  border: none;
-  color: var(--text-light);
-  font-family: inherit;
-  font-size: .7rem;
-  cursor: pointer;
-  transition: all .2s;
-}
-
-.mobile-nav-btn:hover {
-  color: var(--ocean);
-}
-
-.mobile-nav-btn.active {
-  color: var(--ocean-dark);
-  font-weight: 600;
-}
-
-.mobile-nav-btn .icon {
-  font-size: 1.4rem;
-}
-
-/* LOGIN */
-#login-screen {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  padding: 24px;
-}
-
-.login-card {
-  background: var(--white);
-  border-radius: 28px;
-  padding: 40px 24px;
-  width: 100%;
-  max-width: 420px;
-  box-shadow: var(--shadow-lg);
-  text-align: center;
-  animation: fadeUp .6s ease both;
-}
-
-.login-icon {
-  font-size: 56px;
-  margin-bottom: 16px;
-  display: block;
-}
-
-.login-card h1 {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.8rem;
-  color: var(--ocean-dark);
-  margin-bottom: 6px;
-}
-
-.login-card p {
-  color: var(--text-light);
-  font-size: .9rem;
-  margin-bottom: 24px;
-}
-
-.login-card input {
-  width: 100%;
-  padding: 14px 18px;
-  border: 2px solid var(--sand-dark);
-  border-radius: var(--radius-sm);
-  font-family: inherit;
-  font-size: 1rem;
-  margin-bottom: 14px;
-  background: var(--sand);
-  color: var(--text);
-  transition: border-color .2s;
-  outline: none;
-}
-
-.login-card input:focus {
-  border-color: var(--ocean-light);
-  background: var(--white);
-}
-
-.btn-primary {
-  width: 100%;
-  padding: 15px;
-  background: linear-gradient(135deg, var(--ocean), var(--ocean-dark));
-  color: #fff;
-  border: none;
-  border-radius: var(--radius-sm);
-  font-family: inherit;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform .15s, box-shadow .15s;
-}
-
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(44,110,138,.35);
-}
-
-.login-error {
-  color: var(--coral);
-  font-size: .88rem;
-  margin-top: 10px;
-  display: none;
-}
-
-/* APP SHELL */
-#app {
-  display: none;
-  min-height: 100vh;
-  padding-bottom: 70px;
-}
-
-.app-nav {
-  background: var(--white);
-  border-bottom: 2px solid var(--sand-dark);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  box-shadow: 0 2px 12px rgba(44,30,15,.08);
-}
-
-.nav-inner {
-  max-width: 1060px;
-  margin: 0 auto;
-  padding: 0 16px;
-  display: flex;
-  align-items: center;
-  gap: 0;
-}
-
-.nav-logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 14px 0;
-  margin-right: auto;
-}
-
-.nav-logo-icon {
-  font-size: 26px;
-}
-
-.nav-logo h1 {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.3rem;
-  color: var(--ocean-dark);
-  line-height: 1;
-}
-
-.nav-logo span {
-  font-size: .72rem;
-  color: var(--text-light);
-  font-weight: 300;
-}
-
-.nav-tabs {
-  display: none;
-}
-
-.nav-right {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-left: 12px;
-}
-
-/* ── Sélecteur de voyages ── */
-.trip-selector-wrap {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  background: var(--sand);
-  border-radius: 50px;
-  padding: 4px 6px 4px 10px;
-  border: 2px solid var(--sand-dark);
-}
-
-#trip-selector {
-  border: none;
-  background: transparent;
-  font-family: inherit;
-  font-size: .82rem;
-  font-weight: 600;
-  color: var(--ocean-dark);
-  cursor: pointer;
-  max-width: 180px;
-  outline: none;
-}
-
-.btn-trip-add, .btn-trip-more {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 1rem;
-  color: var(--ocean);
-  padding: 2px 4px;
-  border-radius: 50%;
-  line-height: 1;
-  transition: background .15s;
-}
-
-.btn-trip-add:hover { background: var(--ocean-light); color: #fff; }
-.btn-trip-more:hover { background: var(--sand-dark); }
-
-/* Menu contextuel voyage */
-.trip-menu {
-  position: absolute;
-  top: 60px;
-  right: 160px;
-  background: var(--white);
-  border-radius: var(--radius-sm);
-  box-shadow: var(--shadow-lg);
-  border: 1px solid var(--sand-dark);
-  z-index: 500;
-  min-width: 180px;
-  overflow: hidden;
-}
-.trip-menu button {
-  display: block;
-  width: 100%;
-  padding: 10px 16px;
-  background: none;
-  border: none;
-  font-family: inherit;
-  font-size: .85rem;
-  text-align: left;
-  cursor: pointer;
-  transition: background .1s;
-}
-.trip-menu button:hover { background: var(--sand); }
-.trip-menu button.danger { color: var(--coral); }
-
-.user-badge {
-  background: var(--sand);
-  border-radius: 50px;
-  padding: 6px 14px;
-  font-size: .8rem;
-  font-weight: 600;
-  color: var(--text-light);
-  max-width: 120px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.user-badge.admin {
-  background: #ece8f4;
-  color: var(--mountain);
-}
-
-.btn-logout {
-  background: none;
-  border: 2px solid var(--sand-dark);
-  border-radius: 50px;
-  padding: 6px 14px;
-  font-family: inherit;
-  font-size: .82rem;
-  color: var(--text-light);
-  cursor: pointer;
-  transition: all .2s;
-}
-
-.btn-logout:hover {
-  border-color: var(--coral);
-  color: var(--coral);
-}
-
-.page {
-  display: none;
-  max-width: 1060px;
-  margin: 0 auto;
-  padding: 16px 12px 80px;
-}
-
-.page.active {
-  display: block;
-  animation: fadeUp .35s ease both;
-}
-
-/* SECTION TITLES */
-.section-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.1rem;
-  color: var(--ocean-dark);
-  margin-bottom: 14px;
-}
-
-/* TYPE SELECTOR */
-.type-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.type-btn {
-  background: var(--white);
-  border: 2.5px solid var(--sand-dark);
-  border-radius: 16px;
-  padding: 12px 6px;
-  text-align: center;
-  cursor: pointer;
-  transition: all .2s;
-  font-family: inherit;
-  position: relative;
-}
-
-.type-btn .emoji {
-  font-size: 24px;
-  display: block;
-  margin-bottom: 4px;
-}
-
-.type-btn .label {
-  font-size: .75rem;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.type-btn .sub {
-  font-size: .65rem;
-  color: var(--text-light);
-  margin-top: 2px;
-}
-
-.type-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow);
-}
-
-.type-btn.active {
-  border-color: var(--ocean-light);
-  background: #edf6fa;
-}
-
-.type-btn.active[data-type="camping"] { border-color: var(--green); background: #edf6f0; }
-.type-btn.active[data-type="plage"] { border-color: var(--coral); background: #fdf1ee; }
-.type-btn.active[data-type="montagne"] { border-color: var(--mountain); background: #f0ecf5; }
-.type-btn.active[data-type="campagne"] { border-color: #8a7a3a; background: #f7f5e8; }
-.type-btn.active[data-type="sejour"] { border-color: var(--sun); background: #fdf8e8; }
-.type-btn.active[data-type="etranger"] { border-color: var(--sun); background: #fff8e8; }
-.type-btn.active[data-type="croi"] { border-color: #8a7a3a; background: #f7f5e8; }
-.type-btn.active[data-type="roadtrip"] { border-color: var(--ocean); background: #edf6fa; }
-
-.type-check {
-  position: absolute;
-  top: 4px;
-  right: 6px;
-  font-size: 12px;
-  display: none;
-}
-
-.type-btn.active .type-check {
-  display: block;
-}
-
-.types-selected-bar {
-  background: var(--white);
-  border-radius: 12px;
-  padding: 10px 12px;
-  margin-bottom: 16px;
-  box-shadow: var(--shadow);
-  font-size: .8rem;
-  color: var(--text-light);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.type-pill {
-  background: var(--sand-dark);
-  border-radius: 50px;
-  padding: 2px 10px;
-  font-size: .7rem;
-  font-weight: 600;
-  color: var(--text);
-}
-
-/* TRANSPORT SELECTION */
-.transport-section {
-  background: var(--white);
-  border-radius: var(--radius);
-  padding: 16px 16px;
-  margin-bottom: 16px;
-  box-shadow: var(--shadow);
-}
-
-.transport-section h3 {
-  font-size: .9rem;
-  font-weight: 600;
-  margin-bottom: 10px;
-  color: var(--ocean-dark);
-}
-
-.transport-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-  gap: 8px;
-}
-
-.transport-btn {
-  background: var(--white);
-  border: 2px solid var(--sand-dark);
-  border-radius: 10px;
-  padding: 8px 4px;
-  text-align: center;
-  cursor: pointer;
-  transition: all .2s;
-  font-family: inherit;
-  position: relative;
-}
-
-.transport-btn .emoji {
-  font-size: 20px;
-  display: block;
-  margin-bottom: 2px;
-}
-
-.transport-btn .label {
-  font-size: .7rem;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.transport-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow);
-}
-
-.transport-btn.active {
-  border-color: var(--ocean-light);
-  background: #edf6fa;
-}
-
-.transport-check {
-  position: absolute;
-  top: 2px;
-  right: 4px;
-  font-size: 10px;
-  display: none;
-}
-
-.transport-btn.active .transport-check {
-  display: block;
-}
-
-/* DESTINATION */
-.dest-section {
-  background: var(--white);
-  border-radius: var(--radius);
-  padding: 16px 16px;
-  margin-bottom: 16px;
-  box-shadow: var(--shadow);
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  align-items: flex-end;
-}
-
-.dest-field {
-  flex: 1;
-  min-width: 120px;
-}
-
-.dest-field label {
-  font-size: .75rem;
-  font-weight: 600;
-  color: var(--text-light);
-  display: block;
-  margin-bottom: 4px;
-}
-
-.dest-field input {
-  width: 100%;
-  border: 2px solid var(--sand-dark);
-  border-radius: 8px;
-  padding: 8px 10px;
-  font-family: inherit;
-  font-size: .85rem;
-  background: var(--sand);
-  color: var(--text);
-  outline: none;
-  transition: border-color .2s;
-}
-
-.dest-field input:focus {
-  border-color: var(--ocean-light);
-  background: var(--white);
-}
-
-/* MAP SECTION */
-.map-section {
-  background: var(--white);
-  border-radius: var(--radius);
-  padding: 16px 16px;
-  margin-bottom: 16px;
-  box-shadow: var(--shadow);
-}
-
-.map-section h3 {
-  font-size: .9rem;
-  font-weight: 600;
-  margin-bottom: 10px;
-  color: var(--ocean-dark);
-}
-
-#map-container {
-  height: 250px;
-  border-radius: 10px;
-  overflow: hidden;
-  background: var(--sand);
-  margin-bottom: 10px;
-}
-
-.map-actions {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.map-actions input {
-  flex: 1;
-  min-width: 150px;
-  padding: 8px 10px;
-  border: 2px solid var(--sand-dark);
-  border-radius: 8px;
-  font-family: inherit;
-  font-size: .8rem;
-  background: var(--sand);
-  outline: none;
-}
-
-/* CALENDAR SECTION */
-.calendar-section {
-  background: var(--white);
-  border-radius: var(--radius);
-  padding: 16px 16px;
-  margin-bottom: 16px;
-  box-shadow: var(--shadow);
-}
-
-.calendar-section h3 {
-  font-size: .9rem;
-  font-weight: 600;
-  margin-bottom: 10px;
-  color: var(--ocean-dark);
-}
-
-#calendar-container {
-  margin-bottom: 10px;
-}
-
-/* REMINDERS SECTION */
-.reminders-section {
-  background: var(--white);
-  border-radius: var(--radius);
-  padding: 16px 16px;
-  margin-bottom: 16px;
-  box-shadow: var(--shadow);
-}
-
-.reminders-section h3 {
-  font-size: .9rem;
-  font-weight: 600;
-  margin-bottom: 10px;
-  color: var(--ocean-dark);
-}
-
-.reminder-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.reminder-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: var(--sand);
-  padding: 10px;
-  border-radius: 8px;
-}
-
-.reminder-item input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  accent-color: var(--ocean);
-}
-
-.reminder-item span {
-  flex: 1;
-  font-size: .85rem;
-}
-
-.reminder-item .reminder-date {
-  font-size: .75rem;
-  color: var(--text-light);
-}
-
-.reminder-item .reminder-delete {
-  background: none;
-  border: none;
-  color: var(--coral);
-  cursor: pointer;
-  font-size: 16px;
-  opacity: 0;
-  transition: opacity .2s;
-  padding: 2px;
-}
-
-.reminder-item:hover .reminder-delete {
-  opacity: 1;
-}
-
-.add-reminder {
-  display: flex;
-  gap: 8px;
-  margin-top: 10px;
-  flex-wrap: wrap;
-}
-
-.add-reminder input[type="text"] {
-  flex: 1;
-  min-width: 150px;
-  padding: 8px 10px;
-  border: 2px solid var(--sand-dark);
-  border-radius: 8px;
-  font-family: inherit;
-  font-size: .8rem;
-  background: var(--sand);
-  outline: none;
-}
-
-.add-reminder input[type="date"] {
-  padding: 8px 10px;
-  border: 2px solid var(--sand-dark);
-  border-radius: 8px;
-  font-family: inherit;
-  font-size: .8rem;
-  background: var(--sand);
-  outline: none;
-}
-
-.add-reminder button {
-  padding: 8px 12px;
-  background: var(--ocean);
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: .8rem;
-}
-
-/* DOCUMENTS SECTION */
-.documents-section {
-  background: var(--white);
-  border-radius: var(--radius);
-  padding: 16px 16px;
-  margin-bottom: 16px;
-  box-shadow: var(--shadow);
-}
-
-.documents-section h3 {
-  font-size: .9rem;
-  font-weight: 600;
-  margin-bottom: 10px;
-  color: var(--ocean-dark);
-}
-
-.documents-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 8px;
-}
-
-.document-item {
-  background: var(--sand);
-  border-radius: 8px;
-  padding: 8px 10px;
-  font-size: .75rem;
-  color: var(--text);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.document-item .icon {
-  font-size: 14px;
-}
-
-/* PROGRESS */
-.progress-section {
-  background: var(--white);
-  border-radius: var(--radius);
-  padding: 16px 16px;
-  margin-bottom: 16px;
-  box-shadow: var(--shadow);
-}
-
-.progress-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-.progress-header h3 {
-  font-size: .9rem;
-  font-weight: 600;
-}
-
-.progress-count {
-  font-size: .8rem;
-  color: var(--text-light);
-}
-
-.progress-bar-bg {
-  height: 8px;
-  background: var(--sand);
-  border-radius: 10px;
-  overflow: hidden;
-}
-
-.progress-bar-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--ocean-light), var(--green-light));
-  border-radius: 10px;
-  transition: width .5s cubic-bezier(.4, 0, .2, 1);
-}
-
-/* ACTION BAR */
-.action-bar {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 16px;
-  flex-wrap: wrap;
-}
-
-.btn-sm {
-  padding: 8px 12px;
-  border-radius: 50px;
-  border: 2px solid var(--sand-dark);
-  background: var(--white);
-  font-family: inherit;
-  font-size: .75rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all .18s;
-  color: var(--text);
-}
-
-.btn-sm:hover {
-  border-color: var(--ocean-light);
-  color: var(--ocean);
-}
-
-.btn-sm.danger:hover {
-  border-color: var(--coral);
-  color: var(--coral);
-}
-
-.btn-sm.success {
-  background: var(--green);
-  color: #fff;
-  border-color: var(--green);
-}
-
-.btn-sm.success:hover {
-  background: var(--green-light);
-  border-color: var(--green-light);
-}
-
-.btn-sm.accent {
-  background: var(--ocean);
-  color: #fff;
-  border-color: var(--ocean);
-}
-
-.btn-sm.accent:hover {
-  background: var(--ocean-dark);
-  border-color: var(--ocean-dark);
-}
-
-/* CATEGORIES */
-.categories-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-}
-
-.category-card {
-  background: var(--white);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  overflow: hidden;
-  animation: fadeUp .4s ease both;
-}
-
-.cat-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 14px;
-  cursor: pointer;
-  user-select: none;
-  border-bottom: 2px solid var(--sand);
-  transition: background .15s;
-}
-
-.cat-header:hover {
-  background: var(--sand);
-}
-
-.cat-left {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.cat-emoji {
-  font-size: 18px;
-}
-
-.cat-name {
-  font-weight: 700;
-  font-size: .85rem;
-}
-
-.cat-count {
-  font-size: .7rem;
-  background: var(--sand);
-  border-radius: 50px;
-  padding: 2px 8px;
-  color: var(--text-light);
-  font-weight: 500;
-}
-
-.cat-count.done {
-  background: #d4f0e0;
-  color: var(--green);
-}
-
-.cat-toggle {
-  font-size: 14px;
-  color: var(--text-light);
-  transition: transform .2s;
-}
-
-.cat-toggle.open {
-  transform: rotate(180deg);
-}
-
-.cat-body {
-  padding: 8px 12px;
-}
-
-.cat-body.collapsed {
-  display: none;
-}
-
-/* ITEMS */
-.item-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 4px;
-  border-radius: 8px;
-  transition: background .15s;
-  animation: fadeIn .2s ease both;
-}
-
-.item-row:hover {
-  background: var(--sand);
-}
-
-.item-row input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
-  accent-color: var(--ocean);
-  cursor: pointer;
-  flex-shrink: 0;
-}
-
-.item-label {
-  flex: 1;
-  font-size: .8rem;
-  cursor: pointer;
-  transition: color .15s;
-}
-
-.item-row.checked .item-label {
-  text-decoration: line-through;
-  color: var(--text-light);
-}
-
-.item-qty-badge {
-  font-size: .7rem;
-  background: var(--qty-color);
-  color: #fff;
-  padding: 2px 6px;
-  border-radius: 20px;
-  flex-shrink: 0;
-  font-weight: 600;
-  cursor: pointer;
-  min-width: 22px;
-  text-align: center;
-}
-
-.item-qty-badge:hover {
-  background: var(--ocean-dark);
-}
-
-.item-delete {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--text-light);
-  font-size: 12px;
-  opacity: 0;
-  transition: opacity .15s, color .15s;
-  padding: 2px 4px;
-  flex-shrink: 0;
-}
-
-.item-row:hover .item-delete {
-  opacity: 1;
-}
-
-.item-delete:hover {
-  color: var(--coral);
-}
-
-.readonly-mode .item-delete,
-.readonly-mode .add-btn,
-.readonly-mode .add-input {
-  display: none !important;
-}
-
-.readonly-mode .add-row {
-  display: none !important;
-}
-
-/* ADD ROW */
-.add-row {
-  display: flex;
-  gap: 6px;
-  margin-top: 8px;
-  padding-top: 8px;
-  border-top: 1.5px dashed var(--sand-dark);
-}
-
-.add-input {
-  flex: 1;
-  border: none;
-  background: var(--sand);
-  border-radius: 7px;
-  padding: 6px 10px;
-  font-family: inherit;
-  font-size: .75rem;
-  color: var(--text);
-  outline: none;
-  transition: background .15s;
-}
-
-.add-input:focus {
-  background: var(--sand-dark);
-}
-
-.add-btn {
-  background: var(--ocean);
-  color: #fff;
-  border: none;
-  border-radius: 7px;
-  padding: 6px 10px;
-  font-size: .9rem;
-  cursor: pointer;
-  transition: background .15s;
-}
-
-.add-btn:hover {
-  background: var(--ocean-dark);
-}
-
-/* NOTES */
-.notes-section {
-  background: var(--white);
-  border-radius: var(--radius);
-  padding: 16px 16px;
-  margin-top: 16px;
-  box-shadow: var(--shadow);
-}
-
-.notes-section h3 {
-  font-family: 'Playfair Display', serif;
-  font-size: .9rem;
-  margin-bottom: 8px;
-  color: var(--ocean-dark);
-}
-
-.notes-section textarea {
-  width: 100%;
-  min-height: 60px;
-  border: 2px solid var(--sand-dark);
-  border-radius: var(--radius-sm);
-  padding: 10px;
-  font-family: inherit;
-  font-size: .8rem;
-  resize: vertical;
-  background: var(--sand);
-  color: var(--text);
-  outline: none;
-  transition: border-color .2s;
-}
-
-.notes-section textarea:focus {
-  border-color: var(--ocean-light);
-}
-
-/* MA LISTE PAGE */
-.mylist-header {
-  background: var(--white);
-  border-radius: var(--radius);
-  padding: 16px 16px;
-  margin-bottom: 16px;
-  box-shadow: var(--shadow);
-}
-
-.mylist-header h2 {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.2rem;
-  color: var(--ocean-dark);
-  margin-bottom: 6px;
-}
-
-.mylist-header .meta {
-  font-size: .8rem;
-  color: var(--text-light);
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.mylist-cat {
-  margin-bottom: 12px;
-}
-
-.mylist-cat h3 {
-  font-size: .85rem;
-  font-weight: 700;
-  color: var(--ocean-dark);
-  padding: 6px 0 4px;
-  border-bottom: 2px solid var(--sand-dark);
-  margin-bottom: 6px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.mylist-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 4px 2px;
-  font-size: .8rem;
-}
-
-.mylist-item input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
-  accent-color: var(--ocean);
-  flex-shrink: 0;
-  cursor: pointer;
-}
-
-.mylist-item.checked span {
-  text-decoration: line-through;
-  color: var(--text-light);
-}
-
-.mylist-qty {
-  font-size: .7rem;
-  background: var(--qty-color);
-  color: #fff;
-  padding: 2px 6px;
-  border-radius: 20px;
-  font-weight: 600;
-}
-
-.empty-list {
-  text-align: center;
-  padding: 40px 20px;
-  color: var(--text-light);
-}
-
-.empty-list .big {
-  font-size: 36px;
-  margin-bottom: 10px;
-}
-
-/* ADMIN PAGE */
-.admin-card {
-  background: var(--white);
-  border-radius: var(--radius);
-  padding: 16px 16px;
-  margin-bottom: 16px;
-  box-shadow: var(--shadow);
-}
-
-.admin-card h3 {
-  font-family: 'Playfair Display', serif;
-  font-size: .95rem;
-  color: var(--mountain);
-  margin-bottom: 12px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.admin-access-denied {
-  text-align: center;
-  padding: 60px 20px;
-  color: var(--text-light);
-}
-
-.admin-access-denied .big {
-  font-size: 48px;
-  margin-bottom: 12px;
-}
-
-.user-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: .8rem;
-}
-
-.user-table th {
-  text-align: left;
-  padding: 6px 10px;
-  background: var(--sand);
-  font-weight: 600;
-  font-size: .75rem;
-  color: var(--text-light);
-}
-
-.user-table td {
-  padding: 8px 10px;
-  border-bottom: 1px solid var(--sand);
-}
-
-.user-table tr:last-child td {
-  border-bottom: none;
-}
-
-.user-table tr:hover td {
-  background: var(--sand);
-}
-
-.role-badge {
-  padding: 2px 8px;
-  border-radius: 50px;
-  font-size: .7rem;
-  font-weight: 700;
-}
-
-.role-admin { background: #ece8f4; color: var(--mountain); }
-.role-editor { background: #edf6fa; color: var(--ocean-dark); }
-.role-viewer { background: #f7f5e8; color: #6a5c20; }
-
-.admin-form {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  align-items: end;
-  margin-top: 12px;
-}
-
-.form-field label {
-  font-size: .75rem;
-  font-weight: 600;
-  color: var(--text-light);
-  display: block;
-  margin-bottom: 4px;
-}
-
-.form-field input,
-.form-field select {
-  width: 100%;
-  border: 2px solid var(--sand-dark);
-  border-radius: 8px;
-  padding: 8px 10px;
-  font-family: inherit;
-  font-size: .8rem;
-  background: var(--sand);
-  color: var(--text);
-  outline: none;
-  transition: border-color .2s;
-}
-
-.form-field input:focus,
-.form-field select:focus {
-  border-color: var(--mountain);
-}
-
-.btn-admin {
-  padding: 8px 12px;
-  background: var(--mountain);
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  font-family: inherit;
-  font-size: .8rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background .18s;
-  white-space: nowrap;
-  grid-column: span 2;
-}
-
-.btn-admin:hover { background: #9b85ab; }
-
-.btn-danger-sm {
-  padding: 4px 8px;
-  background: none;
-  border: 1.5px solid var(--coral);
-  color: var(--coral);
-  border-radius: 6px;
-  font-family: inherit;
-  font-size: .7rem;
-  cursor: pointer;
-  transition: all .15s;
-}
-
-.btn-danger-sm:hover {
-  background: var(--coral);
-  color: #fff;
-}
-
-.btn-edit-sm {
-  padding: 4px 8px;
-  background: none;
-  border: 1.5px solid var(--ocean-light);
-  color: var(--ocean);
-  border-radius: 6px;
-  font-family: inherit;
-  font-size: .7rem;
-  cursor: pointer;
-  transition: all .15s;
-  margin-right: 4px;
-}
-
-.btn-edit-sm:hover {
-  background: var(--ocean-light);
-  color: #fff;
-}
-
-.admin-pw-section {
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 2px dashed var(--sand-dark);
-}
-
-.admin-pw-section h4 {
-  font-size: .8rem;
-  font-weight: 700;
-  color: var(--text-light);
-  margin-bottom: 8px;
-}
-
-/* QTY MODAL */
-.modal-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(42, 33, 24, .45);
-  z-index: 500;
-  align-items: center;
-  justify-content: center;
-}
-
-.modal-overlay.open {
-  display: flex;
-}
-
-.modal {
-  background: var(--white);
-  border-radius: 22px;
-  padding: 24px 20px;
-  width: 92%;
-  max-width: 340px;
-  box-shadow: var(--shadow-lg);
-  animation: fadeUp .25s ease both;
-  text-align: center;
-}
-
-.modal h3 {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.1rem;
-  color: var(--ocean-dark);
-  margin-bottom: 6px;
-}
-
-.modal p {
-  color: var(--text-light);
-  font-size: .8rem;
-  margin-bottom: 16px;
-}
-
-.qty-controls {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.qty-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: 2px solid var(--sand-dark);
-  background: var(--sand);
-  font-size: 1.1rem;
-  cursor: pointer;
-  font-weight: 700;
-  transition: all .15s;
-  color: var(--text);
-}
-
-.qty-btn:hover {
-  border-color: var(--ocean);
-  color: var(--ocean);
-}
-
-.qty-val {
-  font-size: 1.6rem;
-  font-weight: 700;
-  color: var(--ocean-dark);
-  min-width: 40px;
-  text-align: center;
-}
-
-.modal-btns {
-  display: flex;
-  gap: 8px;
-}
-
-.modal-btns button {
-  flex: 1;
-  padding: 10px;
-  border-radius: 10px;
-  font-family: inherit;
-  font-size: .85rem;
-  font-weight: 600;
-  cursor: pointer;
-  border: 2px solid transparent;
-  transition: all .18s;
-}
-
-.modal-cancel {
-  background: var(--sand);
-  color: var(--text);
-  border-color: var(--sand-dark);
-}
-
-.modal-cancel:hover {
-  border-color: var(--text-light);
-}
-
-.modal-ok {
-  background: var(--ocean);
-  color: #fff;
-}
-
-.modal-ok:hover {
-  background: var(--ocean-dark);
-}
-
-/* PRINT */
+  --qty-color:#d35f5f;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--text);min-height:100vh;
+  background-image:radial-gradient(ellipse at 80% 0%,rgba(44,110,138,.08) 0%,transparent 60%),
+  radial-gradient(ellipse at 0% 100%,rgba(232,115,90,.07) 0%,transparent 50%)}
+
+/* ── SYNC INDICATOR ── */
+#sync-dot{position:fixed;top:10px;right:10px;width:10px;height:10px;border-radius:50%;
+  background:#ccc;z-index:9999;transition:background .4s;box-shadow:0 0 0 2px rgba(255,255,255,.8)}
+#sync-dot.green{background:#22c55e}
+#sync-dot.orange{background:#f59e0b;animation:pulse 1s infinite}
+#sync-dot.red{background:#ef4444}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* ── MOBILE NAV ── */
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--white);
+  border-top:2px solid var(--sand-dark);box-shadow:0 -2px 12px rgba(44,30,15,.08);z-index:1000;padding:8px 0}
+.mobile-nav.active{display:flex}
+.mobile-nav-inner{display:flex;justify-content:space-around;align-items:center;width:100%;max-width:600px;margin:0 auto}
+.mobile-nav-btn{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 12px;
+  background:none;border:none;color:var(--text-light);font-family:inherit;font-size:.7rem;cursor:pointer;transition:all .2s}
+.mobile-nav-btn:hover{color:var(--ocean)}
+.mobile-nav-btn.active{color:var(--ocean-dark);font-weight:600}
+.mobile-nav-btn .icon{font-size:1.4rem}
+
+/* ── LOGIN ── */
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px}
+.login-card{background:var(--white);border-radius:28px;padding:40px 24px;width:100%;max-width:420px;
+  box-shadow:var(--shadow-lg);text-align:center;animation:fadeUp .6s ease both}
+.login-icon{font-size:56px;margin-bottom:16px;display:block}
+.login-card h1{font-family:'Playfair Display',serif;font-size:1.8rem;color:var(--ocean-dark);margin-bottom:6px}
+.login-card p{color:var(--text-light);font-size:.9rem;margin-bottom:24px}
+.login-card input{width:100%;padding:14px 18px;border:2px solid var(--sand-dark);border-radius:var(--radius-sm);
+  font-family:inherit;font-size:1rem;margin-bottom:14px;background:var(--sand);color:var(--text);
+  transition:border-color .2s;outline:none}
+.login-card input:focus{border-color:var(--ocean-light);background:var(--white)}
+.btn-primary{width:100%;padding:15px;background:linear-gradient(135deg,var(--ocean),var(--ocean-dark));
+  color:#fff;border:none;border-radius:var(--radius-sm);font-family:inherit;font-size:1rem;
+  font-weight:600;cursor:pointer;transition:transform .15s,box-shadow .15s}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(44,110,138,.35)}
+.login-error{color:var(--coral);font-size:.88rem;margin-top:10px;display:none}
+.login-info{color:var(--text-light);font-size:.75rem;margin-top:14px;padding-top:14px;
+  border-top:1px dashed var(--sand-dark);text-align:left}
+.login-info strong{display:block;margin-bottom:4px;color:var(--text)}
+.login-info code{background:var(--sand);padding:1px 5px;border-radius:4px;font-size:.7rem}
+
+/* ── APP SHELL ── */
+#app{display:none;min-height:100vh;padding-bottom:70px}
+.app-nav{background:var(--white);border-bottom:2px solid var(--sand-dark);position:sticky;top:0;z-index:100;
+  box-shadow:0 2px 12px rgba(44,30,15,.08)}
+.nav-inner{max-width:1060px;margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:0}
+.nav-logo{display:flex;align-items:center;gap:10px;padding:14px 0;margin-right:auto}
+.nav-logo-icon{font-size:26px}
+.nav-logo h1{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--ocean-dark);line-height:1}
+.nav-logo span{font-size:.72rem;color:var(--text-light);font-weight:300}
+.nav-tabs{display:none}
+.nav-right{display:flex;align-items:center;gap:8px;margin-left:12px}
+
+/* ── TRIP SELECTOR ── */
+.trip-selector-wrap{display:flex;align-items:center;gap:4px;background:var(--sand);
+  border-radius:50px;padding:4px 6px 4px 10px;border:2px solid var(--sand-dark)}
+#trip-selector{border:none;background:transparent;font-family:inherit;font-size:.82rem;
+  font-weight:600;color:var(--ocean-dark);cursor:pointer;max-width:180px;outline:none}
+.btn-trip-add,.btn-trip-more{background:none;border:none;cursor:pointer;font-size:1rem;
+  color:var(--ocean);padding:2px 4px;border-radius:50%;line-height:1;transition:background .15s}
+.btn-trip-add:hover{background:var(--ocean-light);color:#fff}
+.btn-trip-more:hover{background:var(--sand-dark)}
+.trip-menu{position:absolute;top:60px;right:160px;background:var(--white);border-radius:var(--radius-sm);
+  box-shadow:var(--shadow-lg);border:1px solid var(--sand-dark);z-index:500;min-width:180px;overflow:hidden}
+.trip-menu button{display:block;width:100%;padding:10px 16px;background:none;border:none;
+  font-family:inherit;font-size:.85rem;text-align:left;cursor:pointer;transition:background .1s}
+.trip-menu button:hover{background:var(--sand)}
+.trip-menu button.danger{color:var(--coral)}
+
+.user-badge{background:var(--sand);border-radius:50px;padding:6px 14px;font-size:.8rem;
+  font-weight:600;color:var(--text-light);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.user-badge.admin{background:#ece8f4;color:var(--mountain)}
+.btn-logout{background:none;border:2px solid var(--sand-dark);border-radius:50px;padding:6px 14px;
+  font-family:inherit;font-size:.82rem;color:var(--text-light);cursor:pointer;transition:all .2s}
+.btn-logout:hover{border-color:var(--coral);color:var(--coral)}
+
+/* ── PAGES ── */
+.page{display:none;max-width:1060px;margin:0 auto;padding:16px 12px 80px}
+.page.active{display:block;animation:fadeUp .35s ease both}
+.section-title{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--ocean-dark);margin-bottom:14px}
+
+/* ── TYPE GRID ── */
+.type-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;margin-bottom:20px}
+.type-btn{background:var(--white);border:2.5px solid var(--sand-dark);border-radius:16px;padding:12px 6px;
+  text-align:center;cursor:pointer;transition:all .2s;font-family:inherit;position:relative}
+.type-btn .emoji{font-size:24px;display:block;margin-bottom:4px}
+.type-btn .label{font-size:.75rem;font-weight:600;color:var(--text)}
+.type-btn .sub{font-size:.65rem;color:var(--text-light);margin-top:2px}
+.type-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.type-btn.active{border-color:var(--ocean-light);background:#edf6fa}
+.type-btn.active[data-type="camping"]{border-color:var(--green);background:#edf6f0}
+.type-btn.active[data-type="plage"]{border-color:var(--coral);background:#fdf1ee}
+.type-btn.active[data-type="montagne"]{border-color:var(--mountain);background:#f0ecf5}
+.type-btn.active[data-type="campagne"]{border-color:#8a7a3a;background:#f7f5e8}
+.type-btn.active[data-type="sejour"]{border-color:var(--sun);background:#fdf8e8}
+.type-btn.active[data-type="etranger"]{border-color:var(--sun);background:#fff8e8}
+.type-btn.active[data-type="croi"]{border-color:#8a7a3a;background:#f7f5e8}
+.type-btn.active[data-type="roadtrip"]{border-color:var(--ocean);background:#edf6fa}
+.type-check{position:absolute;top:4px;right:6px;font-size:12px;display:none}
+.type-btn.active .type-check{display:block}
+.types-selected-bar{background:var(--white);border-radius:12px;padding:10px 12px;margin-bottom:16px;
+  box-shadow:var(--shadow);font-size:.8rem;color:var(--text-light);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.type-pill{background:var(--sand-dark);border-radius:50px;padding:2px 10px;font-size:.7rem;font-weight:600;color:var(--text)}
+
+/* ── TRANSPORT ── */
+.transport-section{background:var(--white);border-radius:var(--radius);padding:16px;margin-bottom:16px;box-shadow:var(--shadow)}
+.transport-section h3{font-size:.9rem;font-weight:600;margin-bottom:10px;color:var(--ocean-dark)}
+.transport-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px}
+.transport-btn{background:var(--white);border:2px solid var(--sand-dark);border-radius:10px;padding:8px 4px;
+  text-align:center;cursor:pointer;transition:all .2s;font-family:inherit;position:relative}
+.transport-btn .emoji{font-size:20px;display:block;margin-bottom:2px}
+.transport-btn .label{font-size:.7rem;font-weight:600;color:var(--text)}
+.transport-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.transport-btn.active{border-color:var(--ocean-light);background:#edf6fa}
+.transport-check{position:absolute;top:2px;right:4px;font-size:10px;display:none}
+.transport-btn.active .transport-check{display:block}
+
+/* ── DESTINATION ── */
+.dest-section{background:var(--white);border-radius:var(--radius);padding:16px;margin-bottom:16px;
+  box-shadow:var(--shadow);display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+.dest-field{flex:1;min-width:120px}
+.dest-field label{font-size:.75rem;font-weight:600;color:var(--text-light);display:block;margin-bottom:4px}
+.dest-field input{width:100%;border:2px solid var(--sand-dark);border-radius:8px;padding:8px 10px;
+  font-family:inherit;font-size:.85rem;background:var(--sand);color:var(--text);outline:none;transition:border-color .2s}
+.dest-field input:focus{border-color:var(--ocean-light);background:var(--white)}
+
+/* ── MAP ── */
+.map-section{background:var(--white);border-radius:var(--radius);padding:16px;margin-bottom:16px;box-shadow:var(--shadow)}
+.map-section h3{font-size:.9rem;font-weight:600;margin-bottom:10px;color:var(--ocean-dark)}
+#map-container{height:250px;border-radius:10px;overflow:hidden;background:var(--sand);margin-bottom:10px}
+.map-actions{display:flex;gap:8px;flex-wrap:wrap}
+.map-actions input{flex:1;min-width:150px;padding:8px 10px;border:2px solid var(--sand-dark);
+  border-radius:8px;font-family:inherit;font-size:.8rem;background:var(--sand);outline:none}
+
+/* ── CALENDAR ── */
+.calendar-section{background:var(--white);border-radius:var(--radius);padding:16px;margin-bottom:16px;box-shadow:var(--shadow)}
+.calendar-section h3{font-size:.9rem;font-weight:600;margin-bottom:10px;color:var(--ocean-dark)}
+
+/* ── REMINDERS ── */
+.reminders-section{background:var(--white);border-radius:var(--radius);padding:16px;margin-bottom:16px;box-shadow:var(--shadow)}
+.reminders-section h3{font-size:.9rem;font-weight:600;margin-bottom:10px;color:var(--ocean-dark)}
+.reminder-list{display:flex;flex-direction:column;gap:8px}
+.reminder-item{display:flex;align-items:center;gap:10px;background:var(--sand);padding:10px;border-radius:8px}
+.reminder-item input[type="checkbox"]{width:18px;height:18px;accent-color:var(--ocean)}
+.reminder-item span{flex:1;font-size:.85rem}
+.reminder-item .reminder-date{font-size:.75rem;color:var(--text-light)}
+.reminder-item .reminder-delete{background:none;border:none;color:var(--coral);cursor:pointer;
+  font-size:16px;opacity:0;transition:opacity .2s;padding:2px}
+.reminder-item:hover .reminder-delete{opacity:1}
+.add-reminder{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.add-reminder input[type="text"]{flex:1;min-width:150px;padding:8px 10px;border:2px solid var(--sand-dark);
+  border-radius:8px;font-family:inherit;font-size:.8rem;background:var(--sand);outline:none}
+.add-reminder input[type="date"]{padding:8px 10px;border:2px solid var(--sand-dark);
+  border-radius:8px;font-family:inherit;font-size:.8rem;background:var(--sand);outline:none}
+.add-reminder button{padding:8px 12px;background:var(--ocean);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:.8rem}
+
+/* ── DOCUMENTS ── */
+.documents-section{background:var(--white);border-radius:var(--radius);padding:16px;margin-bottom:16px;box-shadow:var(--shadow)}
+.documents-section h3{font-size:.9rem;font-weight:600;margin-bottom:10px;color:var(--ocean-dark)}
+.documents-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.document-item{background:var(--sand);border-radius:8px;padding:8px 10px;font-size:.75rem;
+  color:var(--text);display:flex;align-items:center;gap:6px}
+
+/* ── PROGRESS ── */
+.progress-section{background:var(--white);border-radius:var(--radius);padding:16px;margin-bottom:16px;box-shadow:var(--shadow)}
+.progress-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.progress-header h3{font-size:.9rem;font-weight:600}
+.progress-count{font-size:.8rem;color:var(--text-light)}
+.progress-bar-bg{height:8px;background:var(--sand);border-radius:10px;overflow:hidden}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--ocean-light),var(--green-light));
+  border-radius:10px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+
+/* ── ACTION BAR ── */
+.action-bar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.btn-sm{padding:8px 12px;border-radius:50px;border:2px solid var(--sand-dark);background:var(--white);
+  font-family:inherit;font-size:.75rem;font-weight:500;cursor:pointer;transition:all .18s;color:var(--text)}
+.btn-sm:hover{border-color:var(--ocean-light);color:var(--ocean)}
+.btn-sm.danger:hover{border-color:var(--coral);color:var(--coral)}
+.btn-sm.success{background:var(--green);color:#fff;border-color:var(--green)}
+.btn-sm.success:hover{background:var(--green-light);border-color:var(--green-light)}
+.btn-sm.accent{background:var(--ocean);color:#fff;border-color:var(--ocean)}
+.btn-sm.accent:hover{background:var(--ocean-dark);border-color:var(--ocean-dark)}
+
+/* ── CATEGORIES ── */
+.categories-grid{display:grid;grid-template-columns:1fr;gap:12px}
+.category-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;animation:fadeUp .4s ease both}
+.cat-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;
+  cursor:pointer;user-select:none;border-bottom:2px solid var(--sand);transition:background .15s}
+.cat-header:hover{background:var(--sand)}
+.cat-left{display:flex;align-items:center;gap:8px}
+.cat-emoji{font-size:18px}
+.cat-name{font-weight:700;font-size:.85rem}
+.cat-count{font-size:.7rem;background:var(--sand);border-radius:50px;padding:2px 8px;color:var(--text-light);font-weight:500}
+.cat-count.done{background:#d4f0e0;color:var(--green)}
+.cat-toggle{font-size:14px;color:var(--text-light);transition:transform .2s}
+.cat-toggle.open{transform:rotate(180deg)}
+.cat-body{padding:8px 12px}
+.cat-body.collapsed{display:none}
+
+/* ── ITEMS ── */
+.item-row{display:flex;align-items:center;gap:8px;padding:6px 4px;border-radius:8px;transition:background .15s;animation:fadeIn .2s ease both}
+.item-row:hover{background:var(--sand)}
+.item-row input[type="checkbox"]{width:16px;height:16px;accent-color:var(--ocean);cursor:pointer;flex-shrink:0}
+.item-label{flex:1;font-size:.8rem;cursor:pointer;transition:color .15s}
+.item-row.checked .item-label{text-decoration:line-through;color:var(--text-light)}
+.item-qty-badge{font-size:.7rem;background:var(--qty-color);color:#fff;padding:2px 6px;border-radius:20px;
+  flex-shrink:0;font-weight:600;cursor:pointer;min-width:22px;text-align:center}
+.item-qty-badge:hover{background:var(--ocean-dark)}
+.item-delete{background:none;border:none;cursor:pointer;color:var(--text-light);font-size:12px;
+  opacity:0;transition:opacity .15s,color .15s;padding:2px 4px;flex-shrink:0}
+.item-row:hover .item-delete{opacity:1}
+.item-delete:hover{color:var(--coral)}
+.readonly-mode .item-delete,.readonly-mode .add-btn,.readonly-mode .add-input,.readonly-mode .add-row{display:none!important}
+.add-row{display:flex;gap:6px;margin-top:8px;padding-top:8px;border-top:1.5px dashed var(--sand-dark)}
+.add-input{flex:1;border:none;background:var(--sand);border-radius:7px;padding:6px 10px;
+  font-family:inherit;font-size:.75rem;color:var(--text);outline:none;transition:background .15s}
+.add-input:focus{background:var(--sand-dark)}
+.add-btn{background:var(--ocean);color:#fff;border:none;border-radius:7px;padding:6px 10px;
+  font-size:.9rem;cursor:pointer;transition:background .15s}
+.add-btn:hover{background:var(--ocean-dark)}
+
+/* ── NOTES ── */
+.notes-section{background:var(--white);border-radius:var(--radius);padding:16px;margin-top:16px;box-shadow:var(--shadow)}
+.notes-section h3{font-family:'Playfair Display',serif;font-size:.9rem;margin-bottom:8px;color:var(--ocean-dark)}
+.notes-section textarea{width:100%;min-height:60px;border:2px solid var(--sand-dark);border-radius:var(--radius-sm);
+  padding:10px;font-family:inherit;font-size:.8rem;resize:vertical;background:var(--sand);color:var(--text);
+  outline:none;transition:border-color .2s}
+.notes-section textarea:focus{border-color:var(--ocean-light)}
+
+/* ── MA LISTE ── */
+.mylist-header{background:var(--white);border-radius:var(--radius);padding:16px;margin-bottom:16px;box-shadow:var(--shadow)}
+.mylist-header h2{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--ocean-dark);margin-bottom:6px}
+.mylist-header .meta{font-size:.8rem;color:var(--text-light);display:flex;gap:12px;flex-wrap:wrap}
+.mylist-cat{margin-bottom:12px}
+.mylist-cat h3{font-size:.85rem;font-weight:700;color:var(--ocean-dark);padding:6px 0 4px;
+  border-bottom:2px solid var(--sand-dark);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.mylist-item{display:flex;align-items:center;gap:8px;padding:4px 2px;font-size:.8rem}
+.mylist-item input[type="checkbox"]{width:16px;height:16px;accent-color:var(--ocean);flex-shrink:0;cursor:pointer}
+.mylist-item.checked span{text-decoration:line-through;color:var(--text-light)}
+.mylist-qty{font-size:.7rem;background:var(--qty-color);color:#fff;padding:2px 6px;border-radius:20px;font-weight:600}
+.empty-list{text-align:center;padding:40px 20px;color:var(--text-light)}
+.empty-list .big{font-size:36px;margin-bottom:10px}
+
+/* ── ADMIN ── */
+.admin-card{background:var(--white);border-radius:var(--radius);padding:16px;margin-bottom:16px;box-shadow:var(--shadow)}
+.admin-card h3{font-family:'Playfair Display',serif;font-size:.95rem;color:var(--mountain);margin-bottom:12px;
+  display:flex;align-items:center;gap:6px}
+.admin-access-denied{text-align:center;padding:60px 20px;color:var(--text-light)}
+.admin-access-denied .big{font-size:48px;margin-bottom:12px}
+.user-table{width:100%;border-collapse:collapse;font-size:.8rem}
+.user-table th{text-align:left;padding:6px 10px;background:var(--sand);font-weight:600;font-size:.75rem;color:var(--text-light)}
+.user-table td{padding:8px 10px;border-bottom:1px solid var(--sand)}
+.user-table tr:last-child td{border-bottom:none}
+.user-table tr:hover td{background:var(--sand)}
+.role-badge{padding:2px 8px;border-radius:50px;font-size:.7rem;font-weight:700}
+.role-admin{background:#ece8f4;color:var(--mountain)}
+.role-editor{background:#edf6fa;color:var(--ocean-dark)}
+.role-viewer{background:#f7f5e8;color:#6a5c20}
+.admin-form{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:end;margin-top:12px}
+.form-field label{font-size:.75rem;font-weight:600;color:var(--text-light);display:block;margin-bottom:4px}
+.form-field input,.form-field select{width:100%;border:2px solid var(--sand-dark);border-radius:8px;padding:8px 10px;
+  font-family:inherit;font-size:.8rem;background:var(--sand);color:var(--text);outline:none;transition:border-color .2s}
+.form-field input:focus,.form-field select:focus{border-color:var(--mountain)}
+.btn-admin{padding:8px 12px;background:var(--mountain);color:#fff;border:none;border-radius:8px;
+  font-family:inherit;font-size:.8rem;font-weight:600;cursor:pointer;transition:background .18s;
+  white-space:nowrap;grid-column:span 2}
+.btn-admin:hover{background:#9b85ab}
+.btn-danger-sm{padding:4px 8px;background:none;border:1.5px solid var(--coral);color:var(--coral);
+  border-radius:6px;font-family:inherit;font-size:.7rem;cursor:pointer;transition:all .15s}
+.btn-danger-sm:hover{background:var(--coral);color:#fff}
+.btn-edit-sm{padding:4px 8px;background:none;border:1.5px solid var(--ocean-light);color:var(--ocean);
+  border-radius:6px;font-family:inherit;font-size:.7rem;cursor:pointer;transition:all .15s;margin-right:4px}
+.btn-edit-sm:hover{background:var(--ocean-light);color:#fff}
+
+/* ── SYNC STATUS CARD ── */
+.sync-status-bar{display:flex;align-items:center;gap:8px;padding:8px 12px;
+  background:var(--sand);border-radius:10px;font-size:.78rem;color:var(--text-light);margin-bottom:12px}
+.sync-status-bar .dot{width:8px;height:8px;border-radius:50%;background:#ccc;flex-shrink:0}
+.sync-status-bar .dot.green{background:#22c55e}
+.sync-status-bar .dot.orange{background:#f59e0b}
+.sync-status-bar .dot.red{background:#ef4444}
+
+/* ── MODAL ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(42,33,24,.45);z-index:500;
+  align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--white);border-radius:22px;padding:24px 20px;width:92%;max-width:340px;
+  box-shadow:var(--shadow-lg);animation:fadeUp .25s ease both;text-align:center}
+.modal h3{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--ocean-dark);margin-bottom:6px}
+.modal p{color:var(--text-light);font-size:.8rem;margin-bottom:16px}
+.qty-controls{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:16px}
+.qty-btn{width:36px;height:36px;border-radius:50%;border:2px solid var(--sand-dark);background:var(--sand);
+  font-size:1.1rem;cursor:pointer;font-weight:700;transition:all .15s;color:var(--text)}
+.qty-btn:hover{border-color:var(--ocean);color:var(--ocean)}
+.qty-val{font-size:1.6rem;font-weight:700;color:var(--ocean-dark);min-width:40px;text-align:center}
+.modal-btns{display:flex;gap:8px}
+.modal-btns button{flex:1;padding:10px;border-radius:10px;font-family:inherit;font-size:.85rem;
+  font-weight:600;cursor:pointer;border:2px solid transparent;transition:all .18s}
+.modal-cancel{background:var(--sand);color:var(--text);border-color:var(--sand-dark)}
+.modal-cancel:hover{border-color:var(--text-light)}
+.modal-ok{background:var(--ocean);color:#fff}
+.modal-ok:hover{background:var(--ocean-dark)}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:84px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:rgba(42,33,24,.92);color:#fff;padding:10px 20px;border-radius:50px;
+  font-size:.82rem;opacity:0;transition:all .3s;z-index:2000;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── PRINT ── */
 @media print {
-  #login-screen, #app .app-nav, .mobile-nav, .action-bar, .add-row, .item-delete,
-  .type-grid, .dest-section, .progress-section, .types-selected-bar,
-  .transport-section, .documents-section, .map-section, .calendar-section,
-  .reminders-section, .notes-section, .btn-sm, .nav-tabs, .nav-right,
-  #page-liste .action-bar { display: none !important; }
-  
-  #page-liste { display: block !important; padding: 0 !important; }
-  .mylist-header { box-shadow: none !important; border: 1px solid #ddd; }
-  .mylist-cat h3 { border-bottom: 1px solid #ddd; }
-  body { background: #fff !important; }
-  .app-nav { display: none !important; }
-  .item-row.checked .item-label { color: #999 !important; }
-  .item-row.checked { opacity: 0.6; }
-  .mylist-item.checked span { color: #999 !important; }
-  .mylist-item.checked { opacity: 0.6; }
+  #login-screen,#app .app-nav,.mobile-nav,.action-bar,.add-row,.item-delete,
+  .type-grid,.dest-section,.progress-section,.types-selected-bar,
+  .transport-section,.documents-section,.map-section,.calendar-section,
+  .reminders-section,.notes-section,.btn-sm,.btn-logout,.trip-selector-wrap,#sync-dot{display:none!important}
+  .page{display:block!important;padding:0}
+  body{background:#fff}
 }
 
-/* TOAST */
-.toast {
-  position: fixed;
-  bottom: 80px;
-  left: 50%;
-  transform: translateX(-50%) translateY(80px);
-  background: var(--ocean-dark);
-  color: #fff;
-  padding: 10px 16px;
-  border-radius: 50px;
-  font-size: .8rem;
-  font-weight: 500;
-  transition: transform .3s cubic-bezier(.4, 0, .2, 1);
-  z-index: 999;
-  pointer-events: none;
+/* ── DESKTOP ── */
+@media(min-width:600px){
+  .nav-tabs{display:flex}
+  .mobile-nav{display:none!important}
+  .nav-tab{padding:14px 18px;background:none;border:none;font-family:inherit;font-size:.85rem;
+    font-weight:500;color:var(--text-light);cursor:pointer;border-bottom:3px solid transparent;transition:all .15s}
+  .nav-tab:hover{color:var(--ocean)}
+  .nav-tab.active{color:var(--ocean-dark);font-weight:700;border-bottom-color:var(--ocean)}
+  .categories-grid{grid-template-columns:1fr 1fr}
+  .admin-form{grid-template-columns:1fr 1fr 1fr}
+  .btn-admin{grid-column:span 1}
+  .map-actions{flex-direction:row}
+  .add-reminder{flex-direction:row}
+  #sync-dot{display:none}
 }
 
-.toast.show {
-  transform: translateX(-50%) translateY(0);
-}
-
-/* FullCalendar */
-.fc { font-family: inherit; font-size: .8rem; }
-.fc-today { background-color: rgba(44, 110, 138, 0.1) !important; }
-.fc-event {
-  background-color: var(--ocean);
-  border-color: var(--ocean);
-  color: white !important;
-  font-size: .7rem !important;
-  padding: 2px 4px !important;
-}
-.fc-event:hover { background-color: var(--ocean-dark) !important; }
-
-/* Leaflet */
-.leaflet-container { background: var(--sand); border-radius: 10px; }
-.leaflet-control-attribution { background: white; font-size: 10px; }
-
-/* RESPONSIVE */
-@media (max-width: 768px) {
-  .nav-tabs { display: none !important; }
-  .mobile-nav { display: flex !important; }
-  .page { padding-bottom: 80px; }
-  .type-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; }
-  .type-btn { padding: 10px 4px; }
-  .type-btn .emoji { font-size: 20px; }
-  .type-btn .label { font-size: .7rem; }
-  .type-btn .sub { display: none; }
-  .transport-grid { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 6px; }
-  .transport-btn { padding: 6px 4px; }
-  .transport-btn .emoji { font-size: 18px; }
-  .transport-btn .label { font-size: .65rem; }
-  .dest-section { flex-direction: column; align-items: stretch; }
-  .dest-field { min-width: 100%; margin-bottom: 8px; }
-  .map-actions { flex-direction: column; }
-  .map-actions input { width: 100%; margin-bottom: 8px; }
-  .add-reminder { flex-direction: column; }
-  .add-reminder input[type="text"],
-  .add-reminder input[type="date"] { width: 100%; margin-bottom: 8px; }
-  .admin-form { grid-template-columns: 1fr; }
-  .btn-admin { grid-column: span 1; }
-  #map-container { height: 200px; }
-  .categories-grid { grid-template-columns: 1fr; }
-}
-
-@media (min-width: 769px) {
-  .mobile-nav { display: none !important; }
-  .nav-tabs { display: flex !important; }
-  .type-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
-  .type-btn .sub { display: block; }
-  .categories-grid { grid-template-columns: 1fr 1fr; }
-  .dest-section { flex-direction: row; flex-wrap: wrap; }
-  .map-actions { flex-direction: row; }
-  .add-reminder { flex-direction: row; }
-}
-
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(18px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
 </style>
 </head>
 <body>
+
+<!-- SYNC DOT (mobile indicator) -->
+<div id="sync-dot" title="Statut synchronisation"></div>
 
 <!-- LOGIN -->
 <div id="login-screen">
   <div class="login-card">
     <span class="login-icon">🌴</span>
     <h1>MesVacances</h1>
-    <p>Votre liste de préparation personnelle</p>
+    <p>Votre liste de préparation partagée</p>
     <input type="text" id="login-user" placeholder="Identifiant" autocomplete="off">
     <input type="password" id="login-pass" placeholder="Mot de passe">
     <button class="btn-primary" onclick="doLogin()">Accéder à ma liste</button>
     <div class="login-error" id="login-error">❌ Identifiant ou mot de passe incorrect</div>
+    <div class="login-info">
+      <strong>Comptes par défaut :</strong>
+      <code>yves</code> / <code>vacances2024</code> · Admin<br>
+      <code>famille</code> / <code>ete2024</code> · Éditeur<br>
+      <code>invite</code> / <code>bienvenue</code> · Lecteur
+    </div>
   </div>
 </div>
 
 <!-- MOBILE NAV -->
 <div class="mobile-nav" id="mobile-nav">
   <div class="mobile-nav-inner">
-    <button class="mobile-nav-btn active" onclick="showMobilePage('liste-prep')" id="mobile-btn-liste-prep">
-      <span class="icon">📋</span>
-      <span>Préparation</span>
+    <button class="mobile-nav-btn active" onclick="showPage('liste-prep')" id="mobile-btn-liste-prep">
+      <span class="icon">📋</span><span>Préparation</span>
     </button>
-    <button class="mobile-nav-btn" onclick="showMobilePage('ma-liste')" id="mobile-btn-ma-liste">
-      <span class="icon">🎒</span>
-      <span>Ma Liste</span>
+    <button class="mobile-nav-btn" onclick="showPage('ma-liste')" id="mobile-btn-ma-liste">
+      <span class="icon">🎒</span><span>Ma Liste</span>
     </button>
-    <button class="mobile-nav-btn" onclick="showMobilePage('calendrier')" id="mobile-btn-calendrier">
-      <span class="icon">📅</span>
-      <span>Calendrier</span>
+    <button class="mobile-nav-btn" onclick="showPage('calendrier')" id="mobile-btn-calendrier">
+      <span class="icon">📅</span><span>Calendrier</span>
     </button>
-    <button class="mobile-nav-btn" onclick="showMobilePage('admin')" id="mobile-btn-admin" style="display:none">
-      <span class="icon">⚙️</span>
-      <span>Réglages</span>
+    <button class="mobile-nav-btn" onclick="showPage('admin')" id="mobile-btn-admin" style="display:none">
+      <span class="icon">⚙️</span><span>Réglages</span>
     </button>
   </div>
 </div>
@@ -1598,7 +413,7 @@ body {
     <div class="nav-inner">
       <div class="nav-logo">
         <span class="nav-logo-icon">🌴</span>
-        <h1>MesVacances</h1>
+        <div><h1>MesVacances</h1><span>sync temps réel</span></div>
       </div>
       <div class="nav-tabs">
         <button class="nav-tab active" onclick="showPage('liste-prep')">📋 Préparation</button>
@@ -1608,9 +423,9 @@ body {
       </div>
       <div class="nav-right">
         <div class="trip-selector-wrap">
-          <select id="trip-selector" onchange="switchTrip(this.value)" title="Changer de voyage"></select>
+          <select id="trip-selector" onchange="switchTrip(this.value)"></select>
           <button class="btn-trip-add" onclick="promptNewTrip()" title="Nouveau voyage">＋</button>
-          <button class="btn-trip-more" onclick="showTripMenu()" title="Options voyage">⋯</button>
+          <button class="btn-trip-more" onclick="showTripMenu()" title="Options">⋯</button>
         </div>
         <span class="user-badge" id="user-badge">—</span>
         <button class="btn-logout" onclick="doLogout()">⏻</button>
@@ -1621,113 +436,50 @@ body {
   <!-- PAGE PRÉPARATION -->
   <div class="page active" id="page-liste-prep">
     <div style="height:8px"></div>
-    
     <div class="section-title">📍 Type(s) de vacances</div>
-    <div class="type-grid" id="type-grid">
-      <button class="type-btn" data-type="camping" onclick="toggleType('camping',this)">
-        <span class="type-check">✓</span><span class="emoji">⛺</span>
-        <div class="label">Camping</div><div class="sub">Tente / van</div>
-      </button>
-      <button class="type-btn" data-type="location" onclick="toggleType('location',this)">
-        <span class="type-check">✓</span><span class="emoji">🏡</span>
-        <div class="label">Location</div><div class="sub">Chalet / maison</div>
-      </button>
-      <button class="type-btn" data-type="plage" onclick="toggleType('plage',this)">
-        <span class="type-check">✓</span><span class="emoji">🏖️</span>
-        <div class="label">Mer / Plage</div><div class="sub">Littoral</div>
-      </button>
-      <button class="type-btn" data-type="montagne" onclick="toggleType('montagne',this)">
-        <span class="type-check">✓</span><span class="emoji">⛰️</span>
-        <div class="label">Montagne</div><div class="sub">Ski / rando</div>
-      </button>
-      <button class="type-btn" data-type="campagne" onclick="toggleType('campagne',this)">
-        <span class="type-check">✓</span><span class="emoji">🌾</span>
-        <div class="label">Campagne</div><div class="sub">Nature / repos</div>
-      </button>
-      <button class="type-btn" data-type="sejour" onclick="toggleType('sejour',this)">
-        <span class="type-check">✓</span><span class="emoji">🏨</span>
-        <div class="label">Séjour</div><div class="sub">Hôtel / ville</div>
-      </button>
-      <button class="type-btn" data-type="etranger" onclick="toggleType('etranger',this)">
-        <span class="type-check">✓</span><span class="emoji">🌍</span>
-        <div class="label">Étranger</div><div class="sub">Voyage à l'étranger</div>
-      </button>
-      <button class="type-btn" data-type="croi" onclick="toggleType('croi',this)">
-        <span class="type-check">✓</span><span class="emoji">🚢</span>
-        <div class="label">Croisière</div><div class="sub">Bateau / paquebot</div>
-      </button>
-      <button class="type-btn" data-type="roadtrip" onclick="toggleType('roadtrip',this)">
-        <span class="type-check">✓</span><span class="emoji">🚐</span>
-        <div class="label">Road Trip</div><div class="sub">Voyage en voiture</div>
-      </button>
+    <div class="type-grid">
+      <button class="type-btn" data-type="camping" onclick="toggleType('camping')"><span class="type-check">✓</span><span class="emoji">⛺</span><div class="label">Camping</div><div class="sub">Tente / van</div></button>
+      <button class="type-btn" data-type="location" onclick="toggleType('location')"><span class="type-check">✓</span><span class="emoji">🏡</span><div class="label">Location</div><div class="sub">Chalet / maison</div></button>
+      <button class="type-btn" data-type="plage" onclick="toggleType('plage')"><span class="type-check">✓</span><span class="emoji">🏖️</span><div class="label">Mer / Plage</div><div class="sub">Littoral</div></button>
+      <button class="type-btn" data-type="montagne" onclick="toggleType('montagne')"><span class="type-check">✓</span><span class="emoji">⛰️</span><div class="label">Montagne</div><div class="sub">Ski / rando</div></button>
+      <button class="type-btn" data-type="campagne" onclick="toggleType('campagne')"><span class="type-check">✓</span><span class="emoji">🌾</span><div class="label">Campagne</div><div class="sub">Nature / repos</div></button>
+      <button class="type-btn" data-type="sejour" onclick="toggleType('sejour')"><span class="type-check">✓</span><span class="emoji">🏨</span><div class="label">Séjour</div><div class="sub">Hôtel / ville</div></button>
+      <button class="type-btn" data-type="etranger" onclick="toggleType('etranger')"><span class="type-check">✓</span><span class="emoji">🌍</span><div class="label">Étranger</div><div class="sub">Voyage à l'étranger</div></button>
+      <button class="type-btn" data-type="croi" onclick="toggleType('croi')"><span class="type-check">✓</span><span class="emoji">🚢</span><div class="label">Croisière</div><div class="sub">Bateau / paquebot</div></button>
+      <button class="type-btn" data-type="roadtrip" onclick="toggleType('roadtrip')"><span class="type-check">✓</span><span class="emoji">🚐</span><div class="label">Road Trip</div><div class="sub">Voyage en voiture</div></button>
     </div>
-    <div class="types-selected-bar" id="types-bar">
-      <span>🗺️</span> <span id="types-bar-text" style="color:var(--text)">Sélectionnez un ou plusieurs types</span>
-    </div>
+    <div class="types-selected-bar"><span>🗺️</span><span id="types-bar-text" style="color:var(--text)">Sélectionnez un ou plusieurs types</span></div>
 
     <div class="transport-section">
       <h3>🚗 Type(s) de transport</h3>
-      <div class="transport-grid" id="transport-grid">
-        <button class="transport-btn" data-transport="voiture" onclick="toggleTransport('voiture',this)">
-          <span class="transport-check">✓</span><span class="emoji">🚗</span>
-          <div class="label">Voiture</div>
-        </button>
-        <button class="transport-btn" data-transport="train" onclick="toggleTransport('train',this)">
-          <span class="transport-check">✓</span><span class="emoji">🚆</span>
-          <div class="label">Train</div>
-        </button>
-        <button class="transport-btn" data-transport="avion" onclick="toggleTransport('avion',this)">
-          <span class="transport-check">✓</span><span class="emoji">✈️</span>
-          <div class="label">Avion</div>
-        </button>
-        <button class="transport-btn" data-transport="bus" onclick="toggleTransport('bus',this)">
-          <span class="transport-check">✓</span><span class="emoji">🚌</span>
-          <div class="label">Bus</div>
-        </button>
-        <button class="transport-btn" data-transport="bateau" onclick="toggleTransport('bateau',this)">
-          <span class="transport-check">✓</span><span class="emoji">⛴️</span>
-          <div class="label">Bateau</div>
-        </button>
+      <div class="transport-grid">
+        <button class="transport-btn" data-transport="voiture" onclick="toggleTransport('voiture')"><span class="transport-check">✓</span><span class="emoji">🚗</span><div class="label">Voiture</div></button>
+        <button class="transport-btn" data-transport="train" onclick="toggleTransport('train')"><span class="transport-check">✓</span><span class="emoji">🚆</span><div class="label">Train</div></button>
+        <button class="transport-btn" data-transport="avion" onclick="toggleTransport('avion')"><span class="transport-check">✓</span><span class="emoji">✈️</span><div class="label">Avion</div></button>
+        <button class="transport-btn" data-transport="bus" onclick="toggleTransport('bus')"><span class="transport-check">✓</span><span class="emoji">🚌</span><div class="label">Bus</div></button>
+        <button class="transport-btn" data-transport="bateau" onclick="toggleTransport('bateau')"><span class="transport-check">✓</span><span class="emoji">⛴️</span><div class="label">Bateau</div></button>
       </div>
+    </div>
+
+    <div class="dest-section">
+      <div class="dest-field"><label>📍 Destination</label><input type="text" id="dest-name" placeholder="Ex : Côte d'Azur" oninput="debouncedSave()"></div>
+      <div class="dest-field"><label>📅 Dates</label><input type="text" id="dest-dates" placeholder="Ex : 15 juillet – 1er août" oninput="debouncedSave()"></div>
+      <div class="dest-field"><label>👥 Personnes</label><input type="text" id="dest-people" placeholder="Ex : 4 personnes" oninput="debouncedSave()"></div>
     </div>
 
     <div class="map-section">
       <h3>🗺️ Carte de la destination</h3>
       <div id="map-container"></div>
       <div class="map-actions">
-        <input type="text" id="address-input" placeholder="Adresse...">
-        <button class="btn-sm accent" onclick="geocodeAddress()">🔍</button>
+        <input type="text" id="address-input" placeholder="Rechercher une adresse..." onkeydown="if(event.key==='Enter')geocodeAddress()">
+        <button class="btn-sm accent" onclick="geocodeAddress()">🔍 Localiser</button>
         <button class="btn-sm" onclick="resetMap()">🔄</button>
       </div>
     </div>
 
-    <div class="calendar-section">
-      <h3>📅 Rappels</h3>
-      <div id="calendar-container"></div>
-    </div>
-
-    <div class="reminders-section">
-      <h3>⏰ Mes rappels</h3>
-      <div class="reminder-list" id="reminder-list"></div>
-      <div class="add-reminder">
-        <input type="text" id="reminder-text" placeholder="Ajouter un rappel...">
-        <input type="date" id="reminder-date">
-        <button onclick="addReminder()">Ajouter</button>
-      </div>
-    </div>
-
-    <div class="documents-section" id="documents-section">
+    <div class="documents-section">
       <h3>📄 Documents à emporter</h3>
-      <div class="documents-list" id="documents-list"></div>
-    </div>
-
-    <div class="dest-section">
-      <div class="dest-field"><label>📍 Destination</label>
-        <input type="text" id="dest-name" placeholder="Ex : Côte d'Azur" oninput="saveState()"></div>
-      <div class="dest-field"><label>📅 Dates</label>
-        <input type="text" id="dest-dates" placeholder="Ex : 15 juillet – 1er août" oninput="saveState()"></div>
-      <div class="dest-field"><label>👥 Personnes</label>
-        <input type="text" id="dest-people" placeholder="Ex : 4 personnes" oninput="saveState()"></div>
+      <div class="documents-list" id="documents-list"><p style="color:var(--text-light);font-size:.8rem">Sélectionnez des types de vacances.</p></div>
     </div>
 
     <div class="progress-section">
@@ -1746,9 +498,20 @@ body {
     </div>
 
     <div class="categories-grid" id="cat-grid"></div>
+
+    <div class="reminders-section" style="margin-top:16px">
+      <h3>⏰ Rappels rapides</h3>
+      <div class="reminder-list" id="reminder-list"></div>
+      <div class="add-reminder">
+        <input type="text" id="reminder-text" placeholder="Ajouter un rappel...">
+        <input type="date" id="reminder-date">
+        <button onclick="addReminder()">Ajouter</button>
+      </div>
+    </div>
+
     <div class="notes-section">
       <h3>📝 Notes</h3>
-      <textarea id="notes-area" placeholder="Infos pratiques..." oninput="saveState()"></textarea>
+      <textarea id="notes-area" placeholder="Infos pratiques, adresses, contacts d'urgence..." oninput="debouncedSave()"></textarea>
     </div>
   </div>
 
@@ -1756,7 +519,7 @@ body {
   <div class="page" id="page-ma-liste">
     <div class="action-bar" style="margin-top:8px">
       <button class="btn-sm accent" onclick="window.print()">🖨️ Imprimer</button>
-      <button class="btn-sm" onclick="uncheckAllList()">↩️ Tout décocher</button>
+      <button class="btn-sm" onclick="uncheckAll()">↩️ Tout décocher</button>
     </div>
     <div id="mylist-content"></div>
   </div>
@@ -1765,11 +528,11 @@ body {
   <div class="page" id="page-calendrier">
     <div class="calendar-section" style="margin-top:8px">
       <h3>📅 Calendrier des préparatifs</h3>
-      <p style="color:var(--text-light); margin-bottom:12px;">Ajoutez des rappels pour organiser vos préparatifs.</p>
+      <p style="color:var(--text-light);font-size:.8rem;margin-bottom:12px">Cliquez sur une date pour y ajouter un rappel.</p>
       <div id="full-calendar"></div>
     </div>
     <div class="reminders-section">
-      <h3>⏰ Mes rappels</h3>
+      <h3>⏰ Tous mes rappels</h3>
       <div class="reminder-list" id="full-reminder-list"></div>
       <div class="add-reminder">
         <input type="text" id="full-reminder-text" placeholder="Ajouter un rappel...">
@@ -1782,18 +545,32 @@ body {
   <!-- PAGE ADMIN -->
   <div class="page" id="page-admin">
     <div id="admin-denied" class="admin-access-denied" style="display:none">
-      <div class="big">🔒</div>
-      <p>Accès réservé à l'administrateur.</p>
+      <div class="big">🔒</div><p>Accès réservé à l'administrateur.</p>
     </div>
     <div id="admin-panel">
+      <!-- Sync status -->
+      <div class="admin-card">
+        <h3>☁️ Synchronisation Firebase</h3>
+        <div class="sync-status-bar">
+          <div class="dot" id="admin-sync-dot"></div>
+          <span id="admin-sync-text">Vérification...</span>
+        </div>
+        <p style="font-size:.78rem;color:var(--text-light);margin-bottom:10px">
+          Toutes les modifications sont envoyées <strong>instantanément</strong> à Firebase et reçues sur tous les appareils connectés (téléphone, tablette, PC…).
+        </p>
+        <button class="btn-admin" onclick="forceSync()" style="margin-top:0">⬆️ Forcer la synchronisation</button>
+        <p style="font-size:.72rem;color:var(--text-light);margin-top:10px" id="last-sync-label">—</p>
+      </div>
+
+      <!-- Users -->
       <div class="admin-card">
         <h3>👥 Gestion des utilisateurs</h3>
-        <table class="user-table" id="user-table">
+        <table class="user-table">
           <thead><tr><th>Identifiant</th><th>Rôle</th><th>Actions</th></tr></thead>
           <tbody id="user-tbody"></tbody>
         </table>
         <div style="height:12px"></div>
-        <div class="admin-form" id="add-user-form">
+        <div class="admin-form">
           <div class="form-field"><label>Identifiant</label><input type="text" id="nu-login" placeholder="identifiant"></div>
           <div class="form-field"><label>Mot de passe</label><input type="password" id="nu-pass" placeholder="••••••"></div>
           <div class="form-field"><label>Rôle</label>
@@ -1807,36 +584,17 @@ body {
         </div>
       </div>
 
-      <div class="admin-card">
-        <h3>☁️ Synchronisation automatique</h3>
-        <p style="color:var(--text-light); margin-bottom:12px;">
-          La synchronisation est <strong>toujours active</strong> — toutes vos modifications sont envoyées instantanément vers Firebase et reçues sur tous vos appareils (Netlify, GitHub Pages, téléphone…).
-        </p>
-        <div class="admin-form">
-          <div class="form-field">
-            <label>Statut</label>
-            <input type="text" id="sync-status" readonly style="background:var(--sand); font-weight:600;">
-          </div>
-          <div class="form-field">
-            <label>Dernière sync</label>
-            <input type="text" id="last-sync" readonly style="background:var(--sand);">
-          </div>
-          <button class="btn-admin" onclick="forceSync()" style="grid-column: span 2; margin-top:8px;">⬆️ Forcer l'envoi maintenant</button>
-        </div>
-        <p style="font-size:.78rem; color:var(--text-light); margin-top:10px;">
-          💡 Dès qu'un appareil coche un article ou modifie la liste, tous les autres sont mis à jour en temps réel.
-        </p>
-      </div>
-
+      <!-- Password -->
       <div class="admin-card">
         <h3>🔑 Changer mon mot de passe</h3>
         <div class="admin-form">
           <div class="form-field"><label>Nouveau mot de passe</label><input type="password" id="my-newpass" placeholder="••••••"></div>
           <div class="form-field"><label>Confirmer</label><input type="password" id="my-newpass2" placeholder="••••••"></div>
-          <button class="btn-admin" onclick="changeMyPassword()" style="grid-column: span 2; margin-top:8px;">💾 Enregistrer</button>
+          <button class="btn-admin" onclick="changeMyPassword()">💾 Enregistrer</button>
         </div>
       </div>
 
+      <!-- Roles table -->
       <div class="admin-card">
         <h3>ℹ️ Rôles & permissions</h3>
         <table class="user-table">
@@ -1847,6 +605,26 @@ body {
             <tr><td><span class="role-badge role-viewer">Lecteur 👁️</span></td><td>✅</td><td>❌</td><td>❌</td><td>❌</td></tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- Deploy guide -->
+      <div class="admin-card">
+        <h3>🚀 Déploiement GitHub + Netlify</h3>
+        <div style="font-size:.78rem;color:var(--text);line-height:1.7">
+          <p style="margin-bottom:8px"><strong>1. Firebase :</strong> Créez un projet sur <a href="https://console.firebase.google.com" target="_blank" style="color:var(--ocean)">console.firebase.google.com</a> → Firestore (mode production) → Règles :</p>
+          <pre style="background:var(--sand);padding:10px;border-radius:8px;font-size:.7rem;overflow-x:auto;margin-bottom:8px">rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}</pre>
+          <p style="margin-bottom:4px"><strong>2. GitHub :</strong> Créez un repo, uploadez ce fichier HTML.</p>
+          <p style="margin-bottom:4px"><strong>3. Netlify :</strong> "New site from Git" → sélectionnez votre repo → déployez.</p>
+          <p style="margin-bottom:4px"><strong>4. Partagez</strong> l'URL Netlify avec votre famille — la sync est automatique.</p>
+          <p style="margin-top:8px;color:var(--coral)">⚠️ Pensez à mettre à jour la config Firebase en haut du script avec vos propres clés.</p>
+        </div>
       </div>
     </div>
   </div>
@@ -1872,7 +650,9 @@ body {
 <div class="toast" id="toast"></div>
 
 <script>
-// Configuration Firebase
+// ═══════════════════════════════════════════════════════════════
+//  FIREBASE CONFIG — remplacez par vos propres clés
+// ═══════════════════════════════════════════════════════════════
 const firebaseConfig = {
   apiKey: "AIzaSyArn5IH-qPU9OmbM_tKHiNzTevnEh1TQE0",
   authDomain: "mes-vacances-b1d16.firebaseapp.com",
@@ -1882,531 +662,316 @@ const firebaseConfig = {
   appId: "1:105508964760:web:6780e9f6ce21f9f14783ed"
 };
 
-// Initialiser Firebase
-let db, auth;
+// ═══════════════════════════════════════════════════════════════
+//  FIREBASE INIT
+// ═══════════════════════════════════════════════════════════════
+let db = null;
 try {
   firebase.initializeApp(firebaseConfig);
   db = firebase.firestore();
-  auth = firebase.auth();
-} catch (e) {
-  console.log("Firebase non initialisé :", e);
-}
+  // Active la persistance offline (cache local même sans connexion)
+  db.enablePersistence({ synchronizeTabs: true }).catch(e => {
+    if (e.code === 'failed-precondition') console.warn('Persistance : plusieurs onglets ouverts');
+    else if (e.code === 'unimplemented') console.warn('Persistance non supportée par ce navigateur');
+  });
+} catch(e) { console.error('Firebase init:', e); }
 
-// Variables globales
+// ═══════════════════════════════════════════════════════════════
+//  CONSTANTES FIREBASE — structure PARTAGÉE entre tous les users
+//  trips/{tripId}         → données du voyage (partagé)
+//  app_users/{login}      → comptes utilisateurs
+//  app_meta/trips         → liste des voyages (partagée)
+// ═══════════════════════════════════════════════════════════════
+const COL_TRIPS   = 'trips';
+const COL_USERS   = 'app_users';
+const DOC_META    = 'app_meta';
+const SESSION_KEY = 'vac_session_v3';
+
+// ═══════════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════════
 let currentUser = null;
-let state = {
-  types: [],
-  transports: [],
-  categories: [],
-  checked: {},
-  quantities: {},
-  collapsed: {},
-  dest: { name: '', dates: '', people: '' },
-  notes: '',
-  reminders: [],
-  map: { lat: null, lng: null, zoom: 13 }
-};
-
-let calendar;
-let map;
-let markers = [];
-
-// Types de vacances et leurs documents associés
-const TYPE_DOCUMENTS = {
-  tous: [
-    {icon: "🆔", label: "Carte nationale d'identité / Passeport"},
-    {icon: "💳", label: "Carte bancaire"},
-    {icon: "💰", label: "Espèces / monnaie"},
-    {icon: "🏥", label: "Carte Vitale / attestation mutuelle"},
-    {icon: "👶", label: "Carnet de santé enfants"},
-    {icon: "📄", label: "Guide touristique / plan"}
-  ],
-  camping: [
-    {icon: "📄", label: "Contrat de location / confirmation"},
-    {icon: "🚗", label: "Assurance véhicule"},
-    {icon: "🔥", label: "Assurance habitation"}
-  ],
-  location: [
-    {icon: "📄", label: "Contrat de location"},
-    {icon: "💰", label: "Chèque de caution"},
-    {icon: "🔑", label: "Clés ou code d'accès"}
-  ],
-  etranger: [
-    {icon: "🛂", label: "Passeport valide"},
-    {icon: "🛃", label: "Visa (si nécessaire)"},
-    {icon: "💉", label: "Carnet de vaccination"},
-    {icon: "📄", label: "Permis international"},
-    {icon: "🏦", label: "Carte bancaire sans frais"},
-    {icon: "💱", label: "Devises locales"},
-    {icon: "📋", label: "Copie des réservations"},
-    {icon: "🏨", label: "Confirmation d'hébergement"}
-  ],
-  croi: [
-    {icon: "🛂", label: "Passeport valide"},
-    {icon: "🛃", label: "Visa"},
-    {icon: "🚢", label: "Billet de croisière"},
-    {icon: "📋", label: "Carte d'embarquement"},
-    {icon: "💳", label: "Carte bancaire"},
-    {icon: "🏥", label: "Assurance rapatriement"},
-    {icon: "💊", label: "Médicaments en quantité"}
-  ],
-  roadtrip: [
-    {icon: "🚗", label: "Permis de conduire"},
-    {icon: "📄", label: "Carte grise"},
-    {icon: "🛡️", label: "Assurance véhicule"},
-    {icon: "🎫", label: "Carte péage"},
-    {icon: "🗺️", label: "Carte routière / GPS"},
-    {icon: "🔧", label: "Assistance dépannage"}
-  ]
-};
-
-// Documents par type de transport
-const TRANSPORT_DOCUMENTS = {
-  voiture: [
-    {icon: "🚗", label: "Permis de conduire"},
-    {icon: "📄", label: "Carte grise"},
-    {icon: "🛡️", label: "Assurance véhicule"},
-    {icon: "🎫", label: "Carte péage"},
-    {icon: "🗺️", label: "Carte routière / GPS"}
-  ],
-  train: [
-    {icon: "🎫", label: "Billets de train"},
-    {icon: "🆔", label: "Carte de réduction"},
-    {icon: "📋", label: "Réservation place"}
-  ],
-  avion: [
-    {icon: "✈️", label: "Billets d'avion"},
-    {icon: "🆔", label: "Carte d'embarquement"},
-    {icon: "🧳", label: "Étiquettes bagages"}
-  ],
-  bus: [
-    {icon: "🎫", label: "Billets de bus"},
-    {icon: "🆔", label: "Carte de transport"}
-  ],
-  bateau: [
-    {icon: "⛴️", label: "Billet de bateau"},
-    {icon: "🆔", label: "Carte d'embarquement"},
-    {icon: "🚢", label: "Réservation cabine"}
-  ]
-};
-
-// Catégories par défaut (COMPLÈTES)
-const DEFAULT_CATEGORIES = [
-  {
-    id: 'administratif',
-    emoji: '📄',
-    name: 'Documents & Administratif',
-    items: [
-      {id: 'a1', label: "Carte nationale d'identité / Passeport", types: ['tous'], qty: 0},
-      {id: 'a2', label: "Contrat de location / confirmation réservation", types: ['tous'], qty: 0},
-      {id: 'a3', label: "Billets de train / avion / ferry", types: ['tous'], qty: 0},
-      {id: 'a4', label: "Carte bancaire (sans frais à l'étranger)", types: ['tous'], qty: 0},
-      {id: 'a5', label: "Espèces / monnaie locale", types: ['tous'], qty: 0},
-      {id: 'a6', label: "Carte Vitale / attestation mutuelle", types: ['tous'], qty: 0},
-      {id: 'a7', label: "Carnet de santé enfants", types: ['tous'], qty: 0},
-      {id: 'a8', label: "Permis de conduire", types: ['tous'], qty: 0},
-      {id: 'a9', label: "Carte grise du véhicule", types: ['tous'], qty: 0},
-      {id: 'a10', label: "Assurance véhicule / voyage", types: ['tous'], qty: 0},
-      {id: 'a11', label: "Chèque(s) de caution", types: ['location', 'camping'], qty: 0},
-      {id: 'a12', label: "Guide touristique / plan de ville", types: ['tous'], qty: 0},
-      {id: 'a13', label: "Visa (si nécessaire)", types: ['etranger', 'croi'], qty: 0},
-      {id: 'a14', label: "Carte d'embarquement imprimée", types: ['croi', 'etranger'], qty: 0},
-      {id: 'a15', label: "Assurance rapatriement", types: ['etranger', 'croi', 'montagne'], qty: 0},
-      {id: 'a16', label: "Numéros d'urgence locaux notés", types: ['etranger', 'croi', 'roadtrip', 'montagne'], qty: 0},
-      {id: 'a17', label: "Copie des réservations hôtels / hébergements", types: ['sejour', 'etranger', 'croi', 'roadtrip'], qty: 0},
-      {id: 'a18', label: "Abonnement télépéage / vignette autoroute", types: ['roadtrip', 'etranger', 'campagne'], qty: 0},
-      {id: 'a19', label: "Certificat de vaccination (si exigé)", types: ['etranger', 'croi'], qty: 0}
-    ]
-  },
-  {
-    id: 'vetements',
-    emoji: '👕',
-    name: 'Vêtements & Tenues',
-    items: [
-      {id: 'v1', label: "T-shirts / hauts légers", types: ['tous'], qty: 0},
-      {id: 'v2', label: "Pantalons / shorts", types: ['tous'], qty: 0},
-      {id: 'v3', label: "Sous-vêtements", types: ['tous'], qty: 0},
-      {id: 'v4', label: "Chaussettes (dont chaussettes de sport)", types: ['tous'], qty: 0},
-      {id: 'v5', label: "Pyjamas", types: ['tous'], qty: 0},
-      {id: 'v6', label: "Veste légère / polaire", types: ['tous'], qty: 0},
-      {id: 'v7', label: "Imperméable / K-way", types: ['tous'], qty: 0},
-      {id: 'v8', label: "Maillot de bain", types: ['plage', 'camping', 'location', 'etranger', 'croi', 'montagne', 'sejour', 'campagne'], qty: 0},
-      {id: 'v9', label: "Casquette / chapeau de soleil", types: ['tous'], qty: 0},
-      {id: 'v10', label: "Lunettes de soleil (UV400)", types: ['tous'], qty: 0},
-      {id: 'v11', label: "Chaussures de randonnée / marche", types: ['montagne', 'campagne', 'camping', 'roadtrip', 'etranger'], qty: 0},
-      {id: 'v12', label: "Tongs / sandales", types: ['plage', 'camping', 'location', 'etranger', 'croi', 'sejour', 'campagne'], qty: 0},
-      {id: 'v13', label: "Vêtements chauds (pull, doudoune)", types: ['montagne', 'camping', 'campagne', 'croi', 'etranger', 'roadtrip'], qty: 0},
-      {id: 'v14', label: "Pantalon de ski / vêtements techniques ski", types: ['montagne'], qty: 0},
-      {id: 'v15', label: "Sous-vêtements thermiques", types: ['montagne', 'camping', 'campagne'], qty: 0},
-      {id: 'v16', label: "Gants / bonnet / écharpe", types: ['montagne', 'camping', 'campagne', 'roadtrip'], qty: 0},
-      {id: 'v17', label: "Tenue élégante (dîner, soirée)", types: ['croi', 'sejour', 'etranger'], qty: 0},
-      {id: 'v18', label: "Chaussures de ville / habillées", types: ['croi', 'sejour', 'etranger'], qty: 0},
-      {id: 'v19', label: "Salopette / combinaison de ski enfant", types: ['montagne'], qty: 0},
-      {id: 'v20', label: "Guêtres de randonnée", types: ['montagne', 'campagne', 'camping'], qty: 0}
-    ]
-  },
-  {
-    id: 'toilette',
-    emoji: '🧴',
-    name: 'Hygiène & Toilette',
-    items: [
-      {id: 't1', label: "Brosse à dents + dentifrice", types: ['tous'], qty: 0},
-      {id: 't2', label: "Shampoing + après-shampoing", types: ['tous'], qty: 0},
-      {id: 't3', label: "Gel douche / savon", types: ['tous'], qty: 0},
-      {id: 't4', label: "Déodorant", types: ['tous'], qty: 0},
-      {id: 't5', label: "Crème solaire (indice 30-50)", types: ['tous'], qty: 0},
-      {id: 't6', label: "After-sun / aloe vera", types: ['plage', 'camping', 'etranger', 'croi', 'montagne', 'campagne', 'roadtrip', 'sejour', 'location'], qty: 0},
-      {id: 't7', label: "Lingettes rafraîchissantes", types: ['tous'], qty: 0},
-      {id: 't8', label: "Gel hydroalcoolique", types: ['tous'], qty: 0},
-      {id: 't9', label: "Rasoir / mousse à raser", types: ['tous'], qty: 0},
-      {id: 't10', label: "Coton-tiges / cotons démaquillants", types: ['tous'], qty: 0},
-      {id: 't11', label: "Maquillage / démaquillant", types: ['tous'], qty: 0},
-      {id: 't12', label: "Serviettes de bain / plage", types: ['tous'], qty: 0},
-      {id: 't13', label: "Anti-moustiques / répulsifs insectes", types: ['camping', 'etranger', 'campagne', 'montagne', 'croi', 'plage', 'location'], qty: 0},
-      {id: 't14', label: "Sèche-cheveux de voyage", types: ['etranger', 'sejour', 'croi', 'location', 'montagne'], qty: 0},
-      {id: 't15', label: "Pince à épiler / ciseaux à ongles", types: ['tous'], qty: 0},
-      {id: 't16', label: "Stick lèvres hydratant / protection solaire", types: ['tous'], qty: 0},
-      {id: 't17', label: "Miroir de voyage", types: ['camping', 'roadtrip', 'montagne', 'etranger'], qty: 0}
-    ]
-  },
-  {
-    id: 'pharmacie',
-    emoji: '💊',
-    name: 'Pharmacie & Santé',
-    items: [
-      {id: 'ph1', label: "Ordonnances + médicaments habituels", types: ['tous'], qty: 0},
-      {id: 'ph2', label: "Paracétamol / ibuprofène", types: ['tous'], qty: 0},
-      {id: 'ph3', label: "Anti-diarrhéiques", types: ['tous'], qty: 0},
-      {id: 'ph4', label: "Anti-nausées / mal des transports", types: ['tous'], qty: 0},
-      {id: 'ph5', label: "Pansements / compresses stériles", types: ['tous'], qty: 0},
-      {id: 'ph6', label: "Antiseptique (Bétadine / Biseptine)", types: ['tous'], qty: 0},
-      {id: 'ph7', label: "Thermomètre", types: ['tous'], qty: 0},
-      {id: 'ph8', label: "Crème anti-inflammatoire / anti-brûlure", types: ['tous'], qty: 0},
-      {id: 'ph9', label: "Médicaments contre le mal des montagnes", types: ['montagne', 'etranger'], qty: 0},
-      {id: 'ph10', label: "Traitement antipaludéen (si zone à risque)", types: ['etranger', 'croi'], qty: 0},
-      {id: 'ph11', label: "Collyres / gouttes pour les yeux", types: ['tous'], qty: 0},
-      {id: 'ph12', label: "Bandes élastiques / attelles de cheville", types: ['montagne', 'camping', 'campagne', 'roadtrip'], qty: 0},
-      {id: 'ph13', label: "Antihistaminiques (allergie)", types: ['tous'], qty: 0},
-      {id: 'ph14', label: "Crème anti-méduse / piqûre marine", types: ['plage', 'croi', 'etranger'], qty: 0}
-    ]
-  },
-  {
-    id: 'cuisine',
-    emoji: '🍳',
-    name: 'Cuisine & Repas',
-    items: [
-      {id: 'c1', label: "Casseroles / faitout", types: ['camping', 'location', 'montagne', 'campagne'], qty: 0},
-      {id: 'c2', label: "Poêle(s)", types: ['camping', 'location', 'montagne', 'campagne'], qty: 0},
-      {id: 'c3', label: "Couteaux de cuisine", types: ['camping', 'location', 'montagne', 'campagne', 'roadtrip'], qty: 0},
-      {id: 'c4', label: "Planche à découper", types: ['camping', 'location', 'montagne', 'campagne', 'roadtrip'], qty: 0},
-      {id: 'c5', label: "Ouvre-boîte / tire-bouchon", types: ['camping', 'location', 'montagne', 'campagne', 'roadtrip', 'plage', 'croi'], qty: 0},
-      {id: 'c6', label: "Barbecue / plancha + charbon", types: ['camping', 'location', 'campagne', 'roadtrip', 'plage'], qty: 0},
-      {id: 'c7', label: "Réchaud de camping + cartouches gaz", types: ['camping', 'roadtrip', 'montagne'], qty: 0},
-      {id: 'c8', label: "Sel, poivre, huile, sucre, épices", types: ['camping', 'location', 'montagne', 'campagne'], qty: 0},
-      {id: 'c9', label: "Torchons / essuie-tout", types: ['camping', 'location', 'montagne', 'campagne', 'roadtrip', 'plage'], qty: 0},
-      {id: 'c10', label: "Liquide vaisselle / éponge", types: ['camping', 'location', 'montagne', 'campagne'], qty: 0},
-      {id: 'c11', label: "Couverts / assiettes / verres réutilisables", types: ['camping', 'roadtrip', 'plage', 'montagne', 'campagne'], qty: 0},
-      {id: 'c12', label: "Glacière / sac isotherme", types: ['camping', 'plage', 'roadtrip', 'campagne', 'location', 'montagne', 'sejour', 'etranger'], qty: 0},
-      {id: 'c13', label: "Thermos / gourde isotherme", types: ['tous'], qty: 0},
-      {id: 'c14', label: "Sacs de congélation / boîtes hermétiques", types: ['camping', 'location', 'roadtrip', 'plage', 'montagne', 'campagne'], qty: 0},
-      {id: 'c15', label: "Nappe de pique-nique", types: ['camping', 'plage', 'campagne', 'roadtrip', 'montagne', 'location'], qty: 0}
-    ]
-  },
-  {
-    id: 'epicerie',
-    emoji: '🛒',
-    name: 'Épicerie & Boissons',
-    items: [
-      {id: 'e1', label: "Eau (bouteilles / bonbonnes)", types: ['camping', 'location', 'roadtrip', 'montagne', 'campagne', 'plage', 'etranger', 'sejour'], qty: 0},
-      {id: 'e2', label: "Jus de fruits / sodas", types: ['tous'], qty: 0},
-      {id: 'e3', label: "Café / thé / infusions", types: ['camping', 'location', 'montagne', 'campagne', 'roadtrip', 'sejour'], qty: 0},
-      {id: 'e4', label: "Petit-déjeuner (céréales, confiture, pain…)", types: ['camping', 'location', 'montagne', 'campagne', 'roadtrip'], qty: 0},
-      {id: 'e5', label: "Conserves (légumes, poisson, sauce…)", types: ['camping', 'location', 'roadtrip', 'montagne', 'campagne'], qty: 0},
-      {id: 'e6', label: "Pâtes / riz / semoule / quinoa", types: ['camping', 'location', 'montagne', 'campagne'], qty: 0},
-      {id: 'e7', label: "Snacks & biscuits / barres de céréales", types: ['tous'], qty: 0},
-      {id: 'e8', label: "Fruits & légumes de départ", types: ['camping', 'location', 'roadtrip', 'plage', 'montagne', 'campagne'], qty: 0},
-      {id: 'e9', label: "Vin / bière / apéritif", types: ['camping', 'location', 'montagne', 'campagne', 'croi', 'plage', 'sejour'], qty: 0},
-      {id: 'e10', label: "Produits enfants (goûters, compotes, gourdes…)", types: ['tous'], qty: 0},
-      {id: 'e11', label: "Barres énergétiques / fruits secs / noix", types: ['montagne', 'campagne', 'camping', 'roadtrip', 'plage', 'etranger'], qty: 0},
-      {id: 'e12', label: "Sandwichs / repas de voyage (jour J)", types: ['roadtrip', 'etranger', 'plage', 'sejour', 'croi', 'montagne'], qty: 0},
-      {id: 'e13', label: "Glaces / sucettes de voyage enfants", types: ['plage', 'campagne', 'camping', 'location', 'roadtrip'], qty: 0}
-    ]
-  },
-  {
-    id: 'camping_mat',
-    emoji: '⛺',
-    name: 'Matériel de Camping',
-    items: [
-      {id: 'cm1', label: "Tente + sardines + masses", types: ['camping'], qty: 0},
-      {id: 'cm2', label: "Sacs de couchage", types: ['camping', 'montagne', 'campagne'], qty: 0},
-      {id: 'cm3', label: "Matelas gonflable / tapis de sol", types: ['camping', 'montagne'], qty: 0},
-      {id: 'cm4', label: "Oreillers de camping", types: ['camping', 'roadtrip', 'montagne'], qty: 0},
-      {id: 'cm5', label: "Draps / housse de couette", types: ['camping', 'location', 'montagne', 'campagne'], qty: 0},
-      {id: 'cm6', label: "Ventilateur portable", types: ['camping', 'location', 'roadtrip', 'plage'], qty: 0},
-      {id: 'cm7', label: "Charbon / allume-feu pour grillades", types: ['camping', 'location', 'campagne'], qty: 0},
-      {id: 'cm8', label: "Lampes frontales + piles", types: ['camping', 'montagne', 'campagne'], qty: 0},
-      {id: 'cm9', label: "Lanternes / guirlandes solaires", types: ['camping', 'campagne', 'location'], qty: 0},
-      {id: 'cm10', label: "Corde à linge + pinces", types: ['camping', 'location', 'etranger', 'roadtrip'], qty: 0},
-      {id: 'cm11', label: "Bâches / auvents", types: ['camping'], qty: 0},
-      {id: 'cm12', label: "Tables & chaises de camping", types: ['camping', 'roadtrip', 'plage'], qty: 0}
-    ]
-  },
-  {
-    id: 'plage_mer',
-    emoji: '🏖️',
-    name: 'Plage & Mer',
-    items: [
-      {id: 'pl1', label: "Serviettes de plage (grandes)", types: ['plage', 'croi', 'etranger', 'camping', 'sejour'], qty: 0},
-      {id: 'pl2', label: "Parasol de plage", types: ['plage', 'croi', 'camping', 'etranger'], qty: 0},
-      {id: 'pl3', label: "Chaises longues / matelas de plage", types: ['plage', 'camping', 'croi', 'location'], qty: 0},
-      {id: 'pl4', label: "Jouets de plage (seau, râteau, château…)", types: ['plage', 'camping'], qty: 0},
-      {id: 'pl5', label: "Bouées / brassards / gilet enfant", types: ['plage', 'camping', 'croi', 'location'], qty: 0},
-      {id: 'pl6', label: "Palmes / masque / tuba", types: ['plage', 'croi', 'etranger'], qty: 0},
-      {id: 'pl7', label: "Crème solaire waterproof haute protection", types: ['plage', 'croi', 'montagne', 'etranger', 'camping'], qty: 0},
-      {id: 'pl8', label: "Sac de plage imperméable", types: ['plage', 'croi', 'camping'], qty: 0},
-      {id: 'pl9', label: "Combinaison néoprène / shorty", types: ['plage'], qty: 0},
-      {id: 'pl10', label: "Planche de surf / bodyboard", types: ['plage'], qty: 0},
-      {id: 'pl11', label: "Lunettes de natation", types: ['plage', 'croi', 'sejour', 'location', 'camping'], qty: 0},
-      {id: 'pl12', label: "Tente de plage anti-UV bébé", types: ['plage', 'camping'], qty: 0},
-      {id: 'pl13', label: "Raquettes de plage / volant", types: ['plage', 'camping', 'campagne'], qty: 0},
-      {id: 'pl14', label: "Waterproof pour téléphone", types: ['plage', 'croi', 'camping'], qty: 0}
-    ]
-  },
-  {
-    id: 'montagne_ski',
-    emoji: '⛷️',
-    name: 'Montagne & Ski',
-    items: [
-      {id: 'ms1', label: "Skis / snowboard + fixations", types: ['montagne'], qty: 0},
-      {id: 'ms2', label: "Chaussures de ski", types: ['montagne'], qty: 0},
-      {id: 'ms3', label: "Casque de ski / snowboard", types: ['montagne'], qty: 0},
-      {id: 'ms4', label: "Forfait de remontées mécaniques (réservé)", types: ['montagne'], qty: 0},
-      {id: 'ms5', label: "Masque de ski / lunettes de glacier", types: ['montagne'], qty: 0},
-      {id: 'ms6', label: "Bâtons de randonnée / ski", types: ['montagne', 'campagne'], qty: 0},
-      {id: 'ms7', label: "Crampons / surbottes / guêtres", types: ['montagne'], qty: 0},
-      {id: 'ms8', label: "Sac à dos de randonnée (30-50L)", types: ['montagne', 'campagne', 'camping'], qty: 0},
-      {id: 'ms9', label: "Carte IGN / topoguide / application rando", types: ['montagne', 'campagne'], qty: 0},
-      {id: 'ms10', label: "Couverture de survie", types: ['montagne', 'camping', 'campagne'], qty: 0},
-      {id: 'ms11', label: "Sifflet de sécurité + boussole", types: ['montagne', 'campagne', 'camping'], qty: 0},
-      {id: 'ms12', label: "Kit de réparation matériel de ski", types: ['montagne'], qty: 0},
-      {id: 'ms13', label: "DVA / sonde / pelle (hors-piste)", types: ['montagne'], qty: 0}
-    ]
-  },
-  {
-    id: 'activites',
-    emoji: '🎯',
-    name: 'Activités & Loisirs',
-    items: [
-      {id: 'ac1', label: "Jeux de société / cartes / dominos", types: ['tous'], qty: 0},
-      {id: 'ac2', label: "Livres / romans / BD / magazines", types: ['tous'], qty: 0},
-      {id: 'ac3', label: "Tablette / liseuse + chargeur", types: ['tous'], qty: 0},
-      {id: 'ac4', label: "Casque audio / écouteurs", types: ['tous'], qty: 0},
-      {id: 'ac5', label: "Enceinte Bluetooth portable", types: ['tous'], qty: 0},
-      {id: 'ac6', label: "Vélos / trottinettes (ou location)", types: ['camping', 'location', 'campagne', 'roadtrip', 'plage', 'sejour'], qty: 0},
-      {id: 'ac7', label: "Pétanque", types: ['camping', 'campagne', 'location', 'plage', 'sejour'], qty: 0},
-      {id: 'ac8', label: "Frisbee / ballon de foot / volant", types: ['plage', 'camping', 'campagne', 'location', 'montagne'], qty: 0},
-      {id: 'ac9', label: "Jumelles", types: ['montagne', 'campagne', 'croi', 'etranger', 'roadtrip'], qty: 0},
-      {id: 'ac10', label: "Appareil photo + carte mémoire + batteries", types: ['tous'], qty: 0},
-      {id: 'ac11', label: "Drone (si autorisé)", types: ['montagne', 'plage', 'etranger', 'campagne', 'roadtrip'], qty: 0},
-      {id: 'ac12', label: "Kit de pêche", types: ['camping', 'plage', 'campagne', 'location'], qty: 0},
-      {id: 'ac13', label: "Kayak / paddle gonflable", types: ['plage', 'camping', 'location', 'campagne'], qty: 0},
-      {id: 'ac14', label: "Telescope / guide des étoiles", types: ['camping', 'campagne', 'montagne'], qty: 0}
-    ]
-  },
-  {
-    id: 'enfants',
-    emoji: '🧸',
-    name: 'Bébé & Enfants',
-    items: [
-      {id: 'en1', label: "Poussette / siège auto enfant", types: ['tous'], qty: 0},
-      {id: 'en2', label: "Jouets / doudou bébé", types: ['tous'], qty: 0},
-      {id: 'en3', label: "Couches + lingettes bébé", types: ['tous'], qty: 0},
-      {id: 'en4', label: "Lait maternisé / biberons", types: ['tous'], qty: 0},
-      {id: 'en5', label: "Crème change / crème solaire bébé", types: ['tous'], qty: 0},
-      {id: 'en6', label: "Babyphone / moniteur", types: ['location', 'camping', 'campagne', 'montagne', 'sejour'], qty: 0},
-      {id: 'en7', label: "Gilet de sauvetage enfant", types: ['plage', 'croi', 'camping', 'campagne'], qty: 0},
-      {id: 'en8', label: "Casque vélo / trottinette enfant", types: ['camping', 'location', 'campagne', 'plage', 'sejour'], qty: 0},
-      {id: 'en9', label: "Harnais de portage bébé", types: ['montagne', 'campagne', 'etranger', 'roadtrip'], qty: 0}
-    ]
-  },
-  {
-    id: 'logistique',
-    emoji: '🔧',
-    name: 'Logistique & Voiture',
-    items: [
-      {id: 'l1', label: "Chargeurs téléphone / câbles USB-C", types: ['tous'], qty: 0},
-      {id: 'l2', label: "Multiprise / adaptateur secteur", types: ['tous'], qty: 0},
-      {id: 'l3', label: "Batterie externe (power bank)", types: ['tous'], qty: 0},
-      {id: 'l4', label: "Valises / sacs à dos", types: ['tous'], qty: 0},
-      {id: 'l5', label: "Cadenas pour bagage", types: ['tous'], qty: 0},
-      {id: 'l6', label: "Glacière voiture / sac isotherme", types: ['tous'], qty: 0},
-      {id: 'l7', label: "Support téléphone voiture + chargeur", types: ['tous'], qty: 0},
-      {id: 'l8', label: "Gilets de sécurité + triangles", types: ['tous'], qty: 0},
-      {id: 'l9', label: "Carte routière / GPS / application offline", types: ['tous'], qty: 0},
-      {id: 'l10', label: "Carte d'abonnement péage", types: ['tous'], qty: 0},
-      {id: 'l11', label: "Adaptateur prise électrique (pays étranger)", types: ['etranger', 'croi', 'sejour'], qty: 0},
-      {id: 'l12', label: "Lampe de poche / frontale + piles", types: ['tous'], qty: 0},
-      {id: 'l13', label: "Couverture de voyage / plaid voiture", types: ['roadtrip', 'camping', 'montagne', 'etranger'], qty: 0},
-      {id: 'l14', label: "Kit de premier secours voiture", types: ['tous'], qty: 0}
-    ]
-  },
-  {
-    id: 'maison',
-    emoji: '🏠',
-    name: 'Maison avant de partir',
-    items: [
-      {id: 'm1', label: "Arroser les plantes / prévoir arrosage", types: ['tous'], qty: 0},
-      {id: 'm2', label: "Prévenir un voisin / confier clé", types: ['tous'], qty: 0},
-      {id: 'm3', label: "Couper eau / gaz", types: ['tous'], qty: 0},
-      {id: 'm4', label: "Débrancher appareils électriques", types: ['tous'], qty: 0},
-      {id: 'm5', label: "Vider / nettoyer réfrigérateur", types: ['tous'], qty: 0},
-      {id: 'm6', label: "Sortir les poubelles", types: ['tous'], qty: 0},
-      {id: 'm7', label: "Fermer volets / verrouiller portes et fenêtres", types: ['tous'], qty: 0},
-      {id: 'm8', label: "Suspendre le courrier / faire suivre", types: ['tous'], qty: 0},
-      {id: 'm9', label: "Confier les animaux / prévoir la garde", types: ['tous'], qty: 0},
-      {id: 'm10', label: "Programmer l'alarme / vérifier caméras", types: ['tous'], qty: 0},
-      {id: 'm11', label: "Laisser numéros d'urgence au gardien", types: ['tous'], qty: 0},
-      {id: 'm12', label: "Souscrire assurance habitation vacances", types: ['tous'], qty: 0}
-    ]
-  },
-  {
-    id: 'divers',
-    emoji: '🎒',
-    name: 'Divers & Accessoires',
-    items: [
-      {id: 'd1', label: "Lunettes de rechange", types: ['tous'], qty: 0},
-      {id: 'd2', label: "Montre / réveil portable", types: ['tous'], qty: 0},
-      {id: 'd3', label: "Parapluie compact", types: ['tous'], qty: 0},
-      {id: 'd4', label: "Sac à main / porte-documents", types: ['tous'], qty: 0},
-      {id: 'd5', label: "Porte-monnaie / porte-cartes", types: ['tous'], qty: 0},
-      {id: 'd6', label: "Clés de rechange", types: ['tous'], qty: 0},
-      {id: 'd7', label: "Cadenas pour valise", types: ['tous'], qty: 0},
-      {id: 'd8', label: "Carnet de voyage / journal", types: ['tous'], qty: 0},
-      {id: 'd9', label: "Stylos / crayons", types: ['tous'], qty: 0},
-      {id: 'd10', label: "Couteau suisse / multioutil", types: ['camping', 'montagne', 'roadtrip', 'campagne'], qty: 0},
-      {id: 'd11', label: "Boules Quies / masque de nuit", types: ['tous'], qty: 0},
-      {id: 'd12', label: "Sac poubelles / sachets plastiques", types: ['camping', 'roadtrip', 'plage', 'montagne', 'campagne'], qty: 0}
-    ]
-  }
-];
-
-// DEFAULT USERS
-const DEFAULT_USERS = [
-  { login: 'yves', pass: 'vacances2024', role: 'admin' },
-  { login: 'famille', pass: 'ete2024', role: 'editor' },
-  { login: 'invite', pass: 'bienvenue', role: 'viewer' }
-];
-
-const USERS_KEY = 'vac_users_v3';
-const SESSION_KEY = 'vac_session';
-const TRIPS_META_KEY = 'vac_trips_meta_v1';
-
-// Firebase toujours actif (pas de toggle manuel)
-let realtimeUnsubscribe = null;
-
-// Gestion multi-voyages
 let currentTripId = null;
-let tripsList = []; // [{ id, name, dates }]
+let tripsList = [];
+let realtimeUnsubscribe = null;
+let saveDebounceTimer = null;
+let isSyncing = false;
 
-function genId() {
-  return Date.now().toString(36) + Math.random().toString(36).substr(2, 6);
-}
+let state = {
+  types:[], transports:[], categories:[], checked:{}, quantities:{}, collapsed:{},
+  dest:{name:'',dates:'',people:''}, notes:'', reminders:[], map:{lat:null,lng:null,zoom:13}
+};
 
-// QTY MODAL
+let calendarInstance = null;
+let mapInstance = null;
+let mapMarkers = [];
 let qtyModalItemId = null, qtyModalCurrent = 1;
 
-function openQtyModal(itemId, label) {
-  qtyModalItemId = itemId;
-  qtyModalCurrent = state.quantities[itemId] || 1;
-  document.getElementById('qty-modal-label').textContent = label;
-  document.getElementById('qty-val').textContent = qtyModalCurrent;
-  document.getElementById('qty-modal').classList.add('open');
+// ═══════════════════════════════════════════════════════════════
+//  DATA
+// ═══════════════════════════════════════════════════════════════
+const TYPE_LABELS = {
+  camping:'⛺ Camping', location:'🏡 Location', plage:'🏖️ Mer/Plage',
+  montagne:'⛰️ Montagne', campagne:'🌾 Campagne', sejour:'🏨 Séjour',
+  etranger:'🌍 Étranger', croi:'🚢 Croisière', roadtrip:'🚐 Road Trip'
+};
+
+const TYPE_DOCUMENTS = {
+  tous:[
+    {icon:"🆔",label:"Carte nationale d'identité / Passeport"},
+    {icon:"💳",label:"Carte bancaire"},{icon:"💰",label:"Espèces / monnaie"},
+    {icon:"🏥",label:"Carte Vitale / attestation mutuelle"},
+    {icon:"👶",label:"Carnet de santé enfants"},{icon:"📄",label:"Guide touristique / plan"}
+  ],
+  camping:[{icon:"📄",label:"Contrat de location / confirmation"},{icon:"🚗",label:"Assurance véhicule"},{icon:"🔥",label:"Assurance habitation"}],
+  location:[{icon:"📄",label:"Contrat de location"},{icon:"💰",label:"Chèque de caution"},{icon:"🔑",label:"Clés ou code d'accès"}],
+  etranger:[{icon:"🛂",label:"Passeport valide"},{icon:"🛃",label:"Visa (si nécessaire)"},{icon:"💉",label:"Carnet de vaccination"},
+    {icon:"📄",label:"Permis international"},{icon:"🏦",label:"Carte bancaire sans frais"},{icon:"💱",label:"Devises locales"},
+    {icon:"📋",label:"Copie des réservations"},{icon:"🏨",label:"Confirmation d'hébergement"}],
+  croi:[{icon:"🛂",label:"Passeport valide"},{icon:"🛃",label:"Visa"},{icon:"🚢",label:"Billet de croisière"},
+    {icon:"📋",label:"Carte d'embarquement"},{icon:"💳",label:"Carte bancaire"},{icon:"🏥",label:"Assurance rapatriement"}],
+  roadtrip:[{icon:"🚗",label:"Permis de conduire"},{icon:"📄",label:"Carte grise"},{icon:"🛡️",label:"Assurance véhicule"},
+    {icon:"🎫",label:"Carte péage"},{icon:"🗺️",label:"Carte routière / GPS"},{icon:"🔧",label:"Assistance dépannage"}]
+};
+
+const TRANSPORT_DOCUMENTS = {
+  voiture:[{icon:"🚗",label:"Permis de conduire"},{icon:"📄",label:"Carte grise"},{icon:"🛡️",label:"Assurance véhicule"},{icon:"🎫",label:"Carte péage"}],
+  train:[{icon:"🎫",label:"Billets de train"},{icon:"🆔",label:"Carte de réduction"},{icon:"📋",label:"Réservation place"}],
+  avion:[{icon:"✈️",label:"Billets d'avion"},{icon:"🆔",label:"Carte d'embarquement"},{icon:"🧳",label:"Étiquettes bagages"}],
+  bus:[{icon:"🎫",label:"Billets de bus"},{icon:"🆔",label:"Carte de transport"}],
+  bateau:[{icon:"⛴️",label:"Billet de bateau"},{icon:"🆔",label:"Carte d'embarquement"},{icon:"🚢",label:"Réservation cabine"}]
+};
+
+const DEFAULT_CATEGORIES = [
+  {id:'vetements',emoji:'👗',name:'Vêtements',items:[
+    {id:'v1',label:"Sous-vêtements (prévoir +2)",types:['tous'],qty:0},
+    {id:'v2',label:"Chaussettes",types:['tous'],qty:0},
+    {id:'v3',label:"T-shirts / tops",types:['tous'],qty:0},
+    {id:'v4',label:"Pantalons / shorts",types:['tous'],qty:0},
+    {id:'v5',label:"Tenue de soirée",types:['tous'],qty:0},
+    {id:'v6',label:"Pyjama / vêtements nuit",types:['tous'],qty:0},
+    {id:'v7',label:"Pull / sweat chaud",types:['montagne','camping','campagne','roadtrip'],qty:0},
+    {id:'v8',label:"Veste imperméable / K-way",types:['montagne','camping','campagne','roadtrip','plage'],qty:0},
+    {id:'v9',label:"Maillots de bain (x2)",types:['plage','camping','croi','location'],qty:0},
+    {id:'v10',label:"Tenue de randonnée",types:['montagne','campagne','camping'],qty:0},
+    {id:'v11',label:"Vêtements thermiques",types:['montagne','camping'],qty:0},
+    {id:'v12',label:"Tenue habillée",types:['croi','etranger','sejour'],qty:0}
+  ]},
+  {id:'chaussures',emoji:'👟',name:'Chaussures',items:[
+    {id:'ch1',label:"Chaussures de marche / randonnée",types:['montagne','camping','campagne','etranger','roadtrip'],qty:0},
+    {id:'ch2',label:"Tongs / sandales",types:['plage','camping','location','croi'],qty:0},
+    {id:'ch3',label:"Chaussures de ville",types:['sejour','etranger','croi'],qty:0},
+    {id:'ch4',label:"Chaussures de sport",types:['tous'],qty:0},
+    {id:'ch5',label:"Chaussons",types:['camping','location','montagne'],qty:0}
+  ]},
+  {id:'hygiene',emoji:'🧴',name:'Hygiène & Beauté',items:[
+    {id:'h1',label:"Brosse à dents + dentifrice",types:['tous'],qty:0},
+    {id:'h2',label:"Shampoing / après-shampoing",types:['tous'],qty:0},
+    {id:'h3',label:"Gel douche / savon",types:['tous'],qty:0},
+    {id:'h4',label:"Déodorant",types:['tous'],qty:0},
+    {id:'h5',label:"Rasoir + mousse / épilateur",types:['tous'],qty:0},
+    {id:'h6',label:"Crème hydratante",types:['tous'],qty:0},
+    {id:'h7',label:"Maquillage / démaquillant",types:['tous'],qty:0},
+    {id:'h8',label:"Crème solaire (indice adapté)",types:['plage','montagne','camping','etranger','croi','roadtrip'],qty:0},
+    {id:'h9',label:"Après-soleil / hydratant corps",types:['plage','camping','croi'],qty:0},
+    {id:'h10',label:"Répulsif anti-moustiques",types:['camping','etranger','campagne','plage'],qty:0},
+    {id:'h11',label:"Brosse / peigne",types:['tous'],qty:0},
+    {id:'h12',label:"Cotons / cotons-tiges",types:['tous'],qty:0},
+    {id:'h13',label:"Serviettes de bain (x2)",types:['tous'],qty:0},
+    {id:'h14',label:"Serviette de plage / microfibre",types:['plage','camping','croi'],qty:0}
+  ]},
+  {id:'pharmacie',emoji:'💊',name:'Pharmacie',items:[
+    {id:'ph1',label:"Médicaments habituels (ordonnance)",types:['tous'],qty:0},
+    {id:'ph2',label:"Paracétamol / ibuprofène",types:['tous'],qty:0},
+    {id:'ph3',label:"Pansements + compresses + bandes",types:['tous'],qty:0},
+    {id:'ph4',label:"Antiseptique (Bétadine, Dakin)",types:['tous'],qty:0},
+    {id:'ph5',label:"Anti-diarrhée + probiotiques",types:['etranger','croi','camping'],qty:0},
+    {id:'ph6',label:"Anti-mal des transports",types:['croi','roadtrip','avion','etranger'],qty:0},
+    {id:'ph7',label:"Anti-allergiques / antihistaminiques",types:['tous'],qty:0},
+    {id:'ph8',label:"Thermomètre",types:['tous'],qty:0},
+    {id:'ph9',label:"Protection solaire lèvres (SPF50)",types:['montagne','plage','croi'],qty:0},
+    {id:'ph10',label:"Sérum physiologique",types:['tous'],qty:0}
+  ]},
+  {id:'camping_equip',emoji:'⛺',name:'Matériel Camping',items:[
+    {id:'ce1',label:"Tente + sardines + tendeurs",types:['camping'],qty:0},
+    {id:'ce2',label:"Sac de couchage adapté",types:['camping'],qty:0},
+    {id:'ce3',label:"Matelas gonflable / tapis de sol",types:['camping'],qty:0},
+    {id:'ce4',label:"Réchaud + cartouche de gaz",types:['camping'],qty:0},
+    {id:'ce5',label:"Ustensiles de cuisine (casserole, poêle)",types:['camping'],qty:0},
+    {id:'ce6',label:"Couverts de camping",types:['camping'],qty:0},
+    {id:'ce7',label:"Allume-feu / briquet",types:['camping'],qty:0},
+    {id:'ce8',label:"Lampe frontale + piles",types:['camping','montagne'],qty:0},
+    {id:'ce9',label:"Guirlande solaire / lanternes",types:['camping'],qty:0},
+    {id:'ce10',label:"Corde à linge + pinces",types:['camping'],qty:0}
+  ]},
+  {id:'plage_equip',emoji:'🏖️',name:'Équipement Plage',items:[
+    {id:'pe1',label:"Parasol de plage",types:['plage'],qty:0},
+    {id:'pe2',label:"Chaises longues pliantes",types:['plage','camping'],qty:0},
+    {id:'pe3',label:"Tente UV bébé / abri solaire",types:['plage'],qty:0},
+    {id:'pe4',label:"Lunettes de soleil",types:['plage','montagne','croi'],qty:0},
+    {id:'pe5',label:"Chapeau / casquette",types:['plage','montagne','etranger','camping'],qty:0},
+    {id:'pe6',label:"Masque + tuba",types:['plage','croi'],qty:0},
+    {id:'pe7',label:"Palmes",types:['plage','croi'],qty:0},
+    {id:'pe8',label:"Matelas gonflable de plage",types:['plage'],qty:0},
+    {id:'pe9',label:"Sac imperméable / waterproof",types:['plage','croi','camping'],qty:0}
+  ]},
+  {id:'montagne_equip',emoji:'⛰️',name:'Équipement Montagne',items:[
+    {id:'me1',label:"Bâtons de randonnée",types:['montagne'],qty:0},
+    {id:'me2',label:"Carte topographique / GPS",types:['montagne'],qty:0},
+    {id:'me3',label:"Sac à dos de rando (30-50L)",types:['montagne','camping'],qty:0},
+    {id:'me4',label:"Gants de montagne",types:['montagne'],qty:0},
+    {id:'me5',label:"Bonnet / tour de cou",types:['montagne'],qty:0},
+    {id:'me6',label:"Lunettes de glacier (UV)",types:['montagne'],qty:0},
+    {id:'me7',label:"Crampons / guêtres",types:['montagne'],qty:0}
+  ]},
+  {id:'activites',emoji:'🎯',name:'Activités & Loisirs',items:[
+    {id:'ac1',label:"Livres / liseuse",types:['tous'],qty:0},
+    {id:'ac2',label:"Jeux de société / cartes",types:['tous'],qty:0},
+    {id:'ac3',label:"Tablette / ordinateur portable",types:['tous'],qty:0},
+    {id:'ac4',label:"Casque audio / écouteurs",types:['tous'],qty:0},
+    {id:'ac5',label:"Raquettes de plage / badminton",types:['plage','camping','campagne'],qty:0},
+    {id:'ac6',label:"Vélos / trottinettes",types:['camping','location','campagne','roadtrip','plage'],qty:0},
+    {id:'ac7',label:"Pétanque",types:['camping','campagne','location','plage'],qty:0},
+    {id:'ac8',label:"Frisbee / ballon",types:['plage','camping','campagne','montagne'],qty:0},
+    {id:'ac9',label:"Appareil photo + chargeur",types:['tous'],qty:0},
+    {id:'ac10',label:"Jumelles",types:['montagne','campagne','croi','etranger'],qty:0}
+  ]},
+  {id:'enfants',emoji:'🧸',name:'Bébé & Enfants',items:[
+    {id:'en1',label:"Poussette / siège auto",types:['tous'],qty:0},
+    {id:'en2',label:"Jouets / doudou bébé",types:['tous'],qty:0},
+    {id:'en3',label:"Couches + lingettes",types:['tous'],qty:0},
+    {id:'en4',label:"Lait maternisé / biberons",types:['tous'],qty:0},
+    {id:'en5',label:"Crème solaire bébé",types:['tous'],qty:0},
+    {id:'en6',label:"Gilet de sauvetage enfant",types:['plage','croi','camping'],qty:0},
+    {id:'en7',label:"Casque vélo enfant",types:['camping','location','campagne','plage'],qty:0}
+  ]},
+  {id:'logistique',emoji:'🔧',name:'Logistique & Voiture',items:[
+    {id:'l1',label:"Chargeurs téléphone / câbles USB-C",types:['tous'],qty:0},
+    {id:'l2',label:"Multiprise / adaptateur secteur",types:['tous'],qty:0},
+    {id:'l3',label:"Batterie externe (power bank)",types:['tous'],qty:0},
+    {id:'l4',label:"Valises / sacs à dos",types:['tous'],qty:0},
+    {id:'l5',label:"Glacière / sac isotherme",types:['tous'],qty:0},
+    {id:'l6',label:"Support téléphone voiture",types:['tous'],qty:0},
+    {id:'l7',label:"Gilets de sécurité + triangles",types:['tous'],qty:0},
+    {id:'l8',label:"GPS / application offline",types:['tous'],qty:0},
+    {id:'l9',label:"Adaptateur prise électrique",types:['etranger','croi'],qty:0},
+    {id:'l10',label:"Lampe de poche / frontale",types:['tous'],qty:0},
+    {id:'l11',label:"Kit de premiers secours",types:['tous'],qty:0}
+  ]},
+  {id:'maison',emoji:'🏠',name:'Maison avant de partir',items:[
+    {id:'m1',label:"Arroser les plantes",types:['tous'],qty:0},
+    {id:'m2',label:"Prévenir un voisin / confier clé",types:['tous'],qty:0},
+    {id:'m3',label:"Couper eau / gaz",types:['tous'],qty:0},
+    {id:'m4',label:"Débrancher appareils électriques",types:['tous'],qty:0},
+    {id:'m5',label:"Vider / nettoyer réfrigérateur",types:['tous'],qty:0},
+    {id:'m6',label:"Sortir les poubelles",types:['tous'],qty:0},
+    {id:'m7',label:"Fermer volets / portes",types:['tous'],qty:0},
+    {id:'m8',label:"Confier les animaux",types:['tous'],qty:0},
+    {id:'m9',label:"Programmer l'alarme",types:['tous'],qty:0}
+  ]},
+  {id:'divers',emoji:'🎒',name:'Divers',items:[
+    {id:'d1',label:"Lunettes de rechange",types:['tous'],qty:0},
+    {id:'d2',label:"Parapluie compact",types:['tous'],qty:0},
+    {id:'d3',label:"Porte-monnaie / porte-cartes",types:['tous'],qty:0},
+    {id:'d4',label:"Couteau suisse / multioutil",types:['camping','montagne','roadtrip'],qty:0},
+    {id:'d5',label:"Boules Quies / masque de nuit",types:['tous'],qty:0},
+    {id:'d6',label:"Carnet de voyage / journal",types:['tous'],qty:0}
+  ]}
+];
+
+const DEFAULT_USERS = [
+  {login:'yves', pass:'vacances2024', role:'admin'},
+  {login:'famille', pass:'ete2024', role:'editor'},
+  {login:'invite', pass:'bienvenue', role:'viewer'}
+];
+
+// ═══════════════════════════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════════════════════════
+function genId() { return Date.now().toString(36) + Math.random().toString(36).substr(2,6); }
+
+function setSyncDot(status) {
+  // status: 'green' | 'orange' | 'red'
+  const d = document.getElementById('sync-dot');
+  const ad = document.getElementById('admin-sync-dot');
+  const at = document.getElementById('admin-sync-text');
+  if(d){ d.className = ''; d.classList.add(status); }
+  if(ad){ ad.className = 'dot ' + status; }
+  if(at){
+    if(status==='green') at.textContent = '🟢 Firebase connecté — sync temps réel actif';
+    else if(status==='orange') at.textContent = '🟡 Synchronisation en cours...';
+    else at.textContent = '🔴 Hors ligne — mode local uniquement';
+  }
 }
 
-function closeQtyModal() {
-  document.getElementById('qty-modal').classList.remove('open');
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
 }
 
-function qtyChange(d) {
-  qtyModalCurrent = Math.max(1, qtyModalCurrent + d);
-  document.getElementById('qty-val').textContent = qtyModalCurrent;
-}
-
-function saveQty() {
-  state.quantities[qtyModalItemId] = qtyModalCurrent;
-  const badge = document.querySelector(`#row-${qtyModalItemId} .item-qty-badge`);
-  if (badge) badge.textContent = 'x' + qtyModalCurrent;
-  const mlBadge = document.querySelector(`#mlrow-${qtyModalItemId} .mylist-qty`);
-  if (mlBadge) mlBadge.textContent = 'x' + qtyModalCurrent;
-  closeQtyModal();
-  saveState();
-}
-
-document.getElementById('qty-modal').addEventListener('click', function (e) {
-  if (e.target === this) closeQtyModal();
-});
-
-// AUTH
+// ═══════════════════════════════════════════════════════════════
+//  AUTH — stockage dans Firebase app_users (partagé globalement)
+// ═══════════════════════════════════════════════════════════════
 async function getUsers() {
-  if (db) {
+  if(db) {
     try {
-      const querySnapshot = await db.collection('users').get();
-      const users = [];
-      querySnapshot.forEach((doc) => { users.push(doc.data()); });
-      return users.length > 0 ? users : DEFAULT_USERS;
-    } catch (e) {
-      console.error("Erreur récupération utilisateurs Firebase:", e);
-    }
+      const snap = await db.collection(COL_USERS).get();
+      if(!snap.empty) {
+        return snap.docs.map(d => d.data());
+      }
+    } catch(e) { console.error('getUsers:', e); }
   }
-  const s = localStorage.getItem(USERS_KEY);
-  return s ? JSON.parse(s) : JSON.parse(JSON.stringify(DEFAULT_USERS));
+  const local = localStorage.getItem('vac_users_v3');
+  return local ? JSON.parse(local) : JSON.parse(JSON.stringify(DEFAULT_USERS));
 }
 
-function saveUsers(u) {
-  if (db) {
+async function saveUsers(users) {
+  if(db) {
     const batch = db.batch();
-    u.forEach((user) => {
-      batch.set(db.collection('users').doc(user.login), user);
+    // Supprimer les anciens puis recréer
+    users.forEach(u => {
+      batch.set(db.collection(COL_USERS).doc(u.login), u);
     });
-    batch.commit().catch((e) => console.error("Erreur sauvegarde utilisateurs Firebase:", e));
+    await batch.commit();
   }
-  localStorage.setItem(USERS_KEY, JSON.stringify(u));
+  localStorage.setItem('vac_users_v3', JSON.stringify(users));
 }
 
 async function doLogin() {
   const login = document.getElementById('login-user').value.trim().toLowerCase();
-  const pass = document.getElementById('login-pass').value;
-  
+  const pass  = document.getElementById('login-pass').value;
+  if(!login || !pass) return;
   try {
     const users = await getUsers();
     const u = users.find(x => x.login === login && x.pass === pass);
-    if (u) {
-      sessionStorage.setItem(SESSION_KEY, JSON.stringify({ login: u.login, role: u.role }));
+    if(u) {
+      sessionStorage.setItem(SESSION_KEY, JSON.stringify({login:u.login, role:u.role}));
       document.getElementById('login-error').style.display = 'none';
       bootApp(u);
     } else {
       document.getElementById('login-error').style.display = 'block';
       document.getElementById('login-pass').value = '';
     }
-  } catch (e) {
-    console.error("Erreur lors de la connexion:", e);
+  } catch(e) {
+    console.error('doLogin:', e);
     document.getElementById('login-error').style.display = 'block';
   }
 }
 
-document.getElementById('login-pass').addEventListener('keydown', e => {
-  if (e.key === 'Enter') doLogin();
-});
-
-document.getElementById('login-user').addEventListener('keydown', e => {
-  if (e.key === 'Enter') document.getElementById('login-pass').focus();
-});
+document.getElementById('login-pass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+document.getElementById('login-user').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('login-pass').focus(); });
 
 function doLogout() {
+  if(realtimeUnsubscribe) { realtimeUnsubscribe(); realtimeUnsubscribe = null; }
   sessionStorage.removeItem(SESSION_KEY);
   location.reload();
 }
 
+// ═══════════════════════════════════════════════════════════════
+//  BOOT
+// ═══════════════════════════════════════════════════════════════
 async function bootApp(u) {
   currentUser = u;
   document.getElementById('login-screen').style.display = 'none';
@@ -2414,27 +979,29 @@ async function bootApp(u) {
   document.getElementById('mobile-nav').classList.add('active');
 
   const badge = document.getElementById('user-badge');
-  badge.textContent = u.login + (u.role === 'admin' ? ' 🔑' : u.role === 'viewer' ? ' 👁️' : ' ✏️');
-  badge.className = 'user-badge' + (u.role === 'admin' ? ' admin' : '');
+  badge.textContent = u.login + (u.role==='admin' ? ' 🔑' : u.role==='viewer' ? ' 👁️' : ' ✏️');
+  badge.className = 'user-badge' + (u.role==='admin' ? ' admin' : '');
 
-  if (u.role === 'admin') {
+  if(u.role === 'admin') {
     document.getElementById('tab-admin').style.display = '';
     document.getElementById('mobile-btn-admin').style.display = 'flex';
   }
 
-  // Charger la liste des voyages et le voyage actif
+  setSyncDot(db ? 'orange' : 'red');
+
   await initTrips();
   await loadState();
 
-  if (!state.categories || !state.categories.length) {
+  if(!state.categories || !state.categories.length)
     state.categories = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
-  }
 
   renderTripSelector();
   renderTypeButtons();
   renderTransportButtons();
   renderAll();
   updateDocumentsList();
+  updateProgress();
+  updateTypesBar();
   initMap();
   initCalendar();
   renderReminders();
@@ -2445,385 +1012,325 @@ async function bootApp(u) {
   document.getElementById('notes-area').value  = state.notes       || '';
   document.getElementById('address-input').value = state.dest.name || '';
 
-  updateProgress();
-  updateTypesBar();
-  updateSyncStatus();
-
-  if (u.role === 'viewer') {
+  if(u.role === 'viewer') {
     document.getElementById('cat-grid').classList.add('readonly-mode');
     document.getElementById('main-action-bar').style.display = 'none';
   }
 
-  // Démarrer l'écoute temps réel Firebase (toujours)
   startRealtimeSync();
+  setSyncDot(db ? 'green' : 'red');
 }
 
-// MOBILE NAVIGATION
-function showMobilePage(pageId) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.mobile-nav-btn').forEach(btn => btn.classList.remove('active'));
-  
-  const page = document.getElementById('page-' + pageId);
-  if (page) page.classList.add('active');
-  const btn = document.getElementById('mobile-btn-' + pageId);
-  if (btn) btn.classList.add('active');
-  
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-  
-  if (pageId === 'calendrier') {
-    renderFullCalendar();
-    renderFullReminders();
+// ═══════════════════════════════════════════════════════════════
+//  TRIPS — stockage PARTAGÉ dans /trips/{tripId} + /app_meta/trips
+// ═══════════════════════════════════════════════════════════════
+async function loadTripsMetadata() {
+  if(db) {
+    try {
+      const doc = await db.collection(DOC_META).doc('trips').get();
+      if(doc.exists) return doc.data();
+    } catch(e) { console.error('loadTripsMetadata:', e); }
   }
-  
-  if (pageId === 'ma-liste') {
-    renderMyList();
-  }
+  const local = localStorage.getItem('vac_trips_meta_v3');
+  return local ? JSON.parse(local) : null;
 }
-
-// PAGES NAV (Desktop)
-function showPage(id) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-  const page = document.getElementById('page-' + id);
-  if (page) page.classList.add('active');
-
-  document.querySelectorAll('.nav-tab').forEach(t => {
-    if (t.getAttribute('onclick') && t.getAttribute('onclick').includes(id)) {
-      t.classList.add('active');
-    }
-  });
-
-  document.querySelectorAll('.mobile-nav-btn').forEach(btn => btn.classList.remove('active'));
-  const mobileBtn = document.getElementById('mobile-btn-' + id);
-  if (mobileBtn) mobileBtn.classList.add('active');
-
-  if (id === 'ma-liste') renderMyList();
-  if (id === 'admin') renderAdmin();
-  if (id === 'calendrier') {
-    renderFullCalendar();
-    renderFullReminders();
-  }
-  
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-// STATE PERSIST
-// ─── TRIPS METADATA ────────────────────────────────────────────────────────
 
 async function saveTripsMetadata() {
-  const meta = { currentTripId, list: tripsList };
-  localStorage.setItem(TRIPS_META_KEY, JSON.stringify(meta));
-  if (db && currentUser) {
+  const meta = {currentTripId, list: tripsList};
+  localStorage.setItem('vac_trips_meta_v3', JSON.stringify(meta));
+  if(db) {
     try {
-      await db.collection('users').doc(currentUser.login)
-        .collection('meta').doc('trips').set(meta);
+      await db.collection(DOC_META).doc('trips').set(meta);
     } catch(e) { console.error('saveTripsMetadata:', e); }
   }
 }
 
-async function loadTripsMetadata() {
-  if (db && currentUser) {
-    try {
-      const doc = await db.collection('users').doc(currentUser.login)
-        .collection('meta').doc('trips').get();
-      if (doc.exists) return doc.data();
-    } catch(e) { console.error('loadTripsMetadata:', e); }
-  }
-  const local = localStorage.getItem(TRIPS_META_KEY);
-  return local ? JSON.parse(local) : null;
-}
-
-// ─── SAVE / LOAD STATE ─────────────────────────────────────────────────────
-
-async function saveState() {
-  state.dest.name   = document.getElementById('dest-name').value;
-  state.dest.dates  = document.getElementById('dest-dates').value;
-  state.dest.people = document.getElementById('dest-people').value;
-  state.notes       = document.getElementById('notes-area').value;
-
-  const tripKey = 'vac_trip_' + currentTripId;
-  localStorage.setItem(tripKey, JSON.stringify(state));
-
-  // Mettre à jour le résumé dans la liste des voyages
-  const trip = tripsList.find(t => t.id === currentTripId);
-  if (trip) {
-    trip.dates = state.dest.dates || '';
-    trip.name  = trip.name || state.dest.name || 'Voyage sans nom';
-    saveTripsMetadata();
-  }
-
-  if (db && currentUser && currentTripId) {
-    try {
-      await db.collection('users').doc(currentUser.login)
-        .collection('trips').doc(currentTripId).set({
-          state,
-          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-      const el = document.getElementById('last-sync');
-      if (el) el.value = '🟢 ' + new Date().toLocaleTimeString();
-    } catch(e) { console.error('saveState Firebase:', e); }
-  }
-
-  updateProgress();
-  updateDocumentsList();
-}
-
-async function loadState() {
-  if (!currentTripId) return;
-
-  if (db && currentUser) {
-    try {
-      const doc = await db.collection('users').doc(currentUser.login)
-        .collection('trips').doc(currentTripId).get();
-      if (doc.exists) {
-        applyStateFromObject(doc.data().state);
-        return;
-      }
-    } catch(e) { console.error('loadState Firebase:', e); }
-  }
-
-  const local = localStorage.getItem('vac_trip_' + currentTripId);
-  if (local) {
-    try { applyStateFromObject(JSON.parse(local)); } catch(e) {}
-  }
-}
-
-function applyStateFromObject(loaded) {
-  if (!loaded) return;
-  state.types      = loaded.types      || [];
-  state.transports = loaded.transports || [];
-  state.checked    = loaded.checked    || {};
-  state.quantities = loaded.quantities || {};
-  state.collapsed  = loaded.collapsed  || {};
-  state.dest       = loaded.dest       || { name:'', dates:'', people:'' };
-  state.notes      = loaded.notes      || '';
-  state.reminders  = loaded.reminders  || [];
-  state.map        = loaded.map        || { lat:null, lng:null, zoom:13 };
-  if (loaded.categories && loaded.categories.length) {
-    state.categories = loaded.categories;
-  }
-}
-
-// ─── REAL-TIME SYNC ────────────────────────────────────────────────────────
-
-function startRealtimeSync() {
-  if (realtimeUnsubscribe) { realtimeUnsubscribe(); realtimeUnsubscribe = null; }
-  if (!db || !currentUser || !currentTripId) return;
-
-  const docRef = db.collection('users').doc(currentUser.login)
-    .collection('trips').doc(currentTripId);
-
-  let isFirst = true;
-  realtimeUnsubscribe = docRef.onSnapshot(doc => {
-    if (isFirst) { isFirst = false; return; }
-    if (!doc.exists) return;
-    const remote = doc.data().state;
-    if (!remote) return;
-
-    applyStateFromObject(remote);
-    localStorage.setItem('vac_trip_' + currentTripId, JSON.stringify(state));
-
-    renderAll();
-    renderTypeButtons();
-    updateTypesBar();
-    updateProgress();
-    updateDocumentsList();
-    const dn = document.getElementById('dest-name');
-    if (dn) dn.value = state.dest.name || '';
-    const dd = document.getElementById('dest-dates');
-    if (dd) dd.value = state.dest.dates || '';
-    const dp = document.getElementById('dest-people');
-    if (dp) dp.value = state.dest.people || '';
-    const na = document.getElementById('notes-area');
-    if (na) na.value = state.notes || '';
-
-    const el = document.getElementById('last-sync');
-    if (el) el.value = '🔄 ' + new Date().toLocaleTimeString();
-    showToast('🔄 Liste mise à jour depuis un autre appareil');
-  }, err => console.error('onSnapshot:', err));
-}
-
-// ─── TRIP MANAGEMENT ───────────────────────────────────────────────────────
-
 async function initTrips() {
   const meta = await loadTripsMetadata();
-
-  if (meta && meta.list && meta.list.length) {
-    tripsList    = meta.list;
+  if(meta && meta.list && meta.list.length) {
+    tripsList     = meta.list;
     currentTripId = meta.currentTripId || meta.list[0].id;
+    if(!tripsList.find(t => t.id === currentTripId))
+      currentTripId = tripsList[0].id;
   } else {
-    // Migrer l'ancien état unique si existant, sinon créer voyage par défaut
-    let migratedState = null;
-    if (db && currentUser) {
-      try {
-        const old = await db.collection('users').doc(currentUser.login)
-          .collection('states').doc('current').get();
-        if (old.exists) migratedState = old.data().state;
-      } catch(e) {}
-    }
-    if (!migratedState) {
-      const local = localStorage.getItem('vac_state_v8') ||
-                    localStorage.getItem('vac_state_v7');
-      if (local) { try { migratedState = JSON.parse(local); } catch(e) {} }
-    }
+    // Migration depuis l'ancienne structure par user
+    let migrated = null;
+    const oldLocal = localStorage.getItem('vac_state_v8') || localStorage.getItem('vac_state_v7');
+    if(oldLocal) { try { migrated = JSON.parse(oldLocal); } catch(e){} }
+
     const firstId = genId();
     currentTripId = firstId;
-    tripsList = [{ id: firstId, name: 'Mes vacances', dates: '' }];
+    tripsList = [{id:firstId, name:'Mes vacances', dates:''}];
     await saveTripsMetadata();
-    if (migratedState) {
-      applyStateFromObject(migratedState);
-      if (!state.categories || !state.categories.length)
+    if(migrated) {
+      applyState(migrated);
+      if(!state.categories || !state.categories.length)
         state.categories = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
       await saveState();
     }
-    return; // state already applied above or will be initialized in bootApp
   }
-
-  // S'assurer que le trip actif existe
-  if (!tripsList.find(t => t.id === currentTripId))
-    currentTripId = tripsList[0].id;
 }
 
 async function switchTrip(tripId) {
-  if (tripId === currentTripId) return;
-  await saveState(); // sauvegarder avant de partir
-  if (realtimeUnsubscribe) { realtimeUnsubscribe(); realtimeUnsubscribe = null; }
-
+  if(tripId === currentTripId) return;
+  await saveState();
+  stopRealtimeSync();
   currentTripId = tripId;
   state.categories = [];
   await loadState();
-  if (!state.categories || !state.categories.length)
+  if(!state.categories || !state.categories.length)
     state.categories = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
-
   await saveTripsMetadata();
-  renderTripSelector();
-  renderAll();
-  renderTypeButtons();
-  updateTypesBar();
-  updateProgress();
-  updateDocumentsList();
-  document.getElementById('dest-name').value  = state.dest.name   || '';
-  document.getElementById('dest-dates').value = state.dest.dates  || '';
-  document.getElementById('dest-people').value= state.dest.people || '';
-  document.getElementById('notes-area').value = state.notes        || '';
+  refreshUI();
   startRealtimeSync();
   showToast('✈️ ' + (tripsList.find(t=>t.id===tripId)||{}).name);
 }
 
 async function promptNewTrip() {
   const name = prompt('Nom du nouveau voyage :', 'Vacances ' + new Date().getFullYear());
-  if (!name) return;
+  if(!name) return;
   const id = genId();
-  tripsList.push({ id, name, dates: '' });
+  tripsList.push({id, name, dates:''});
   currentTripId = id;
   state = {
     types:[], transports:[], checked:{}, quantities:{}, collapsed:{},
-    dest:{ name:'', dates:'', people:'' }, notes:'', reminders:[],
-    map:{ lat:null, lng:null, zoom:13 },
+    dest:{name:'',dates:'',people:''}, notes:'', reminders:[], map:{lat:null,lng:null,zoom:13},
     categories: JSON.parse(JSON.stringify(DEFAULT_CATEGORIES))
   };
   await saveState();
   await saveTripsMetadata();
+  stopRealtimeSync();
   renderTripSelector();
-  renderAll();
-  renderTypeButtons();
-  updateTypesBar();
-  updateProgress();
-  document.getElementById('dest-name').value  = '';
-  document.getElementById('dest-dates').value = '';
-  document.getElementById('dest-people').value= '';
-  document.getElementById('notes-area').value = '';
+  refreshUI();
   startRealtimeSync();
-  showToast('✈️ Nouveau voyage créé : ' + name);
+  showToast('✈️ Nouveau voyage : ' + name);
 }
 
 async function renameCurrentTrip() {
   const trip = tripsList.find(t => t.id === currentTripId);
-  if (!trip) return;
-  const name = prompt('Renommer ce voyage :', trip.name);
-  if (!name) return;
+  if(!trip) return;
+  const name = prompt('Renommer :', trip.name);
+  if(!name) return;
   trip.name = name;
   await saveTripsMetadata();
   renderTripSelector();
-  showToast('✏️ Voyage renommé : ' + name);
+  showToast('✏️ ' + name);
 }
 
 async function deleteCurrentTrip() {
-  if (tripsList.length <= 1) {
-    showToast('⚠️ Impossible de supprimer le seul voyage');
-    return;
-  }
+  if(tripsList.length <= 1) { showToast('⚠️ Impossible de supprimer le seul voyage'); return; }
   const trip = tripsList.find(t => t.id === currentTripId);
-  if (!confirm('Supprimer le voyage "' + (trip ? trip.name : '') + '" et toutes ses données ?')) return;
-
-  tripsList = tripsList.filter(t => t.id !== currentTripId);
-  if (db && currentUser) {
-    try {
-      await db.collection('users').doc(currentUser.login)
-        .collection('trips').doc(currentTripId).delete();
-    } catch(e) {}
-  }
-  localStorage.removeItem('vac_trip_' + currentTripId);
+  if(!confirm('Supprimer "' + (trip?trip.name:'') + '" ?')) return;
+  const delId = currentTripId;
+  tripsList = tripsList.filter(t => t.id !== delId);
+  if(db) { try { await db.collection(COL_TRIPS).doc(delId).delete(); } catch(e){} }
+  localStorage.removeItem('vac_trip_' + delId);
   await switchTrip(tripsList[0].id);
   showToast('🗑️ Voyage supprimé');
 }
 
 function renderTripSelector() {
   const sel = document.getElementById('trip-selector');
-  if (!sel) return;
+  if(!sel) return;
   sel.innerHTML = tripsList.map(t =>
-    `<option value="${t.id}" ${t.id === currentTripId ? 'selected' : ''}>
-      ✈️ ${t.name}${t.dates ? ' · ' + t.dates : ''}
-    </option>`
+    `<option value="${t.id}" ${t.id===currentTripId?'selected':''}> ✈️ ${t.name}${t.dates?' · '+t.dates:''}</option>`
   ).join('');
 }
 
 function showTripMenu() {
-  // Fermer si déjà ouvert
   const existing = document.getElementById('trip-menu-popup');
-  if (existing) { existing.remove(); return; }
-
+  if(existing){ existing.remove(); return; }
   const menu = document.createElement('div');
   menu.id = 'trip-menu-popup';
   menu.className = 'trip-menu';
   menu.innerHTML = `
-    <button onclick="renameCurrentTrip(); closeTripMenu()">✏️ Renommer ce voyage</button>
-    <button onclick="promptNewTrip(); closeTripMenu()">➕ Nouveau voyage</button>
-    <button class="danger" onclick="deleteCurrentTrip(); closeTripMenu()">🗑️ Supprimer ce voyage</button>
-  `;
+    <button onclick="renameCurrentTrip();closeTripMenu()">✏️ Renommer ce voyage</button>
+    <button onclick="promptNewTrip();closeTripMenu()">➕ Nouveau voyage</button>
+    <button class="danger" onclick="deleteCurrentTrip();closeTripMenu()">🗑️ Supprimer</button>`;
   document.body.appendChild(menu);
-  setTimeout(() => document.addEventListener('click', closeTripMenu, { once: true }), 100);
+  setTimeout(() => document.addEventListener('click', closeTripMenu, {once:true}), 100);
+}
+function closeTripMenu(){ const m=document.getElementById('trip-menu-popup'); if(m) m.remove(); }
+
+// ═══════════════════════════════════════════════════════════════
+//  STATE SAVE / LOAD — stockage dans /trips/{tripId} (partagé)
+// ═══════════════════════════════════════════════════════════════
+async function saveState() {
+  // Lire les champs du DOM avant de sauvegarder
+  const dn = document.getElementById('dest-name');
+  const dd = document.getElementById('dest-dates');
+  const dp = document.getElementById('dest-people');
+  const na = document.getElementById('notes-area');
+  if(dn) state.dest.name   = dn.value;
+  if(dd) state.dest.dates  = dd.value;
+  if(dp) state.dest.people = dp.value;
+  if(na) state.notes       = na.value;
+
+  // Mettre à jour le résumé voyage
+  const trip = tripsList.find(t => t.id === currentTripId);
+  if(trip) {
+    trip.dates = state.dest.dates || '';
+    trip.name  = trip.name || state.dest.name || 'Voyage sans nom';
+  }
+
+  // Sauvegarde locale immédiate
+  localStorage.setItem('vac_trip_' + currentTripId, JSON.stringify(state));
+
+  // Sauvegarde Firebase (partagée → tous les utilisateurs voient les changements)
+  if(db && currentTripId) {
+    setSyncDot('orange');
+    try {
+      await db.collection(COL_TRIPS).doc(currentTripId).set({
+        state,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedBy: currentUser ? currentUser.login : 'unknown'
+      });
+      setSyncDot('green');
+      const lbl = document.getElementById('last-sync-label');
+      if(lbl) lbl.textContent = '✅ Dernière sync : ' + new Date().toLocaleTimeString('fr-FR');
+    } catch(e) {
+      console.error('saveState Firebase:', e);
+      setSyncDot('red');
+    }
+  }
+
+  saveTripsMetadata();
+  updateProgress();
+  updateDocumentsList();
 }
 
-function closeTripMenu() {
-  const m = document.getElementById('trip-menu-popup');
-  if (m) m.remove();
+// Sauvegarde avec debounce (pour les champs texte — évite les appels trop fréquents)
+function debouncedSave() {
+  clearTimeout(saveDebounceTimer);
+  saveDebounceTimer = setTimeout(() => saveState(), 600);
+}
+
+async function loadState() {
+  if(!currentTripId) return;
+  // Priorité Firebase (données fraîches et partagées)
+  if(db) {
+    try {
+      const doc = await db.collection(COL_TRIPS).doc(currentTripId).get();
+      if(doc.exists && doc.data().state) {
+        applyState(doc.data().state);
+        localStorage.setItem('vac_trip_' + currentTripId, JSON.stringify(state)); // mise en cache
+        return;
+      }
+    } catch(e) { console.error('loadState Firebase:', e); }
+  }
+  // Fallback localStorage
+  const local = localStorage.getItem('vac_trip_' + currentTripId);
+  if(local) { try { applyState(JSON.parse(local)); } catch(e){} }
+}
+
+function applyState(s) {
+  if(!s) return;
+  state.types      = s.types      || [];
+  state.transports = s.transports || [];
+  state.checked    = s.checked    || {};
+  state.quantities = s.quantities || {};
+  state.collapsed  = s.collapsed  || {};
+  state.dest       = s.dest       || {name:'',dates:'',people:''};
+  state.notes      = s.notes      || '';
+  state.reminders  = s.reminders  || [];
+  state.map        = s.map        || {lat:null,lng:null,zoom:13};
+  if(s.categories && s.categories.length) state.categories = s.categories;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  REALTIME SYNC — écoute /trips/{tripId} → tous les users voient les mises à jour
+// ═══════════════════════════════════════════════════════════════
+function startRealtimeSync() {
+  stopRealtimeSync();
+  if(!db || !currentTripId) return;
+
+  let isFirstSnapshot = true;
+  realtimeUnsubscribe = db.collection(COL_TRIPS).doc(currentTripId)
+    .onSnapshot(doc => {
+      // Ignorer le premier snapshot (c'est notre propre écriture initiale)
+      if(isFirstSnapshot) { isFirstSnapshot = false; return; }
+      if(!doc.exists || !doc.data().state) return;
+
+      const remote   = doc.data().state;
+      const updatedBy = doc.data().updatedBy || '';
+
+      // Ne pas ré-appliquer si c'est nous qui avons écrit
+      if(updatedBy === (currentUser ? currentUser.login : '') && !isSyncing) return;
+
+      applyState(remote);
+      localStorage.setItem('vac_trip_' + currentTripId, JSON.stringify(state));
+      refreshUI(true); // true = vient d'un autre appareil
+
+      setSyncDot('green');
+      const lbl = document.getElementById('last-sync-label');
+      if(lbl) lbl.textContent = '🔄 Reçu depuis ' + updatedBy + ' — ' + new Date().toLocaleTimeString('fr-FR');
+      showToast('🔄 Mis à jour par ' + (updatedBy || 'un autre appareil'));
+    }, err => {
+      console.error('onSnapshot error:', err);
+      setSyncDot('red');
+    });
+}
+
+function stopRealtimeSync() {
+  if(realtimeUnsubscribe) { realtimeUnsubscribe(); realtimeUnsubscribe = null; }
 }
 
 async function forceSync() {
+  isSyncing = true;
   try {
     await saveState();
-    showToast('✅ Données envoyées vers Firebase');
+    showToast('✅ Données envoyées à Firebase');
   } catch(e) {
     showToast('❌ Erreur de synchronisation');
   }
+  isSyncing = false;
 }
 
-function updateSyncStatus() {
-  const el  = document.getElementById('sync-status');
-  const ls  = document.getElementById('last-sync');
-  if (el) el.value = db ? '🟢 Firebase connecté – temps réel actif' : '🔴 Hors ligne – mode local uniquement';
-  if (ls) ls.value = db ? '🟢 ' + new Date().toLocaleTimeString() : '—';
+// ═══════════════════════════════════════════════════════════════
+//  UI REFRESH
+// ═══════════════════════════════════════════════════════════════
+function refreshUI(fromRemote) {
+  renderAll();
+  renderTypeButtons();
+  renderTransportButtons();
+  updateTypesBar();
+  updateProgress();
+  updateDocumentsList();
+  renderReminders();
+  renderTripSelector();
+
+  document.getElementById('dest-name').value   = state.dest.name   || '';
+  document.getElementById('dest-dates').value  = state.dest.dates  || '';
+  document.getElementById('dest-people').value = state.dest.people || '';
+  document.getElementById('notes-area').value  = state.notes       || '';
 }
 
-// TYPE SELECTION
-function toggleType(type, btn) {
+// ═══════════════════════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════════════════════
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab, .mobile-nav-btn').forEach(t => t.classList.remove('active'));
+  const page = document.getElementById('page-' + id);
+  if(page) page.classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach(t => {
+    if(t.getAttribute('onclick') && t.getAttribute('onclick').includes(id)) t.classList.add('active');
+  });
+  const mb = document.getElementById('mobile-btn-' + id);
+  if(mb) mb.classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+  if(id === 'ma-liste')  renderMyList();
+  if(id === 'admin')     renderAdmin();
+  if(id === 'calendrier'){ renderFullCalendar(); renderFullReminders(); }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  TYPE / TRANSPORT
+// ═══════════════════════════════════════════════════════════════
+function toggleType(type) {
+  if(currentUser && currentUser.role === 'viewer') return;
   const idx = state.types.indexOf(type);
-  if (idx >= 0) {
-    state.types.splice(idx, 1);
-  } else {
-    state.types.push(type);
-  }
+  if(idx >= 0) state.types.splice(idx,1); else state.types.push(type);
   renderTypeButtons();
   updateTypesBar();
   renderAll();
@@ -2833,42 +1340,25 @@ function toggleType(type, btn) {
 
 function renderTypeButtons() {
   document.querySelectorAll('.type-btn').forEach(btn => {
-    const t = btn.dataset.type;
-    btn.classList.toggle('active', state.types.includes(t));
+    btn.classList.toggle('active', state.types.includes(btn.dataset.type));
   });
 }
 
-const TYPE_LABELS = {
-  camping: '⛺ Camping',
-  location: '🏡 Location',
-  plage: '🏖️ Mer/Plage',
-  montagne: '⛰️ Montagne',
-  campagne: '🌾 Campagne',
-  sejour: '🏨 Séjour',
-  etranger: '🌍 Étranger',
-  croi: '🚢 Croisière',
-  roadtrip: '🚐 Road Trip'
-};
-
 function updateTypesBar() {
   const bar = document.getElementById('types-bar-text');
-  if (!state.types.length) {
+  if(!state.types.length) {
     bar.innerHTML = 'Sélectionnez un ou plusieurs types de vacances';
     bar.style.color = 'var(--text-light)';
   } else {
-    bar.innerHTML = state.types.map(t => `<span class="type-pill">${TYPE_LABELS[t] || t}</span>`).join(' ');
+    bar.innerHTML = state.types.map(t => `<span class="type-pill">${TYPE_LABELS[t]||t}</span>`).join(' ');
     bar.style.color = 'var(--text)';
   }
 }
 
-// TRANSPORT SELECTION
-function toggleTransport(transport, btn) {
+function toggleTransport(transport) {
+  if(currentUser && currentUser.role === 'viewer') return;
   const idx = state.transports.indexOf(transport);
-  if (idx >= 0) {
-    state.transports.splice(idx, 1);
-  } else {
-    state.transports.push(transport);
-  }
+  if(idx >= 0) state.transports.splice(idx,1); else state.transports.push(transport);
   renderTransportButtons();
   saveState();
   updateDocumentsList();
@@ -2876,385 +1366,202 @@ function toggleTransport(transport, btn) {
 
 function renderTransportButtons() {
   document.querySelectorAll('.transport-btn').forEach(btn => {
-    const t = btn.dataset.transport;
-    btn.classList.toggle('active', state.transports.includes(t));
+    btn.classList.toggle('active', state.transports.includes(btn.dataset.transport));
   });
 }
 
-// DOCUMENTS LIST
+// ═══════════════════════════════════════════════════════════════
+//  DOCUMENTS
+// ═══════════════════════════════════════════════════════════════
 function updateDocumentsList() {
-  const documentsList = document.getElementById('documents-list');
-  let documents = [];
-
-  state.types.forEach(type => {
-    if (TYPE_DOCUMENTS[type]) {
-      documents = documents.concat(TYPE_DOCUMENTS[type]);
-    }
-  });
-
-  state.transports.forEach(transport => {
-    if (TRANSPORT_DOCUMENTS[transport]) {
-      documents = documents.concat(TRANSPORT_DOCUMENTS[transport]);
-    }
-  });
-
-  documents = documents.filter((doc, index, self) => {
-    return index === self.findIndex((t) => t.label === doc.label);
-  });
-
-  if (documents.length === 0) {
-    documentsList.innerHTML = '<p style="color:var(--text-light);font-size:.8rem;">Sélectionnez des types de vacances et de transport.</p>';
+  const list = document.getElementById('documents-list');
+  let docs = [...(TYPE_DOCUMENTS['tous']||[])];
+  state.types.forEach(t => { if(TYPE_DOCUMENTS[t]) docs = docs.concat(TYPE_DOCUMENTS[t]); });
+  state.transports.forEach(t => { if(TRANSPORT_DOCUMENTS[t]) docs = docs.concat(TRANSPORT_DOCUMENTS[t]); });
+  // Déduplique
+  const seen = new Set();
+  docs = docs.filter(d => { if(seen.has(d.label)) return false; seen.add(d.label); return true; });
+  if(!docs.length) {
+    list.innerHTML = '<p style="color:var(--text-light);font-size:.8rem">Sélectionnez des types de vacances.</p>';
   } else {
-    documentsList.innerHTML = documents.map(doc => `
-      <div class="document-item">
-        <span class="icon">${doc.icon}</span>
-        <span>${doc.label}</span>
-      </div>
-    `).join('');
+    list.innerHTML = docs.map(d => `<div class="document-item"><span>${d.icon}</span><span>${d.label}</span></div>`).join('');
   }
 }
 
-// MAP FUNCTIONS
+// ═══════════════════════════════════════════════════════════════
+//  MAP
+// ═══════════════════════════════════════════════════════════════
 function initMap() {
-  if (map) return;
-  
-  const defaultLat = state.map.lat || 48.8566;
-  const defaultLng = state.map.lng || 2.3522;
-  const defaultZoom = state.map.zoom || 13;
-  
-  map = L.map('map-container').setView([defaultLat, defaultLng], defaultZoom);
-  
+  if(mapInstance) return;
+  mapInstance = L.map('map-container').setView([state.map.lat||48.8566, state.map.lng||2.3522], state.map.zoom||6);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-  }).addTo(map);
-  
-  if (state.map.lat && state.map.lng) {
-    addMarker(state.map.lat, state.map.lng, state.dest.name || 'Destination');
-  }
-  
-  map.on('click', function(e) {
-    if (currentUser && currentUser.role === 'viewer') return;
-    
-    const { lat, lng } = e.latlng;
-    state.map.lat = lat;
-    state.map.lng = lng;
-    state.map.zoom = map.getZoom();
-    
+    attribution:'&copy; OpenStreetMap'
+  }).addTo(mapInstance);
+  if(state.map.lat && state.map.lng) addMapMarker(state.map.lat, state.map.lng, state.dest.name||'Destination');
+  mapInstance.on('click', e => {
+    if(currentUser && currentUser.role==='viewer') return;
+    const {lat, lng} = e.latlng;
+    state.map.lat = lat; state.map.lng = lng; state.map.zoom = mapInstance.getZoom();
     reverseGeocode(lat, lng);
-    clearMarkers();
-    addMarker(lat, lng, 'Nouvelle destination');
+    clearMapMarkers();
+    addMapMarker(lat, lng, 'Destination');
     saveState();
   });
 }
 
-function addMarker(lat, lng, title) {
-  clearMarkers();
-  const marker = L.marker([lat, lng]).addTo(map);
-  marker.bindPopup(`<b>${title}</b><br>Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`).openPopup();
-  markers.push(marker);
-  map.setView([lat, lng], state.map.zoom || 13);
+function addMapMarker(lat, lng, title) {
+  clearMapMarkers();
+  const m = L.marker([lat, lng]).addTo(mapInstance);
+  m.bindPopup(`<b>${title}</b>`).openPopup();
+  mapMarkers.push(m);
+  mapInstance.setView([lat, lng], state.map.zoom||13);
 }
 
-function clearMarkers() {
-  markers.forEach(marker => map.removeLayer(marker));
-  markers = [];
-}
+function clearMapMarkers() { mapMarkers.forEach(m => mapInstance.removeLayer(m)); mapMarkers=[]; }
 
 function resetMap() {
-  if (currentUser && currentUser.role === 'viewer') return;
-  
-  clearMarkers();
-  state.map = { lat: null, lng: null, zoom: 13 };
-  map.setView([48.8566, 2.3522], 13);
+  if(currentUser && currentUser.role==='viewer') return;
+  clearMapMarkers();
+  state.map = {lat:null,lng:null,zoom:6};
+  mapInstance.setView([46.2276,2.2137], 6);
   document.getElementById('address-input').value = '';
-  document.getElementById('dest-name').value = '';
   saveState();
   showToast('🗺️ Carte réinitialisée');
 }
 
 function geocodeAddress() {
-  const address = document.getElementById('address-input').value;
-  if (!address) {
-    showToast('⚠️ Veuillez entrer une adresse');
-    return;
-  }
-  
-  fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`)
-    .then(response => response.json())
+  const addr = document.getElementById('address-input').value;
+  if(!addr) { showToast('⚠️ Entrez une adresse'); return; }
+  fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addr)}`)
+    .then(r => r.json())
     .then(data => {
-      if (data && data.length > 0) {
-        const { lat, lon } = data[0];
-        state.map.lat = parseFloat(lat);
-        state.map.lng = parseFloat(lon);
-        state.map.zoom = 15;
-        state.dest.name = address;
-        
-        clearMarkers();
-        addMarker(state.map.lat, state.map.lng, address);
-        
-        document.getElementById('dest-name').value = address;
-        saveState();
-        showToast('📍 Adresse localisée');
-      } else {
-        showToast('❌ Adresse non trouvée');
-      }
-    })
-    .catch(error => {
-      console.error('Erreur géocodage:', error);
-      showToast('❌ Erreur lors de la localisation');
-    });
+      if(data && data.length) {
+        const {lat, lon} = data[0];
+        state.map.lat = parseFloat(lat); state.map.lng = parseFloat(lon); state.map.zoom = 13;
+        state.dest.name = addr;
+        clearMapMarkers(); addMapMarker(state.map.lat, state.map.lng, addr);
+        document.getElementById('dest-name').value = addr;
+        saveState(); showToast('📍 Localisé !');
+      } else showToast('❌ Adresse non trouvée');
+    }).catch(() => showToast('❌ Erreur de géocodage'));
 }
 
 function reverseGeocode(lat, lng) {
   fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
-    .then(response => response.json())
+    .then(r => r.json())
     .then(data => {
-      if (data && data.display_name) {
-        const address = data.display_name;
-        state.dest.name = address;
-        document.getElementById('address-input').value = address;
-        document.getElementById('dest-name').value = address;
+      if(data && data.display_name) {
+        state.dest.name = data.display_name;
+        document.getElementById('address-input').value = data.display_name;
+        document.getElementById('dest-name').value = data.display_name;
         saveState();
       }
-    })
-    .catch(error => {
-      console.error('Erreur géocodage inverse:', error);
-    });
+    }).catch(()=>{});
 }
 
-// CALENDAR FUNCTIONS
+// ═══════════════════════════════════════════════════════════════
+//  CALENDAR
+// ═══════════════════════════════════════════════════════════════
 function initCalendar() {
-  const calendarEl = document.getElementById('calendar-container');
-  
-  calendar = new FullCalendar.Calendar(calendarEl, {
-    initialView: 'dayGridMonth',
-    locale: 'fr',
-    headerToolbar: {
-      left: 'prev,next today',
-      center: 'title',
-      right: 'dayGridMonth,timeGridWeek,timeGridDay'
-    },
-    events: state.reminders.map(reminder => ({
-      title: reminder.text,
-      start: reminder.date,
-      allDay: true,
-      color: '#2c6e8a',
-      textColor: '#ffffff'
-    })),
-    dateClick: function(info) {
-      if (currentUser && currentUser.role === 'viewer') return;
-      document.getElementById('reminder-date').value = info.dateStr;
-      document.getElementById('reminder-text').focus();
-    }
-  });
-  
-  calendar.render();
+  // mini rappels dans la page préparation — pas de calendrier visuel ici (remplacé par la section reminders)
 }
 
 function renderFullCalendar() {
-  if (!calendar) {
-    const calendarEl = document.createElement('div');
-    calendarEl.id = 'full-calendar-container';
-    document.getElementById('full-calendar').appendChild(calendarEl);
-    
-    calendar = new FullCalendar.Calendar(calendarEl, {
-      initialView: 'dayGridMonth',
-      locale: 'fr',
-      headerToolbar: {
-        left: 'prev,next today',
-        center: 'title',
-        right: 'dayGridMonth,timeGridWeek,timeGridDay'
-      },
-      events: state.reminders.map(reminder => ({
-        title: reminder.text,
-        start: reminder.date,
-        allDay: true,
-        color: '#2c6e8a',
-        textColor: '#ffffff'
-      })),
-      dateClick: function(info) {
-        if (currentUser && currentUser.role === 'viewer') return;
-        document.getElementById('full-reminder-date').value = info.dateStr;
-        document.getElementById('full-reminder-text').focus();
-      }
-    });
-    
-    calendar.render();
-  } else {
-    calendar.removeAllEvents();
-    state.reminders.forEach(reminder => {
-      calendar.addEvent({
-        title: reminder.text,
-        start: reminder.date,
-        allDay: true,
-        color: '#2c6e8a',
-        textColor: '#ffffff'
-      });
-    });
+  const container = document.getElementById('full-calendar');
+  if(calendarInstance) {
+    calendarInstance.removeAllEvents();
+    state.reminders.forEach(r => calendarInstance.addEvent({title:r.text, start:r.date, allDay:true, color:'#2c6e8a', textColor:'#fff'}));
+    return;
   }
+  calendarInstance = new FullCalendar.Calendar(container, {
+    initialView:'dayGridMonth', locale:'fr',
+    headerToolbar:{left:'prev,next today', center:'title', right:'dayGridMonth,timeGridWeek'},
+    events: state.reminders.map(r => ({title:r.text, start:r.date, allDay:true, color:'#2c6e8a', textColor:'#fff'})),
+    dateClick: info => {
+      if(currentUser && currentUser.role==='viewer') return;
+      document.getElementById('full-reminder-date').value = info.dateStr;
+      document.getElementById('full-reminder-text').focus();
+    }
+  });
+  calendarInstance.render();
 }
 
-// REMINDERS FUNCTIONS
+// ═══════════════════════════════════════════════════════════════
+//  REMINDERS
+// ═══════════════════════════════════════════════════════════════
 function addReminder() {
-  if (currentUser && currentUser.role === 'viewer') return;
-  
+  if(currentUser && currentUser.role==='viewer') return;
   const text = document.getElementById('reminder-text').value.trim();
   const date = document.getElementById('reminder-date').value;
-  
-  if (!text) {
-    showToast('⚠️ Veuillez entrer un texte');
-    return;
-  }
-  
-  if (!date) {
-    showToast('⚠️ Veuillez sélectionner une date');
-    return;
-  }
-  
-  const newReminder = {
-    id: Date.now().toString(),
-    text: text,
-    date: date,
-    completed: false
-  };
-  
-  state.reminders.push(newReminder);
-  
+  if(!text || !date) { showToast('⚠️ Texte et date requis'); return; }
+  state.reminders.push({id:Date.now().toString(), text, date, completed:false});
   document.getElementById('reminder-text').value = '';
   document.getElementById('reminder-date').value = '';
-  
-  saveState();
-  renderReminders();
-  showToast('✅ Rappel ajouté');
+  saveState(); renderReminders(); showToast('✅ Rappel ajouté');
 }
 
 function addFullReminder() {
-  if (currentUser && currentUser.role === 'viewer') return;
-  
+  if(currentUser && currentUser.role==='viewer') return;
   const text = document.getElementById('full-reminder-text').value.trim();
   const date = document.getElementById('full-reminder-date').value;
-  
-  if (!text) {
-    showToast('⚠️ Veuillez entrer un texte');
-    return;
-  }
-  
-  if (!date) {
-    showToast('⚠️ Veuillez sélectionner une date');
-    return;
-  }
-  
-  const newReminder = {
-    id: Date.now().toString(),
-    text: text,
-    date: date,
-    completed: false
-  };
-  
-  state.reminders.push(newReminder);
-  
+  if(!text || !date) { showToast('⚠️ Texte et date requis'); return; }
+  state.reminders.push({id:Date.now().toString(), text, date, completed:false});
   document.getElementById('full-reminder-text').value = '';
   document.getElementById('full-reminder-date').value = '';
-  
-  saveState();
-  renderFullReminders();
-  renderFullCalendar();
-  showToast('✅ Rappel ajouté');
+  saveState(); renderReminders(); renderFullReminders(); renderFullCalendar(); showToast('✅ Rappel ajouté');
 }
 
 function deleteReminder(id) {
-  if (currentUser && currentUser.role === 'viewer') return;
-  
-  state.reminders = state.reminders.filter(reminder => reminder.id !== id);
-  saveState();
-  renderReminders();
-  renderFullCalendar();
+  if(currentUser && currentUser.role==='viewer') return;
+  state.reminders = state.reminders.filter(r => r.id !== id);
+  saveState(); renderReminders(); renderFullReminders();
+  if(calendarInstance) renderFullCalendar();
   showToast('🗑️ Rappel supprimé');
 }
 
 function toggleReminderCompleted(id) {
-  if (currentUser && currentUser.role === 'viewer') return;
-  
-  const reminder = state.reminders.find(r => r.id === id);
-  if (reminder) {
-    reminder.completed = !reminder.completed;
-    saveState();
-    renderReminders();
-    renderFullReminders();
-  }
+  const r = state.reminders.find(r => r.id===id);
+  if(r){ r.completed = !r.completed; saveState(); renderReminders(); renderFullReminders(); }
 }
 
-function renderReminders() {
-  const reminderList = document.getElementById('reminder-list');
-  
-  if (state.reminders.length === 0) {
-    reminderList.innerHTML = '<p style="color:var(--text-light);font-size:.8rem;">Aucun rappel. Ajoutez-en un !</p>';
-    return;
-  }
-  
-  const sortedReminders = [...state.reminders].sort((a, b) => new Date(a.date) - new Date(b.date));
-  
-  reminderList.innerHTML = sortedReminders.map(reminder => `
+function _renderReminderList(listId) {
+  const el = document.getElementById(listId);
+  if(!el) return;
+  if(!state.reminders.length) { el.innerHTML = '<p style="color:var(--text-light);font-size:.8rem">Aucun rappel.</p>'; return; }
+  const sorted = [...state.reminders].sort((a,b) => new Date(a.date)-new Date(b.date));
+  el.innerHTML = sorted.map(r => `
     <div class="reminder-item">
-      <input type="checkbox" ${reminder.completed ? 'checked' : ''} 
-             onchange="toggleReminderCompleted('${reminder.id}')">
-      <span style="${reminder.completed ? 'text-decoration:line-through;color:var(--text-light)' : ''}">
-        ${reminder.text}
-      </span>
-      <span class="reminder-date">${new Date(reminder.date).toLocaleDateString('fr-FR')}</span>
-      <button class="reminder-delete" onclick="deleteReminder('${reminder.id}')" title="Supprimer">✕</button>
-    </div>
-  `).join('');
+      <input type="checkbox" ${r.completed?'checked':''} onchange="toggleReminderCompleted('${r.id}')">
+      <span style="${r.completed?'text-decoration:line-through;color:var(--text-light)':''}">${r.text}</span>
+      <span class="reminder-date">${new Date(r.date+' 00:00').toLocaleDateString('fr-FR')}</span>
+      <button class="reminder-delete" onclick="deleteReminder('${r.id}')">✕</button>
+    </div>`).join('');
 }
 
-function renderFullReminders() {
-  const reminderList = document.getElementById('full-reminder-list');
-  
-  if (state.reminders.length === 0) {
-    reminderList.innerHTML = '<p style="color:var(--text-light);font-size:.8rem;">Aucun rappel. Ajoutez-en un !</p>';
-    return;
-  }
-  
-  const sortedReminders = [...state.reminders].sort((a, b) => new Date(a.date) - new Date(b.date));
-  
-  reminderList.innerHTML = sortedReminders.map(reminder => `
-    <div class="reminder-item">
-      <input type="checkbox" ${reminder.completed ? 'checked' : ''} 
-             onchange="toggleReminderCompleted('${reminder.id}')">
-      <span style="${reminder.completed ? 'text-decoration:line-through;color:var(--text-light)' : ''}">
-        ${reminder.text}
-      </span>
-      <span class="reminder-date">${new Date(reminder.date).toLocaleDateString('fr-FR')}</span>
-      <button class="reminder-delete" onclick="deleteReminder('${reminder.id}')" title="Supprimer">✕</button>
-    </div>
-  `).join('');
-}
+function renderReminders()     { _renderReminderList('reminder-list'); }
+function renderFullReminders() { _renderReminderList('full-reminder-list'); }
 
-// ITEM VISIBILITY
+// ═══════════════════════════════════════════════════════════════
+//  CATEGORIES / ITEMS
+// ═══════════════════════════════════════════════════════════════
 function itemVisible(item) {
-  if (!state.types.length) return true;
-  // Visible si tagué 'tous' ou si un de ses types correspond à un type sélectionné
-  return item.types.includes('tous') ||
-    state.types.some(t => item.types.includes(t));
+  if(!state.types.length) return true;
+  return item.types.includes('tous') || state.types.some(t => item.types.includes(t));
 }
 
-// RENDER PREPARATION PAGE
 function renderAll() {
   const grid = document.getElementById('cat-grid');
   grid.innerHTML = '';
-  const isReadonly = currentUser && currentUser.role === 'viewer';
+  const isReadonly = currentUser && currentUser.role==='viewer';
 
   state.categories.forEach(cat => {
     const vis = cat.items.filter(itemVisible);
-    if (!vis.length) return;
-
+    if(!vis.length) return;
+    const collapsed = state.collapsed[cat.id] || false;
+    const done = vis.filter(i => state.checked[i.id]).length;
     const card = document.createElement('div');
     card.className = 'category-card';
     card.dataset.catId = cat.id;
-
-    const collapsed = state.collapsed[cat.id] || false;
-    const done = vis.filter(i => state.checked[i.id]).length;
-
     card.innerHTML = `
       <div class="cat-header" onclick="toggleCat('${cat.id}')">
         <div class="cat-left">
@@ -3262,45 +1569,38 @@ function renderAll() {
           <span class="cat-name">${cat.name}</span>
         </div>
         <div style="display:flex;align-items:center;gap:7px">
-          <span class="cat-count ${done === vis.length ? 'done' : ''}">${done}/${vis.length}</span>
-          <span class="cat-toggle ${collapsed ? '' : 'open'}">▾</span>
+          <span class="cat-count ${done===vis.length?'done':''}">${done}/${vis.length}</span>
+          <span class="cat-toggle ${collapsed?'':'open'}">▾</span>
         </div>
       </div>
-      <div class="cat-body ${collapsed ? 'collapsed' : ''}" id="body-${cat.id}">
-        ${vis.map(item => renderItemHTML(item)).join('')}
+      <div class="cat-body ${collapsed?'collapsed':''}" id="body-${cat.id}">
+        ${vis.map(i => renderItemHTML(i)).join('')}
         ${isReadonly ? '' : `<div class="add-row">
           <input class="add-input" id="add-input-${cat.id}" placeholder="Ajouter un article…" onkeydown="addItemKey(event,'${cat.id}')">
           <button class="add-btn" onclick="addItem('${cat.id}')">＋</button>
         </div>`}
       </div>`;
-
     grid.appendChild(card);
   });
-
   updateProgress();
 }
 
 function renderItemHTML(item) {
   const checked = state.checked[item.id] || false;
-  const qty = state.quantities[item.id] || 0;
-  const isReadonly = currentUser && currentUser.role === 'viewer';
-
+  const qty     = state.quantities[item.id] || 0;
+  const isRO    = currentUser && currentUser.role==='viewer';
   return `
-    <div class="item-row ${checked ? 'checked' : ''}" id="row-${item.id}">
-      <input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleItem('${item.id}',this)">
+    <div class="item-row ${checked?'checked':''}" id="row-${item.id}">
+      <input type="checkbox" ${checked?'checked':''} onchange="toggleItem('${item.id}',this)">
       <span class="item-label" onclick="toggleItemClick('${item.id}')">${item.label}</span>
-      ${qty > 0 ?
-        `<span class="item-qty-badge" onclick="openQtyModal('${item.id}',\`${item.label.replace(/`/g, "'")}\`)">x${qty}</span>` :
-        `<span class="item-qty-badge" onclick="openQtyModal('${item.id}',\`${item.label.replace(/`/g, "'")}\`)">qté</span>`
-      }
-      ${isReadonly ? '' : `<button class="item-delete" onclick="deleteItem('${item.id}')" title="Supprimer">✕</button>`}
+      <span class="item-qty-badge" onclick="openQtyModal('${item.id}','${item.label.replace(/'/g,"&#39;")}')">${qty>0?'x'+qty:'qté'}</span>
+      ${isRO ? '' : `<button class="item-delete" onclick="deleteItem('${item.id}')">✕</button>`}
     </div>`;
 }
 
-// INTERACTIONS
 function toggleCat(catId) {
   state.collapsed[catId] = !state.collapsed[catId];
-  const body = document.getElementById('body-' + catId);
+  const body   = document.getElementById('body-' + catId);
   const toggle = body.previousElementSibling.querySelector('.cat-toggle');
   body.classList.toggle('collapsed', state.collapsed[catId]);
   toggle.classList.toggle('open', !state.collapsed[catId]);
@@ -3309,178 +1609,133 @@ function toggleCat(catId) {
 
 function toggleItem(itemId, cb) {
   state.checked[itemId] = cb.checked;
-  document.getElementById('row-' + itemId)?.classList.toggle('checked', cb.checked);
-  const mlRow = document.getElementById('mlrow-' + itemId);
-  if (mlRow) mlRow.classList.toggle('checked', cb.checked);
+  document.getElementById('row-'+itemId)?.classList.toggle('checked', cb.checked);
+  const ml = document.getElementById('mlrow-'+itemId);
+  if(ml) ml.classList.toggle('checked', cb.checked);
   saveState();
   refreshCatCount(itemId);
 }
 
 function toggleItemClick(itemId) {
   const cb = document.querySelector(`#row-${itemId} input[type=checkbox]`);
-  if (!cb) return;
+  if(!cb) return;
   cb.checked = !cb.checked;
   toggleItem(itemId, cb);
 }
 
 function refreshCatCount(itemId) {
-  const cat = state.categories.find(c => c.items.some(i => i.id === itemId));
-  if (!cat) return;
+  const cat = state.categories.find(c => c.items.some(i => i.id===itemId));
+  if(!cat) return;
   const card = document.querySelector(`[data-cat-id="${cat.id}"]`);
-  if (!card) return;
-  const vis = cat.items.filter(itemVisible);
+  if(!card) return;
+  const vis  = cat.items.filter(itemVisible);
   const done = vis.filter(i => state.checked[i.id]).length;
   const span = card.querySelector('.cat-count');
-  span.textContent = `${done}/${vis.length}`;
-  span.className = `cat-count ${done === vis.length ? 'done' : ''}`;
+  if(span){ span.textContent = `${done}/${vis.length}`; span.className = `cat-count ${done===vis.length?'done':''}`; }
   updateProgress();
 }
 
 function addItem(catId) {
-  if (currentUser && currentUser.role === 'viewer') return;
-  const input = document.getElementById('add-input-' + catId);
+  if(currentUser && currentUser.role==='viewer') return;
+  const input = document.getElementById('add-input-'+catId);
   const label = input.value.trim();
-  if (!label) return;
-
-  const cat = state.categories.find(c => c.id === catId);
-  const newItem = {
-    id: catId + '_' + Date.now(),
-    label,
-    qty: 0,
-    types: state.types.length ? [...state.types] : ['tous']
-  };
-  cat.items.push(newItem);
+  if(!label) return;
+  const cat = state.categories.find(c => c.id===catId);
+  const item = {id:catId+'_'+Date.now(), label, qty:0, types: state.types.length ? [...state.types] : ['tous']};
+  cat.items.push(item);
   input.value = '';
-
-  const body = document.getElementById('body-' + catId);
+  const body   = document.getElementById('body-'+catId);
   const addRow = body.querySelector('.add-row');
-  const div = document.createElement('div');
-  div.innerHTML = renderItemHTML(newItem);
+  const div    = document.createElement('div');
+  div.innerHTML = renderItemHTML(item);
   body.insertBefore(div.firstChild, addRow);
-
   saveState();
-  refreshCatCount(newItem.id);
+  refreshCatCount(item.id);
   showToast('✅ Article ajouté');
 }
 
-function addItemKey(e, catId) {
-  if (e.key === 'Enter') addItem(catId);
-}
+function addItemKey(e, catId) { if(e.key==='Enter') addItem(catId); }
 
 function deleteItem(itemId) {
-  if (currentUser && currentUser.role === 'viewer') return;
-  state.categories.forEach(cat => {
-    cat.items = cat.items.filter(i => i.id !== itemId);
-  });
+  if(currentUser && currentUser.role==='viewer') return;
+  state.categories.forEach(c => { c.items = c.items.filter(i => i.id!==itemId); });
   delete state.checked[itemId];
   delete state.quantities[itemId];
-  document.getElementById('row-' + itemId)?.remove();
-  saveState();
-  updateProgress();
-  showToast('🗑️ Supprimé');
+  document.getElementById('row-'+itemId)?.remove();
+  saveState(); updateProgress(); showToast('🗑️ Supprimé');
 }
 
 function updateProgress() {
-  let total = 0, done = 0;
-  state.categories.forEach(cat => {
-    cat.items.filter(itemVisible).forEach(item => {
-      total++;
-      if (state.checked[item.id]) done++;
-    });
-  });
-  const pct = total ? Math.round(done / total * 100) : 0;
+  let total=0, done=0;
+  state.categories.forEach(c => c.items.filter(itemVisible).forEach(i => { total++; if(state.checked[i.id]) done++; }));
+  const pct = total ? Math.round(done/total*100) : 0;
   document.getElementById('prog-count').textContent = `${done} / ${total} articles (${pct}%)`;
   document.getElementById('prog-bar').style.width = pct + '%';
 }
 
-function expandAll() {
-  state.categories.forEach(c => { state.collapsed[c.id] = false; });
-  renderAll();
-  saveState();
-}
-
-function collapseAll() {
-  state.categories.forEach(c => { state.collapsed[c.id] = true; });
-  renderAll();
-  saveState();
-}
+function expandAll()  { state.categories.forEach(c => { state.collapsed[c.id]=false; }); renderAll(); saveState(); }
+function collapseAll(){ state.categories.forEach(c => { state.collapsed[c.id]=true;  }); renderAll(); saveState(); }
 
 function uncheckAll() {
   state.checked = {};
-  renderAll();
-  document.querySelectorAll('.mylist-item').forEach(r => r.classList.remove('checked'));
-  document.querySelectorAll('.mylist-item input[type=checkbox]').forEach(cb => cb.checked = false);
-  saveState();
-  showToast('↩️ Tout décoché');
-}
-
-function uncheckAllList() {
-  uncheckAll();
+  document.querySelectorAll('.item-row').forEach(r => r.classList.remove('checked'));
+  document.querySelectorAll('.item-row input[type=checkbox]').forEach(cb => cb.checked=false);
+  saveState(); showToast('↩️ Tout décoché');
 }
 
 function resetAll() {
-  if (!confirm('Remettre toute la liste à zéro ?')) return;
+  if(!confirm('Remettre toute la liste à zéro ?')) return;
   state.categories = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
-  state.checked = {};
-  state.quantities = {};
-  renderAll();
-  saveState();
-  showToast('🔄 Réinitialisé');
+  state.checked = {}; state.quantities = {};
+  renderAll(); saveState(); showToast('🔄 Réinitialisé');
 }
 
-// MA LISTE PAGE
+// ═══════════════════════════════════════════════════════════════
+//  MA LISTE
+// ═══════════════════════════════════════════════════════════════
 function renderMyList() {
   const wrap = document.getElementById('mylist-content');
-  let hasAny = false;
-  let html = '';
-
-  const dest = state.dest;
-  html += `<div class="mylist-header">
+  const d    = state.dest;
+  let html = `<div class="mylist-header">
     <h2>🎒 Ma liste de vacances</h2>
     <div class="meta">
-      ${dest.name ? `<span>📍 ${dest.name}</span>` : ''}
-      ${dest.dates ? `<span>📅 ${dest.dates}</span>` : ''}
-      ${dest.people ? `<span>👥 ${dest.people}</span>` : ''}
-      ${state.types.length ? `<span>${state.types.map(t => TYPE_LABELS[t]).join(', ')}</span>` : ''}
-      ${state.transports.length ? `<span>🚗 ${state.transports.join(', ')}</span>` : ''}
+      ${d.name   ? `<span>📍 ${d.name}</span>`   : ''}
+      ${d.dates  ? `<span>📅 ${d.dates}</span>`  : ''}
+      ${d.people ? `<span>👥 ${d.people}</span>` : ''}
+      ${state.types.length ? `<span>${state.types.map(t=>TYPE_LABELS[t]).join(', ')}</span>` : ''}
     </div>
   </div>`;
 
+  let hasAny = false;
   state.categories.forEach(cat => {
-    const vis = cat.items.filter(itemVisible).filter(item => state.checked[item.id]);
-    if (!vis.length) return;
+    const vis = cat.items.filter(itemVisible).filter(i => state.checked[i.id]);
+    if(!vis.length) return;
     hasAny = true;
-    html += `<div class="mylist-cat">
-      <h3><span>${cat.emoji}</span> ${cat.name}</h3>`;
-    vis.forEach(item => {
-      const qty = state.quantities[item.id] || 0;
-      html += `<div class="mylist-item ${state.checked[item.id] ? 'checked' : ''}" id="mlrow-${item.id}">
-        <input type="checkbox" ${state.checked[item.id] ? 'checked' : ''} onchange="toggleItem('${item.id}',this)">
-        <span>${item.label}</span>
-        ${qty > 0 ? `<span class="mylist-qty">x${qty}</span>` : ''}
+    html += `<div class="mylist-cat"><h3><span>${cat.emoji}</span> ${cat.name}</h3>`;
+    vis.forEach(i => {
+      const qty = state.quantities[i.id] || 0;
+      html += `<div class="mylist-item ${state.checked[i.id]?'checked':''}" id="mlrow-${i.id}">
+        <input type="checkbox" ${state.checked[i.id]?'checked':''} onchange="toggleItem('${i.id}',this)">
+        <span>${i.label}</span>
+        ${qty>0?`<span class="mylist-qty">x${qty}</span>`:''}
       </div>`;
     });
     html += '</div>';
   });
 
-  if (!hasAny) {
-    html = `<div class="empty-list"><div class="big">🏝️</div>
-      <p>Aucun article coché.<br>Cochez des articles dans l'onglet Préparation.</p></div>`;
-  }
+  if(!hasAny) html = `<div class="empty-list"><div class="big">🏝️</div><p>Aucun article coché.<br>Cochez des articles dans Préparation.</p></div>`;
 
-  if (state.notes) {
-    html += `<div class="notes-section" style="margin-top:16px">
-      <h3>📝 Notes</h3>
-      <p style="font-size:.8rem;color:var(--text);white-space:pre-wrap">${state.notes}</p>
-    </div>`;
-  }
+  if(state.notes) html += `<div class="notes-section" style="margin-top:16px"><h3>📝 Notes</h3>
+    <p style="font-size:.8rem;color:var(--text);white-space:pre-wrap">${state.notes}</p></div>`;
 
   wrap.innerHTML = html;
 }
 
-// ADMIN PAGE
+// ═══════════════════════════════════════════════════════════════
+//  ADMIN
+// ═══════════════════════════════════════════════════════════════
 async function renderAdmin() {
-  if (!currentUser || currentUser.role !== 'admin') {
+  if(!currentUser || currentUser.role!=='admin') {
     document.getElementById('admin-denied').style.display = 'block';
     document.getElementById('admin-panel').style.display = 'none';
     return;
@@ -3488,61 +1743,51 @@ async function renderAdmin() {
   document.getElementById('admin-denied').style.display = 'none';
   document.getElementById('admin-panel').style.display = 'block';
 
+  // Refresh sync dot
+  setSyncDot(db ? 'green' : 'red');
+
   const users = await getUsers();
-  const tbody = document.getElementById('user-tbody');
-  tbody.innerHTML = users.map((u, i) => `
+  document.getElementById('user-tbody').innerHTML = users.map((u,i) => `
     <tr>
-      <td><strong>${u.login}</strong>${u.login === currentUser.login ? ' <span style="font-size:.7rem;color:var(--text-light)">(vous)</span>' : ''}</td>
-      <td><span class="role-badge role-${u.role}">${{ admin: 'Admin 🔑', editor: 'Éditeur ✏️', viewer: 'Lecteur 👁️' }[u.role] || u.role}</span></td>
+      <td><strong>${u.login}</strong>${u.login===currentUser.login?' <span style="font-size:.7rem;color:var(--text-light)">(vous)</span>':''}</td>
+      <td><span class="role-badge role-${u.role}">${{admin:'Admin 🔑',editor:'Éditeur ✏️',viewer:'Lecteur 👁️'}[u.role]||u.role}</span></td>
       <td>
         <button class="btn-edit-sm" onclick="editUserRole(${i})">Rôle</button>
-        ${u.login !== currentUser.login ? `<button class="btn-danger-sm" onclick="removeUser(${i})">Supprimer</button>` : ''}
+        ${u.login!==currentUser.login?`<button class="btn-danger-sm" onclick="removeUser(${i})">Supprimer</button>`:''}
       </td>
     </tr>`).join('');
 }
 
 async function addUser() {
   const login = document.getElementById('nu-login').value.trim().toLowerCase();
-  const pass = document.getElementById('nu-pass').value.trim();
-  const role = document.getElementById('nu-role').value;
-
-  if (!login || !pass) {
-    showToast('⚠️ Remplissez tous les champs');
-    return;
-  }
-
+  const pass  = document.getElementById('nu-pass').value.trim();
+  const role  = document.getElementById('nu-role').value;
+  if(!login || !pass) { showToast('⚠️ Remplissez tous les champs'); return; }
   const users = await getUsers();
-  if (users.find(u => u.login === login)) {
-    showToast('⚠️ Cet identifiant existe déjà');
-    return;
-  }
-
-  users.push({ login, pass, role });
+  if(users.find(u => u.login===login)) { showToast('⚠️ Identifiant déjà utilisé'); return; }
+  users.push({login, pass, role});
   await saveUsers(users);
-
   document.getElementById('nu-login').value = '';
   document.getElementById('nu-pass').value = '';
-
   await renderAdmin();
   showToast('✅ Utilisateur ajouté');
 }
 
 async function removeUser(idx) {
-  if (!confirm('Supprimer cet utilisateur ?')) return;
+  if(!confirm('Supprimer cet utilisateur ?')) return;
   const users = await getUsers();
-  users.splice(idx, 1);
+  users.splice(idx,1);
   await saveUsers(users);
   await renderAdmin();
   showToast('🗑️ Utilisateur supprimé');
 }
 
 async function editUserRole(idx) {
-  const users = await getUsers();
-  const u = users[idx];
-  const roles = ['admin', 'editor', 'viewer'];
-  const labels = ['Admin 🔑', 'Éditeur ✏️', 'Lecteur 👁️'];
-  const cur = roles.indexOf(u.role);
-  const next = (cur + 1) % roles.length;
+  const users  = await getUsers();
+  const u      = users[idx];
+  const roles  = ['admin','editor','viewer'];
+  const labels = ['Admin 🔑','Éditeur ✏️','Lecteur 👁️'];
+  const next   = (roles.indexOf(u.role)+1) % roles.length;
   u.role = roles[next];
   await saveUsers(users);
   await renderAdmin();
@@ -3552,50 +1797,47 @@ async function editUserRole(idx) {
 async function changeMyPassword() {
   const p1 = document.getElementById('my-newpass').value;
   const p2 = document.getElementById('my-newpass2').value;
-
-  if (!p1 || p1 !== p2) {
-    showToast('⚠️ Les mots de passe ne correspondent pas');
-    return;
-  }
-
-  if (p1.length < 4) {
-    showToast('⚠️ Minimum 4 caractères');
-    return;
-  }
-
+  if(!p1 || p1!==p2) { showToast('⚠️ Les mots de passe ne correspondent pas'); return; }
+  if(p1.length < 4)  { showToast('⚠️ Minimum 4 caractères'); return; }
   const users = await getUsers();
-  const u = users.find(x => x.login === currentUser.login);
-  if (u) {
-    u.pass = p1;
-    await saveUsers(users);
-  }
-
+  const u     = users.find(x => x.login===currentUser.login);
+  if(u) { u.pass = p1; await saveUsers(users); }
   document.getElementById('my-newpass').value = '';
   document.getElementById('my-newpass2').value = '';
-
   showToast('✅ Mot de passe modifié');
 }
 
-// TOAST
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2300);
+// ═══════════════════════════════════════════════════════════════
+//  QTY MODAL
+// ═══════════════════════════════════════════════════════════════
+function openQtyModal(itemId, label) {
+  qtyModalItemId   = itemId;
+  qtyModalCurrent  = state.quantities[itemId] || 1;
+  document.getElementById('qty-modal-label').textContent = label;
+  document.getElementById('qty-val').textContent = qtyModalCurrent;
+  document.getElementById('qty-modal').classList.add('open');
 }
+function closeQtyModal() { document.getElementById('qty-modal').classList.remove('open'); }
+function qtyChange(d)    { qtyModalCurrent = Math.max(1,qtyModalCurrent+d); document.getElementById('qty-val').textContent = qtyModalCurrent; }
+function saveQty() {
+  state.quantities[qtyModalItemId] = qtyModalCurrent;
+  const b = document.querySelector(`#row-${qtyModalItemId} .item-qty-badge`);
+  if(b) b.textContent = 'x' + qtyModalCurrent;
+  closeQtyModal(); saveState();
+}
+document.getElementById('qty-modal').addEventListener('click', e => { if(e.target===document.getElementById('qty-modal')) closeQtyModal(); });
 
-// AUTO BOOT
-(function () {
+// ═══════════════════════════════════════════════════════════════
+//  AUTO BOOT (session persistée)
+// ═══════════════════════════════════════════════════════════════
+(function() {
   const s = sessionStorage.getItem(SESSION_KEY);
-  if (s) {
-    const sess = JSON.parse(s);
-    getUsers().then(users => {
-      const u = users.find(x => x.login === sess.login);
-      if (u) {
-        bootApp(u);
-      }
-    });
-  }
+  if(!s) return;
+  const sess = JSON.parse(s);
+  getUsers().then(users => {
+    const u = users.find(x => x.login===sess.login);
+    if(u) bootApp(u);
+  });
 })();
 </script>
 </body>
