@@ -62,10 +62,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--text);m
   font-weight:600;cursor:pointer;transition:transform .15s,box-shadow .15s}
 .btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(44,110,138,.35)}
 .login-error{color:var(--coral);font-size:.88rem;margin-top:10px;display:none}
-.login-info{color:var(--text-light);font-size:.75rem;margin-top:14px;padding-top:14px;
-  border-top:1px dashed var(--sand-dark);text-align:left}
-.login-info strong{display:block;margin-bottom:4px;color:var(--text)}
-.login-info code{background:var(--sand);padding:1px 5px;border-radius:4px;font-size:.7rem}
+
 
 /* ── APP SHELL ── */
 #app{display:none;min-height:100vh;padding-bottom:70px}
@@ -380,12 +377,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--text);m
     <input type="password" id="login-pass" placeholder="Mot de passe">
     <button class="btn-primary" onclick="doLogin()">Accéder à ma liste</button>
     <div class="login-error" id="login-error">❌ Identifiant ou mot de passe incorrect</div>
-    <div class="login-info">
-      <strong>Comptes par défaut :</strong>
-      <code>yves</code> / <code>vacances2024</code> · Admin<br>
-      <code>famille</code> / <code>ete2024</code> · Éditeur<br>
-      <code>invite</code> / <code>bienvenue</code> · Lecteur
-    </div>
+
   </div>
 </div>
 
