@@ -238,6 +238,72 @@ body {
   margin-left: 12px;
 }
 
+/* ── Sélecteur de voyages ── */
+.trip-selector-wrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--sand);
+  border-radius: 50px;
+  padding: 4px 6px 4px 10px;
+  border: 2px solid var(--sand-dark);
+}
+
+#trip-selector {
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: .82rem;
+  font-weight: 600;
+  color: var(--ocean-dark);
+  cursor: pointer;
+  max-width: 180px;
+  outline: none;
+}
+
+.btn-trip-add, .btn-trip-more {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  color: var(--ocean);
+  padding: 2px 4px;
+  border-radius: 50%;
+  line-height: 1;
+  transition: background .15s;
+}
+
+.btn-trip-add:hover { background: var(--ocean-light); color: #fff; }
+.btn-trip-more:hover { background: var(--sand-dark); }
+
+/* Menu contextuel voyage */
+.trip-menu {
+  position: absolute;
+  top: 60px;
+  right: 160px;
+  background: var(--white);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--sand-dark);
+  z-index: 500;
+  min-width: 180px;
+  overflow: hidden;
+}
+.trip-menu button {
+  display: block;
+  width: 100%;
+  padding: 10px 16px;
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: .85rem;
+  text-align: left;
+  cursor: pointer;
+  transition: background .1s;
+}
+.trip-menu button:hover { background: var(--sand); }
+.trip-menu button.danger { color: var(--coral); }
+
 .user-badge {
   background: var(--sand);
   border-radius: 50px;
@@ -1541,6 +1607,11 @@ body {
         <button class="nav-tab admin-tab" id="tab-admin" onclick="showPage('admin')" style="display:none">⚙️ Réglages</button>
       </div>
       <div class="nav-right">
+        <div class="trip-selector-wrap">
+          <select id="trip-selector" onchange="switchTrip(this.value)" title="Changer de voyage"></select>
+          <button class="btn-trip-add" onclick="promptNewTrip()" title="Nouveau voyage">＋</button>
+          <button class="btn-trip-more" onclick="showTripMenu()" title="Options voyage">⋯</button>
+        </div>
         <span class="user-badge" id="user-badge">—</span>
         <button class="btn-logout" onclick="doLogout()">⏻</button>
       </div>
@@ -1737,26 +1808,23 @@ body {
       </div>
 
       <div class="admin-card">
-        <h3>☁️ Synchronisation temps réel</h3>
+        <h3>☁️ Synchronisation automatique</h3>
         <p style="color:var(--text-light); margin-bottom:12px;">
-          Toutes vos modifications sont synchronisées instantanément entre tous les appareils (Netlify, GitHub Pages, téléphone…).
+          La synchronisation est <strong>toujours active</strong> — toutes vos modifications sont envoyées instantanément vers Firebase et reçues sur tous vos appareils (Netlify, GitHub Pages, téléphone…).
         </p>
         <div class="admin-form">
           <div class="form-field">
             <label>Statut</label>
-            <select id="sync-status" onchange="toggleFirebaseSync()">
-              <option value="disabled">❌ Désactivé (local uniquement)</option>
-              <option value="enabled">✅ Temps réel activé</option>
-            </select>
+            <input type="text" id="sync-status" readonly style="background:var(--sand); font-weight:600;">
           </div>
           <div class="form-field">
-            <label>Dernière synchronisation</label>
+            <label>Dernière sync</label>
             <input type="text" id="last-sync" readonly style="background:var(--sand);">
           </div>
-          <button class="btn-admin" onclick="forceSync()" style="grid-column: span 2; margin-top:8px;">⬆️ Pousser mes données maintenant</button>
+          <button class="btn-admin" onclick="forceSync()" style="grid-column: span 2; margin-top:8px;">⬆️ Forcer l'envoi maintenant</button>
         </div>
         <p style="font-size:.78rem; color:var(--text-light); margin-top:10px;">
-          💡 La sync temps réel utilise Firebase Firestore. Dès qu'un appareil modifie un article, tous les autres sont mis à jour automatiquement.
+          💡 Dès qu'un appareil coche un article ou modifie la liste, tous les autres sont mis à jour en temps réel.
         </p>
       </div>
 
@@ -2230,11 +2298,19 @@ const DEFAULT_USERS = [
 ];
 
 const USERS_KEY = 'vac_users_v3';
-const STATE_KEY = 'vac_state_v8'; // v8 : nouvelles catégories complètes
 const SESSION_KEY = 'vac_session';
-// Firebase activé par défaut si non explicitement désactivé
-let useFirebase = localStorage.getItem('vac_firebase_enabled') !== 'false';
-let realtimeUnsubscribe = null; // pour arrêter le listener onSnapshot
+const TRIPS_META_KEY = 'vac_trips_meta_v1';
+
+// Firebase toujours actif (pas de toggle manuel)
+let realtimeUnsubscribe = null;
+
+// Gestion multi-voyages
+let currentTripId = null;
+let tripsList = []; // [{ id, name, dates }]
+
+function genId() {
+  return Date.now().toString(36) + Math.random().toString(36).substr(2, 6);
+}
 
 // QTY MODAL
 let qtyModalItemId = null, qtyModalCurrent = 1;
@@ -2272,30 +2348,25 @@ document.getElementById('qty-modal').addEventListener('click', function (e) {
 
 // AUTH
 async function getUsers() {
-  if (useFirebase) {
+  if (db) {
     try {
       const querySnapshot = await db.collection('users').get();
       const users = [];
-      querySnapshot.forEach((doc) => {
-        users.push(doc.data());
-      });
+      querySnapshot.forEach((doc) => { users.push(doc.data()); });
       return users.length > 0 ? users : DEFAULT_USERS;
     } catch (e) {
       console.error("Erreur récupération utilisateurs Firebase:", e);
-      return DEFAULT_USERS;
     }
-  } else {
-    const s = localStorage.getItem(USERS_KEY);
-    return s ? JSON.parse(s) : JSON.parse(JSON.stringify(DEFAULT_USERS));
   }
+  const s = localStorage.getItem(USERS_KEY);
+  return s ? JSON.parse(s) : JSON.parse(JSON.stringify(DEFAULT_USERS));
 }
 
 function saveUsers(u) {
-  if (useFirebase) {
+  if (db) {
     const batch = db.batch();
     u.forEach((user) => {
-      const userRef = db.collection('users').doc(user.login);
-      batch.set(userRef, user);
+      batch.set(db.collection('users').doc(user.login), user);
     });
     batch.commit().catch((e) => console.error("Erreur sauvegarde utilisateurs Firebase:", e));
   }
@@ -2351,12 +2422,15 @@ async function bootApp(u) {
     document.getElementById('mobile-btn-admin').style.display = 'flex';
   }
 
+  // Charger la liste des voyages et le voyage actif
+  await initTrips();
   await loadState();
-  
+
   if (!state.categories || !state.categories.length) {
     state.categories = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
   }
 
+  renderTripSelector();
   renderTypeButtons();
   renderTransportButtons();
   renderAll();
@@ -2365,26 +2439,23 @@ async function bootApp(u) {
   initCalendar();
   renderReminders();
 
-  document.getElementById('dest-name').value = state.dest.name || '';
-  document.getElementById('dest-dates').value = state.dest.dates || '';
+  document.getElementById('dest-name').value   = state.dest.name   || '';
+  document.getElementById('dest-dates').value  = state.dest.dates  || '';
   document.getElementById('dest-people').value = state.dest.people || '';
-  document.getElementById('notes-area').value = state.notes || '';
+  document.getElementById('notes-area').value  = state.notes       || '';
   document.getElementById('address-input').value = state.dest.name || '';
 
   updateProgress();
   updateTypesBar();
+  updateSyncStatus();
 
   if (u.role === 'viewer') {
     document.getElementById('cat-grid').classList.add('readonly-mode');
     document.getElementById('main-action-bar').style.display = 'none';
   }
 
-  updateSyncStatus();
-
-  // Démarrer l'écoute temps réel Firebase si activée
-  if (useFirebase) {
-    startRealtimeSync();
-  }
+  // Démarrer l'écoute temps réel Firebase (toujours)
+  startRealtimeSync();
 }
 
 // MOBILE NAVIGATION
@@ -2437,188 +2508,312 @@ function showPage(id) {
 }
 
 // STATE PERSIST
-async function saveState() {
-  state.dest.name = document.getElementById('dest-name').value;
-  state.dest.dates = document.getElementById('dest-dates').value;
-  state.dest.people = document.getElementById('dest-people').value;
-  state.notes = document.getElementById('notes-area').value;
-  
-  if (useFirebase && currentUser) {
+// ─── TRIPS METADATA ────────────────────────────────────────────────────────
+
+async function saveTripsMetadata() {
+  const meta = { currentTripId, list: tripsList };
+  localStorage.setItem(TRIPS_META_KEY, JSON.stringify(meta));
+  if (db && currentUser) {
     try {
-      await db.collection('users').doc(currentUser.login).collection('states').doc('current').set({
-        state: state,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
-      document.getElementById('last-sync').value = new Date().toLocaleString();
-    } catch (e) {
-      console.error("Erreur sauvegarde Firebase:", e);
-    }
+      await db.collection('users').doc(currentUser.login)
+        .collection('meta').doc('trips').set(meta);
+    } catch(e) { console.error('saveTripsMetadata:', e); }
   }
-  
-  localStorage.setItem(STATE_KEY, JSON.stringify(state));
+}
+
+async function loadTripsMetadata() {
+  if (db && currentUser) {
+    try {
+      const doc = await db.collection('users').doc(currentUser.login)
+        .collection('meta').doc('trips').get();
+      if (doc.exists) return doc.data();
+    } catch(e) { console.error('loadTripsMetadata:', e); }
+  }
+  const local = localStorage.getItem(TRIPS_META_KEY);
+  return local ? JSON.parse(local) : null;
+}
+
+// ─── SAVE / LOAD STATE ─────────────────────────────────────────────────────
+
+async function saveState() {
+  state.dest.name   = document.getElementById('dest-name').value;
+  state.dest.dates  = document.getElementById('dest-dates').value;
+  state.dest.people = document.getElementById('dest-people').value;
+  state.notes       = document.getElementById('notes-area').value;
+
+  const tripKey = 'vac_trip_' + currentTripId;
+  localStorage.setItem(tripKey, JSON.stringify(state));
+
+  // Mettre à jour le résumé dans la liste des voyages
+  const trip = tripsList.find(t => t.id === currentTripId);
+  if (trip) {
+    trip.dates = state.dest.dates || '';
+    trip.name  = trip.name || state.dest.name || 'Voyage sans nom';
+    saveTripsMetadata();
+  }
+
+  if (db && currentUser && currentTripId) {
+    try {
+      await db.collection('users').doc(currentUser.login)
+        .collection('trips').doc(currentTripId).set({
+          state,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      const el = document.getElementById('last-sync');
+      if (el) el.value = '🟢 ' + new Date().toLocaleTimeString();
+    } catch(e) { console.error('saveState Firebase:', e); }
+  }
+
   updateProgress();
   updateDocumentsList();
 }
 
 async function loadState() {
-  if (useFirebase && currentUser) {
+  if (!currentTripId) return;
+
+  if (db && currentUser) {
     try {
-      const doc = await db.collection('users').doc(currentUser.login).collection('states').doc('current').get();
+      const doc = await db.collection('users').doc(currentUser.login)
+        .collection('trips').doc(currentTripId).get();
       if (doc.exists) {
-        const loaded = doc.data().state;
-        state.types = loaded.types || [];
-        state.transports = loaded.transports || [];
-        state.checked = loaded.checked || {};
-        state.quantities = loaded.quantities || {};
-        state.collapsed = loaded.collapsed || {};
-        state.dest = loaded.dest || {};
-        state.notes = loaded.notes || '';
-        state.reminders = loaded.reminders || [];
-        state.map = loaded.map || { lat: null, lng: null, zoom: 13 };
-        if (loaded.categories) {
-          state.categories = loaded.categories;
-        }
+        applyStateFromObject(doc.data().state);
         return;
       }
-    } catch (e) {
-      console.error("Erreur chargement Firebase:", e);
-    }
+    } catch(e) { console.error('loadState Firebase:', e); }
   }
-  
-  const s = localStorage.getItem(STATE_KEY);
-  if (!s) return;
-  try {
-    const loaded = JSON.parse(s);
-    state.types = loaded.types || [];
-    state.transports = loaded.transports || [];
-    state.checked = loaded.checked || {};
-    state.quantities = loaded.quantities || {};
-    state.collapsed = loaded.collapsed || {};
-    state.dest = loaded.dest || {};
-    state.notes = loaded.notes || '';
-    state.reminders = loaded.reminders || [];
-    state.map = loaded.map || { lat: null, lng: null, zoom: 13 };
-    if (loaded.categories) {
-      state.categories = loaded.categories;
-    }
-  } catch (e) {
-    console.error("Erreur de chargement de l'état local:", e);
+
+  const local = localStorage.getItem('vac_trip_' + currentTripId);
+  if (local) {
+    try { applyStateFromObject(JSON.parse(local)); } catch(e) {}
   }
 }
 
-// SYNC TEMPS RÉEL — écoute les changements Firebase depuis n'importe quel appareil
-function startRealtimeSync() {
-  if (realtimeUnsubscribe) {
-    realtimeUnsubscribe(); // arrêter l'ancien listener si existant
-    realtimeUnsubscribe = null;
+function applyStateFromObject(loaded) {
+  if (!loaded) return;
+  state.types      = loaded.types      || [];
+  state.transports = loaded.transports || [];
+  state.checked    = loaded.checked    || {};
+  state.quantities = loaded.quantities || {};
+  state.collapsed  = loaded.collapsed  || {};
+  state.dest       = loaded.dest       || { name:'', dates:'', people:'' };
+  state.notes      = loaded.notes      || '';
+  state.reminders  = loaded.reminders  || [];
+  state.map        = loaded.map        || { lat:null, lng:null, zoom:13 };
+  if (loaded.categories && loaded.categories.length) {
+    state.categories = loaded.categories;
   }
-  if (!useFirebase || !currentUser || !db) return;
+}
 
-  const docRef = db.collection('users').doc(currentUser.login).collection('states').doc('current');
+// ─── REAL-TIME SYNC ────────────────────────────────────────────────────────
 
-  // Flag pour ignorer le premier snapshot (chargement initial déjà fait)
-  let isFirstSnapshot = true;
+function startRealtimeSync() {
+  if (realtimeUnsubscribe) { realtimeUnsubscribe(); realtimeUnsubscribe = null; }
+  if (!db || !currentUser || !currentTripId) return;
 
-  realtimeUnsubscribe = docRef.onSnapshot((doc) => {
-    if (isFirstSnapshot) { isFirstSnapshot = false; return; }
+  const docRef = db.collection('users').doc(currentUser.login)
+    .collection('trips').doc(currentTripId);
+
+  let isFirst = true;
+  realtimeUnsubscribe = docRef.onSnapshot(doc => {
+    if (isFirst) { isFirst = false; return; }
     if (!doc.exists) return;
-
     const remote = doc.data().state;
     if (!remote) return;
 
-    // Appliquer l'état distant
-    state.types       = remote.types       || [];
-    state.transports  = remote.transports  || [];
-    state.checked     = remote.checked     || {};
-    state.quantities  = remote.quantities  || {};
-    state.collapsed   = remote.collapsed   || {};
-    state.dest        = remote.dest        || {};
-    state.notes       = remote.notes       || '';
-    state.reminders   = remote.reminders   || [];
-    state.map         = remote.map         || { lat: null, lng: null, zoom: 13 };
-    if (remote.categories && remote.categories.length) {
-      state.categories = remote.categories;
-    }
+    applyStateFromObject(remote);
+    localStorage.setItem('vac_trip_' + currentTripId, JSON.stringify(state));
 
-    // Mettre à jour localStorage local
-    localStorage.setItem(STATE_KEY, JSON.stringify(state));
-
-    // Rafraîchir l'interface
     renderAll();
     renderTypeButtons();
     updateTypesBar();
     updateProgress();
     updateDocumentsList();
-    if (document.getElementById('dest-name'))
-      document.getElementById('dest-name').value = state.dest.name || '';
-    if (document.getElementById('dest-dates'))
-      document.getElementById('dest-dates').value = state.dest.dates || '';
-    if (document.getElementById('dest-people'))
-      document.getElementById('dest-people').value = state.dest.people || '';
-    if (document.getElementById('notes-area'))
-      document.getElementById('notes-area').value = state.notes || '';
+    const dn = document.getElementById('dest-name');
+    if (dn) dn.value = state.dest.name || '';
+    const dd = document.getElementById('dest-dates');
+    if (dd) dd.value = state.dest.dates || '';
+    const dp = document.getElementById('dest-people');
+    if (dp) dp.value = state.dest.people || '';
+    const na = document.getElementById('notes-area');
+    if (na) na.value = state.notes || '';
 
-    const syncTime = new Date().toLocaleTimeString();
-    if (document.getElementById('last-sync'))
-      document.getElementById('last-sync').value = '🔄 Sync ' + syncTime;
-    showToast('🔄 Données mises à jour depuis un autre appareil');
-  }, (error) => {
-    console.error('Erreur listener temps réel :', error);
-  });
+    const el = document.getElementById('last-sync');
+    if (el) el.value = '🔄 ' + new Date().toLocaleTimeString();
+    showToast('🔄 Liste mise à jour depuis un autre appareil');
+  }, err => console.error('onSnapshot:', err));
 }
 
-// SYNC WITH FIREBASE
-function toggleFirebaseSync() {
-  const select = document.getElementById('sync-status');
-  useFirebase = select.value === 'enabled';
+// ─── TRIP MANAGEMENT ───────────────────────────────────────────────────────
 
-  // Persister le choix dans localStorage
-  localStorage.setItem('vac_firebase_enabled', useFirebase ? 'true' : 'false');
+async function initTrips() {
+  const meta = await loadTripsMetadata();
 
-  if (useFirebase) {
-    document.getElementById('sync-status').value = 'enabled';
-    showToast('✅ Synchronisation temps réel activée');
-    const users = JSON.parse(localStorage.getItem(USERS_KEY) || JSON.stringify(DEFAULT_USERS));
-    saveUsers(users);
-    saveState().then(() => startRealtimeSync());
+  if (meta && meta.list && meta.list.length) {
+    tripsList    = meta.list;
+    currentTripId = meta.currentTripId || meta.list[0].id;
   } else {
-    if (realtimeUnsubscribe) { realtimeUnsubscribe(); realtimeUnsubscribe = null; }
-    document.getElementById('sync-status').value = 'disabled';
-    showToast('❌ Synchronisation désactivée — mode local uniquement');
+    // Migrer l'ancien état unique si existant, sinon créer voyage par défaut
+    let migratedState = null;
+    if (db && currentUser) {
+      try {
+        const old = await db.collection('users').doc(currentUser.login)
+          .collection('states').doc('current').get();
+        if (old.exists) migratedState = old.data().state;
+      } catch(e) {}
+    }
+    if (!migratedState) {
+      const local = localStorage.getItem('vac_state_v8') ||
+                    localStorage.getItem('vac_state_v7');
+      if (local) { try { migratedState = JSON.parse(local); } catch(e) {} }
+    }
+    const firstId = genId();
+    currentTripId = firstId;
+    tripsList = [{ id: firstId, name: 'Mes vacances', dates: '' }];
+    await saveTripsMetadata();
+    if (migratedState) {
+      applyStateFromObject(migratedState);
+      if (!state.categories || !state.categories.length)
+        state.categories = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+      await saveState();
+    }
+    return; // state already applied above or will be initialized in bootApp
   }
 
-  updateSyncStatus();
+  // S'assurer que le trip actif existe
+  if (!tripsList.find(t => t.id === currentTripId))
+    currentTripId = tripsList[0].id;
+}
+
+async function switchTrip(tripId) {
+  if (tripId === currentTripId) return;
+  await saveState(); // sauvegarder avant de partir
+  if (realtimeUnsubscribe) { realtimeUnsubscribe(); realtimeUnsubscribe = null; }
+
+  currentTripId = tripId;
+  state.categories = [];
+  await loadState();
+  if (!state.categories || !state.categories.length)
+    state.categories = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+
+  await saveTripsMetadata();
+  renderTripSelector();
+  renderAll();
+  renderTypeButtons();
+  updateTypesBar();
+  updateProgress();
+  updateDocumentsList();
+  document.getElementById('dest-name').value  = state.dest.name   || '';
+  document.getElementById('dest-dates').value = state.dest.dates  || '';
+  document.getElementById('dest-people').value= state.dest.people || '';
+  document.getElementById('notes-area').value = state.notes        || '';
+  startRealtimeSync();
+  showToast('✈️ ' + (tripsList.find(t=>t.id===tripId)||{}).name);
+}
+
+async function promptNewTrip() {
+  const name = prompt('Nom du nouveau voyage :', 'Vacances ' + new Date().getFullYear());
+  if (!name) return;
+  const id = genId();
+  tripsList.push({ id, name, dates: '' });
+  currentTripId = id;
+  state = {
+    types:[], transports:[], checked:{}, quantities:{}, collapsed:{},
+    dest:{ name:'', dates:'', people:'' }, notes:'', reminders:[],
+    map:{ lat:null, lng:null, zoom:13 },
+    categories: JSON.parse(JSON.stringify(DEFAULT_CATEGORIES))
+  };
+  await saveState();
+  await saveTripsMetadata();
+  renderTripSelector();
+  renderAll();
+  renderTypeButtons();
+  updateTypesBar();
+  updateProgress();
+  document.getElementById('dest-name').value  = '';
+  document.getElementById('dest-dates').value = '';
+  document.getElementById('dest-people').value= '';
+  document.getElementById('notes-area').value = '';
+  startRealtimeSync();
+  showToast('✈️ Nouveau voyage créé : ' + name);
+}
+
+async function renameCurrentTrip() {
+  const trip = tripsList.find(t => t.id === currentTripId);
+  if (!trip) return;
+  const name = prompt('Renommer ce voyage :', trip.name);
+  if (!name) return;
+  trip.name = name;
+  await saveTripsMetadata();
+  renderTripSelector();
+  showToast('✏️ Voyage renommé : ' + name);
+}
+
+async function deleteCurrentTrip() {
+  if (tripsList.length <= 1) {
+    showToast('⚠️ Impossible de supprimer le seul voyage');
+    return;
+  }
+  const trip = tripsList.find(t => t.id === currentTripId);
+  if (!confirm('Supprimer le voyage "' + (trip ? trip.name : '') + '" et toutes ses données ?')) return;
+
+  tripsList = tripsList.filter(t => t.id !== currentTripId);
+  if (db && currentUser) {
+    try {
+      await db.collection('users').doc(currentUser.login)
+        .collection('trips').doc(currentTripId).delete();
+    } catch(e) {}
+  }
+  localStorage.removeItem('vac_trip_' + currentTripId);
+  await switchTrip(tripsList[0].id);
+  showToast('🗑️ Voyage supprimé');
+}
+
+function renderTripSelector() {
+  const sel = document.getElementById('trip-selector');
+  if (!sel) return;
+  sel.innerHTML = tripsList.map(t =>
+    `<option value="${t.id}" ${t.id === currentTripId ? 'selected' : ''}>
+      ✈️ ${t.name}${t.dates ? ' · ' + t.dates : ''}
+    </option>`
+  ).join('');
+}
+
+function showTripMenu() {
+  // Fermer si déjà ouvert
+  const existing = document.getElementById('trip-menu-popup');
+  if (existing) { existing.remove(); return; }
+
+  const menu = document.createElement('div');
+  menu.id = 'trip-menu-popup';
+  menu.className = 'trip-menu';
+  menu.innerHTML = `
+    <button onclick="renameCurrentTrip(); closeTripMenu()">✏️ Renommer ce voyage</button>
+    <button onclick="promptNewTrip(); closeTripMenu()">➕ Nouveau voyage</button>
+    <button class="danger" onclick="deleteCurrentTrip(); closeTripMenu()">🗑️ Supprimer ce voyage</button>
+  `;
+  document.body.appendChild(menu);
+  setTimeout(() => document.addEventListener('click', closeTripMenu, { once: true }), 100);
+}
+
+function closeTripMenu() {
+  const m = document.getElementById('trip-menu-popup');
+  if (m) m.remove();
 }
 
 async function forceSync() {
-  if (!useFirebase || !currentUser) {
-    showToast('⚠️ Activez d\'abord la synchronisation Firebase');
-    return;
-  }
-  
   try {
     await saveState();
-    const users = JSON.parse(localStorage.getItem(USERS_KEY) || JSON.stringify(DEFAULT_USERS));
-    await saveUsers(users);
-    document.getElementById('last-sync').value = new Date().toLocaleString();
-    showToast('✅ Synchronisation forcée réussie');
-  } catch (e) {
-    console.error("Erreur synchronisation forcée:", e);
-    showToast('❌ Erreur lors de la synchronisation');
+    showToast('✅ Données envoyées vers Firebase');
+  } catch(e) {
+    showToast('❌ Erreur de synchronisation');
   }
 }
 
 function updateSyncStatus() {
-  const select = document.getElementById('sync-status');
-  const lastSync = document.getElementById('last-sync');
-  if (!select) return;
-  if (useFirebase) {
-    select.value = 'enabled';
-    if (lastSync) lastSync.value = '🟢 Connecté – ' + new Date().toLocaleTimeString();
-  } else {
-    select.value = 'disabled';
-    if (lastSync) lastSync.value = '🔴 Mode local (non synchronisé)';
-  }
+  const el  = document.getElementById('sync-status');
+  const ls  = document.getElementById('last-sync');
+  if (el) el.value = db ? '🟢 Firebase connecté – temps réel actif' : '🔴 Hors ligne – mode local uniquement';
+  if (ls) ls.value = db ? '🟢 ' + new Date().toLocaleTimeString() : '—';
 }
 
 // TYPE SELECTION
