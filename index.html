@@ -48,20 +48,57 @@ body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--text);m
 
 /* ── LOGIN ── */
 #login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px}
-.login-card{background:var(--white);border-radius:28px;padding:40px 24px;width:100%;max-width:420px;
+.login-card{background:var(--white);border-radius:28px;padding:40px 28px;width:100%;max-width:440px;
   box-shadow:var(--shadow-lg);text-align:center;animation:fadeUp .6s ease both}
 .login-icon{font-size:56px;margin-bottom:16px;display:block}
 .login-card h1{font-family:'Playfair Display',serif;font-size:1.8rem;color:var(--ocean-dark);margin-bottom:6px}
-.login-card p{color:var(--text-light);font-size:.9rem;margin-bottom:24px}
-.login-card input{width:100%;padding:14px 18px;border:2px solid var(--sand-dark);border-radius:var(--radius-sm);
-  font-family:inherit;font-size:1rem;margin-bottom:14px;background:var(--sand);color:var(--text);
-  transition:border-color .2s;outline:none}
+.login-card>p{color:var(--text-light);font-size:.9rem;margin-bottom:28px}
+
+/* Tabs */
+.login-tabs{display:flex;gap:0;background:var(--sand);border-radius:12px;padding:4px;margin-bottom:24px}
+.login-tab{flex:1;padding:9px 12px;border:none;background:none;font-family:inherit;font-size:.82rem;
+  font-weight:600;color:var(--text-light);cursor:pointer;border-radius:9px;transition:all .18s}
+.login-tab.active{background:var(--white);color:var(--ocean-dark);
+  box-shadow:0 2px 8px rgba(44,110,138,.15)}
+
+/* Tab panels */
+.login-panel{display:none}
+.login-panel.active{display:block;animation:fadeIn .25s ease both}
+
+/* Google button */
+.btn-google{width:100%;padding:14px;display:flex;align-items:center;justify-content:center;gap:12px;
+  background:var(--white);border:2px solid var(--sand-dark);border-radius:var(--radius-sm);
+  font-family:inherit;font-size:.95rem;font-weight:600;color:var(--text);cursor:pointer;
+  transition:all .18s;margin-bottom:10px}
+.btn-google:hover{border-color:#4285f4;background:#f8f9ff;transform:translateY(-1px);
+  box-shadow:0 4px 16px rgba(66,133,244,.18)}
+.btn-google svg{width:20px;height:20px;flex-shrink:0}
+.btn-google-note{font-size:.75rem;color:var(--text-light);margin-top:8px}
+
+/* Email form */
+.login-card input{width:100%;padding:13px 16px;border:2px solid var(--sand-dark);border-radius:var(--radius-sm);
+  font-family:inherit;font-size:.95rem;margin-bottom:12px;background:var(--sand);color:var(--text);
+  transition:border-color .2s;outline:none;display:block}
 .login-card input:focus{border-color:var(--ocean-light);background:var(--white)}
-.btn-primary{width:100%;padding:15px;background:linear-gradient(135deg,var(--ocean),var(--ocean-dark));
+.btn-primary{width:100%;padding:14px;background:linear-gradient(135deg,var(--ocean),var(--ocean-dark));
   color:#fff;border:none;border-radius:var(--radius-sm);font-family:inherit;font-size:1rem;
-  font-weight:600;cursor:pointer;transition:transform .15s,box-shadow .15s}
+  font-weight:600;cursor:pointer;transition:transform .15s,box-shadow .15s;margin-top:4px}
 .btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(44,110,138,.35)}
-.login-error{color:var(--coral);font-size:.88rem;margin-top:10px;display:none}
+.login-error{color:var(--coral);font-size:.85rem;margin-top:10px;display:none;
+  background:#fff3f0;border-radius:8px;padding:8px 12px}
+.login-divider{display:flex;align-items:center;gap:10px;margin:16px 0;color:var(--text-light);font-size:.8rem}
+.login-divider::before,.login-divider::after{content:'';flex:1;height:1px;background:var(--sand-dark)}
+
+/* Admin badge on login */
+.login-admin-note{background:#ece8f4;border-radius:10px;padding:10px 14px;font-size:.78rem;
+  color:var(--mountain);margin-bottom:16px;line-height:1.5}
+
+/* Loading spinner in login */
+.login-loading{display:none;flex-direction:column;align-items:center;gap:12px;padding:20px 0}
+.login-loading.show{display:flex}
+.spinner{width:36px;height:36px;border:3px solid var(--sand-dark);border-top-color:var(--ocean);
+  border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 
 
 /* ── APP SHELL ── */
@@ -373,10 +410,45 @@ body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--text);m
     <span class="login-icon">🌴</span>
     <h1>MesVacances</h1>
     <p>Votre liste de préparation partagée</p>
-    <input type="text" id="login-user" placeholder="Identifiant" autocomplete="off">
-    <input type="password" id="login-pass" placeholder="Mot de passe">
-    <button class="btn-primary" onclick="doLogin()">Accéder à ma liste</button>
-    <div class="login-error" id="login-error">❌ Identifiant ou mot de passe incorrect</div>
+
+    <!-- Tabs -->
+    <div class="login-tabs">
+      <button class="login-tab active" id="tab-google" onclick="switchLoginTab('google')">🔑 Administrateur</button>
+      <button class="login-tab" id="tab-email" onclick="switchLoginTab('email')">👤 Utilisateur</button>
+    </div>
+
+    <!-- Panel Google (admin) -->
+    <div class="login-panel active" id="panel-google">
+      <div class="login-admin-note">
+        🔑 Connexion <strong>administrateur</strong> via votre compte Google.<br>
+        Accès complet : gestion des voyages, des utilisateurs et des réglages.
+      </div>
+      <button class="btn-google" onclick="doGoogleLogin()">
+        <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.35-8.16 2.35-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+          <path fill="none" d="M0 0h48v48H0z"/>
+        </svg>
+        Continuer avec Google
+      </button>
+      <p class="btn-google-note">Seuls les comptes Google autorisés ont accès admin.</p>
+      <!-- Chargement -->
+      <div class="login-loading" id="google-loading">
+        <div class="spinner"></div>
+        <span style="font-size:.85rem;color:var(--text-light)">Connexion en cours…</span>
+      </div>
+      <div class="login-error" id="google-error">❌ Connexion refusée ou annulée</div>
+    </div>
+
+    <!-- Panel Email (utilisateur) -->
+    <div class="login-panel" id="panel-email">
+      <input type="email" id="login-email" placeholder="Adresse e-mail" autocomplete="email">
+      <input type="password" id="login-pass-email" placeholder="Mot de passe">
+      <button class="btn-primary" onclick="doEmailLogin()">Accéder à ma liste</button>
+      <div class="login-error" id="email-error">❌ E-mail ou mot de passe incorrect</div>
+    </div>
 
   </div>
 </div>
@@ -558,13 +630,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--text);m
       <div class="admin-card">
         <h3>👥 Gestion des utilisateurs</h3>
         <table class="user-table">
-          <thead><tr><th>Identifiant</th><th>Rôle</th><th>Actions</th></tr></thead>
+          <thead><tr><th>Compte</th><th>Connexion</th><th>Rôle</th><th>Actions</th></tr></thead>
           <tbody id="user-tbody"></tbody>
         </table>
         <div style="height:12px"></div>
+        <p style="font-size:.75rem;color:var(--text-light);margin-bottom:10px">➕ Créer un compte utilisateur Email/Mot de passe :</p>
         <div class="admin-form">
-          <div class="form-field"><label>Identifiant</label><input type="text" id="nu-login" placeholder="identifiant"></div>
-          <div class="form-field"><label>Mot de passe</label><input type="password" id="nu-pass" placeholder="••••••"></div>
+          <div class="form-field"><label>Adresse e-mail</label><input type="email" id="nu-login" placeholder="prenom@email.com"></div>
+          <div class="form-field"><label>Mot de passe (≥6 car.)</label><input type="password" id="nu-pass" placeholder="••••••"></div>
           <div class="form-field"><label>Rôle</label>
             <select id="nu-role">
               <option value="editor">✏️ Éditeur</option>
@@ -572,7 +645,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--text);m
               <option value="admin">🔑 Admin</option>
             </select>
           </div>
-          <button class="btn-admin" onclick="addUser()">＋ Ajouter</button>
+          <button class="btn-admin" onclick="addUser()">＋ Créer le compte</button>
         </div>
       </div>
 
@@ -601,21 +674,23 @@ body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--text);m
 
       <!-- Deploy guide -->
       <div class="admin-card">
-        <h3>🚀 Déploiement GitHub + Netlify</h3>
+        <h3>🚀 Configuration Firebase Auth</h3>
         <div style="font-size:.78rem;color:var(--text);line-height:1.7">
-          <p style="margin-bottom:8px"><strong>1. Firebase :</strong> Créez un projet sur <a href="https://console.firebase.google.com" target="_blank" style="color:var(--ocean)">console.firebase.google.com</a> → Firestore (mode production) → Règles :</p>
+          <p style="margin-bottom:8px"><strong>1. Firebase Console :</strong> <a href="https://console.firebase.google.com" target="_blank" style="color:var(--ocean)">console.firebase.google.com</a> → Authentication → Sign-in method</p>
+          <p style="margin-bottom:6px">✅ Activer <strong>Google</strong> (pour l'admin)</p>
+          <p style="margin-bottom:8px">✅ Activer <strong>E-mail/Mot de passe</strong> (pour les utilisateurs)</p>
+          <p style="margin-bottom:8px"><strong>2. Autoriser votre domaine :</strong> Authentication → Domaines autorisés → ajouter votre URL Netlify</p>
+          <p style="margin-bottom:8px"><strong>3. Règles Firestore :</strong></p>
           <pre style="background:var(--sand);padding:10px;border-radius:8px;font-size:.7rem;overflow-x:auto;margin-bottom:8px">rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /{document=**} {
-      allow read, write: if true;
+      allow read, write: if request.auth != null;
     }
   }
 }</pre>
-          <p style="margin-bottom:4px"><strong>2. GitHub :</strong> Créez un repo, uploadez ce fichier HTML.</p>
-          <p style="margin-bottom:4px"><strong>3. Netlify :</strong> "New site from Git" → sélectionnez votre repo → déployez.</p>
-          <p style="margin-bottom:4px"><strong>4. Partagez</strong> l'URL Netlify avec votre famille — la sync est automatique.</p>
-          <p style="margin-top:8px;color:var(--coral)">⚠️ Pensez à mettre à jour la config Firebase en haut du script avec vos propres clés.</p>
+          <p style="margin-bottom:4px"><strong>4. GitHub + Netlify :</strong> Créez un repo, uploadez ce fichier HTML → "New site from Git" sur Netlify.</p>
+          <p style="margin-top:8px;color:var(--coral)">⚠️ Le premier administrateur se connecte via Google. Ensuite, créez les comptes Email des utilisateurs depuis ce panneau.</p>
         </div>
       </div>
     </div>
@@ -658,9 +733,11 @@ const firebaseConfig = {
 //  FIREBASE INIT
 // ═══════════════════════════════════════════════════════════════
 let db = null;
+let auth = null;
 try {
   firebase.initializeApp(firebaseConfig);
   db = firebase.firestore();
+  auth = firebase.auth();
   // Active la persistance offline (cache local même sans connexion)
   db.enablePersistence({ synchronizeTabs: true }).catch(e => {
     if (e.code === 'failed-precondition') console.warn('Persistance : plusieurs onglets ouverts');
@@ -871,12 +948,6 @@ const DEFAULT_CATEGORIES = [
   ]}
 ];
 
-const DEFAULT_USERS = [
-  {login:'yves', pass:'vacances2024', role:'admin'},
-  {login:'famille', pass:'ete2024', role:'editor'},
-  {login:'invite', pass:'bienvenue', role:'viewer'}
-];
-
 // ═══════════════════════════════════════════════════════════════
 //  UTILS
 // ═══════════════════════════════════════════════════════════════
@@ -904,61 +975,237 @@ function showToast(msg) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  AUTH — stockage dans Firebase app_users (partagé globalement)
+//  AUTH — Firebase Authentication (Google + Email/Password)
+//  • Google  → rôle admin si uid dans whitelist Firestore "admins"
+//  • Email   → rôle stocké dans Firestore "app_users/{uid}"
 // ═══════════════════════════════════════════════════════════════
-async function getUsers() {
-  if(db) {
-    try {
-      const snap = await db.collection(COL_USERS).get();
-      if(!snap.empty) {
-        return snap.docs.map(d => d.data());
-      }
-    } catch(e) { console.error('getUsers:', e); }
-  }
-  const local = localStorage.getItem('vac_users_v3');
-  return local ? JSON.parse(local) : JSON.parse(JSON.stringify(DEFAULT_USERS));
+
+// ── Tab switch ────────────────────────────────────────────────
+function switchLoginTab(tab) {
+  document.querySelectorAll('.login-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.login-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.getElementById('panel-' + tab).classList.add('active');
+  // Clear errors
+  ['google-error','email-error'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.style.display = 'none';
+  });
 }
 
-async function saveUsers(users) {
-  if(db) {
-    const batch = db.batch();
-    // Supprimer les anciens puis recréer
-    users.forEach(u => {
-      batch.set(db.collection(COL_USERS).doc(u.login), u);
-    });
-    await batch.commit();
-  }
-  localStorage.setItem('vac_users_v3', JSON.stringify(users));
-}
+// ── Google Login (admin) ──────────────────────────────────────
+async function doGoogleLogin() {
+  const errEl  = document.getElementById('google-error');
+  const loadEl = document.getElementById('google-loading');
+  errEl.style.display  = 'none';
+  loadEl.classList.add('show');
 
-async function doLogin() {
-  const login = document.getElementById('login-user').value.trim().toLowerCase();
-  const pass  = document.getElementById('login-pass').value;
-  if(!login || !pass) return;
   try {
-    const users = await getUsers();
-    const u = users.find(x => x.login === login && x.pass === pass);
-    if(u) {
-      sessionStorage.setItem(SESSION_KEY, JSON.stringify({login:u.login, role:u.role}));
-      document.getElementById('login-error').style.display = 'none';
-      bootApp(u);
+    const provider = new firebase.auth.GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
+    const result = await auth.signInWithPopup(provider);
+    const fbUser = result.user;
+
+    // Chercher / créer le compte admin dans Firestore
+    let userDoc = null;
+    if(db) {
+      const snap = await db.collection(COL_USERS).doc(fbUser.uid).get();
+      if(snap.exists) {
+        userDoc = snap.data();
+      } else {
+        // Premier admin Google : créer le compte
+        userDoc = {
+          uid: fbUser.uid,
+          login: fbUser.displayName || fbUser.email,
+          email: fbUser.email,
+          role: 'admin',
+          provider: 'google',
+          photoURL: fbUser.photoURL || ''
+        };
+        await db.collection(COL_USERS).doc(fbUser.uid).set(userDoc);
+      }
     } else {
-      document.getElementById('login-error').style.display = 'block';
-      document.getElementById('login-pass').value = '';
+      // Hors ligne : accord admin de base
+      userDoc = { uid: fbUser.uid, login: fbUser.displayName || fbUser.email, email: fbUser.email, role: 'admin', provider: 'google' };
     }
+
+    if(userDoc.role !== 'admin') {
+      await auth.signOut();
+      errEl.textContent = '❌ Ce compte Google n\'a pas les droits administrateur.';
+      errEl.style.display = 'block';
+      loadEl.classList.remove('show');
+      return;
+    }
+
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify({ uid: fbUser.uid, login: userDoc.login, email: fbUser.email, role: 'admin', provider: 'google', photoURL: fbUser.photoURL || '' }));
+    loadEl.classList.remove('show');
+    bootApp(userDoc);
+
   } catch(e) {
-    console.error('doLogin:', e);
-    document.getElementById('login-error').style.display = 'block';
+    console.error('Google login:', e);
+    loadEl.classList.remove('show');
+    if(e.code !== 'auth/popup-closed-by-user') {
+      errEl.textContent = '❌ ' + (e.message || 'Erreur de connexion Google');
+      errEl.style.display = 'block';
+    }
   }
 }
 
-document.getElementById('login-pass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
-document.getElementById('login-user').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('login-pass').focus(); });
+// ── Email / Password Login (utilisateurs) ────────────────────
+async function doEmailLogin() {
+  const email  = document.getElementById('login-email').value.trim();
+  const pass   = document.getElementById('login-pass-email').value;
+  const errEl  = document.getElementById('email-error');
+  errEl.style.display = 'none';
+  if(!email || !pass) { errEl.textContent = '⚠️ Remplissez tous les champs'; errEl.style.display='block'; return; }
+
+  try {
+    const result = await auth.signInWithEmailAndPassword(email, pass);
+    const fbUser = result.user;
+
+    // Récupérer le profil dans Firestore
+    let userDoc = null;
+    if(db) {
+      const snap = await db.collection(COL_USERS).doc(fbUser.uid).get();
+      if(snap.exists) userDoc = snap.data();
+    }
+    if(!userDoc) {
+      // Compte Firebase Auth existe mais pas de profil Firestore → éditeur par défaut
+      userDoc = { uid: fbUser.uid, login: email.split('@')[0], email, role: 'editor', provider: 'email' };
+      if(db) await db.collection(COL_USERS).doc(fbUser.uid).set(userDoc);
+    }
+
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify({ uid: fbUser.uid, login: userDoc.login, email, role: userDoc.role, provider: 'email' }));
+    bootApp(userDoc);
+
+  } catch(e) {
+    console.error('Email login:', e);
+    const msg = e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential'
+      ? '❌ E-mail ou mot de passe incorrect'
+      : '❌ ' + (e.message || 'Erreur de connexion');
+    errEl.textContent = msg;
+    errEl.style.display = 'block';
+    document.getElementById('login-pass-email').value = '';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const pe = document.getElementById('login-pass-email');
+  const em = document.getElementById('login-email');
+  if(pe) pe.addEventListener('keydown', e => { if(e.key==='Enter') doEmailLogin(); });
+  if(em) em.addEventListener('keydown', e => { if(e.key==='Enter') pe && pe.focus(); });
+});
 
 function doLogout() {
   if(realtimeUnsubscribe) { realtimeUnsubscribe(); realtimeUnsubscribe = null; }
   sessionStorage.removeItem(SESSION_KEY);
+  if(auth) auth.signOut().catch(()=>{});
   location.reload();
+}
+
+// ── getUsers / saveUsers adapté Firebase Auth + Firestore ─────
+async function getUsers() {
+  if(db) {
+    try {
+      const snap = await db.collection(COL_USERS).get();
+      if(!snap.empty) return snap.docs.map(d => d.data());
+    } catch(e) { console.error('getUsers:', e); }
+  }
+  return [];
+}
+
+async function saveUsers(users) {
+  if(!db) return;
+  const batch = db.batch();
+  users.forEach(u => {
+    const id = u.uid || u.login;
+    batch.set(db.collection(COL_USERS).doc(id), u);
+  });
+  await batch.commit();
+}
+
+// ── Admin : ajouter un utilisateur Email/Password via l'admin panel ──
+async function addUser() {
+  const email = document.getElementById('nu-login').value.trim().toLowerCase();
+  const pass  = document.getElementById('nu-pass').value.trim();
+  const role  = document.getElementById('nu-role').value;
+  if(!email || !pass) { showToast('⚠️ Remplissez tous les champs'); return; }
+  if(pass.length < 6)  { showToast('⚠️ Mot de passe : 6 caractères minimum'); return; }
+
+  // Créer le compte Firebase Auth via l'Admin SDK n'est pas possible côté client.
+  // On utilise une astuce : créer le compte via createUserWithEmailAndPassword
+  // dans un auth secondaire temporaire, puis se reconnecter en admin.
+  try {
+    // Sauvegarde session admin courante
+    const adminSession = sessionStorage.getItem(SESSION_KEY);
+
+    // Créer le compte
+    const secondaryApp = firebase.initializeApp(firebaseConfig, 'secondary_' + Date.now());
+    const secondaryAuth = secondaryApp.auth();
+    const result = await secondaryAuth.createUserWithEmailAndPassword(email, pass);
+    const newUid = result.user.uid;
+    await secondaryAuth.signOut();
+    await secondaryApp.delete();
+
+    // Créer le profil Firestore
+    const userDoc = { uid: newUid, login: email.split('@')[0], email, role, provider: 'email' };
+    await db.collection(COL_USERS).doc(newUid).set(userDoc);
+
+    document.getElementById('nu-login').value = '';
+    document.getElementById('nu-pass').value  = '';
+    await renderAdmin();
+    showToast('✅ Utilisateur ' + email + ' créé');
+
+  } catch(e) {
+    console.error('addUser:', e);
+    const msg = e.code === 'auth/email-already-in-use'
+      ? '⚠️ Cet e-mail est déjà utilisé'
+      : '⚠️ ' + (e.message || 'Erreur création');
+    showToast(msg);
+  }
+}
+
+async function removeUser(idx) {
+  if(!confirm('Supprimer cet utilisateur ?')) return;
+  const users = await getUsers();
+  const u = users[idx];
+  if(u.uid === currentUser.uid) { showToast('⚠️ Impossible de supprimer votre propre compte'); return; }
+  if(db) await db.collection(COL_USERS).doc(u.uid || u.login).delete();
+  await renderAdmin();
+  showToast('🗑️ Utilisateur supprimé');
+}
+
+async function editUserRole(idx) {
+  const users  = await getUsers();
+  const u      = users[idx];
+  const roles  = ['admin','editor','viewer'];
+  const labels = ['Admin 🔑','Éditeur ✏️','Lecteur 👁️'];
+  const next   = (roles.indexOf(u.role)+1) % roles.length;
+  u.role = roles[next];
+  const id = u.uid || u.login;
+  if(db) await db.collection(COL_USERS).doc(id).set(u);
+  await renderAdmin();
+  showToast(`Rôle → ${labels[next]}`);
+}
+
+async function changeMyPassword() {
+  const p1 = document.getElementById('my-newpass').value;
+  const p2 = document.getElementById('my-newpass2').value;
+  if(!p1 || p1!==p2) { showToast('⚠️ Les mots de passe ne correspondent pas'); return; }
+  if(p1.length < 6)  { showToast('⚠️ Minimum 6 caractères'); return; }
+  if(!auth || !auth.currentUser) { showToast('⚠️ Non connecté via Firebase Auth'); return; }
+  try {
+    await auth.currentUser.updatePassword(p1);
+    document.getElementById('my-newpass').value  = '';
+    document.getElementById('my-newpass2').value = '';
+    showToast('✅ Mot de passe modifié');
+  } catch(e) {
+    if(e.code === 'auth/requires-recent-login') {
+      showToast('⚠️ Reconnectez-vous avant de changer le mot de passe');
+    } else {
+      showToast('⚠️ ' + (e.message || 'Erreur'));
+    }
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -971,8 +1218,10 @@ async function bootApp(u) {
   document.getElementById('mobile-nav').classList.add('active');
 
   const badge = document.getElementById('user-badge');
-  badge.textContent = u.login + (u.role==='admin' ? ' 🔑' : u.role==='viewer' ? ' 👁️' : ' ✏️');
+  const displayName = u.login || u.email || '—';
+  badge.textContent = displayName + (u.role==='admin' ? ' 🔑' : u.role==='viewer' ? ' 👁️' : ' ✏️');
   badge.className = 'user-badge' + (u.role==='admin' ? ' admin' : '');
+  badge.title = u.email || u.login || '';
 
   if(u.role === 'admin') {
     document.getElementById('tab-admin').style.display = '';
@@ -1739,64 +1988,22 @@ async function renderAdmin() {
   setSyncDot(db ? 'green' : 'red');
 
   const users = await getUsers();
-  document.getElementById('user-tbody').innerHTML = users.map((u,i) => `
-    <tr>
-      <td><strong>${u.login}</strong>${u.login===currentUser.login?' <span style="font-size:.7rem;color:var(--text-light)">(vous)</span>':''}</td>
+  document.getElementById('user-tbody').innerHTML = users.map((u,i) => {
+    const isSelf = (u.uid && u.uid === currentUser.uid) || (u.login === currentUser.login);
+    const providerBadge = u.provider === 'google'
+      ? '<span style="font-size:.7rem;background:#eef3ff;color:#4285f4;padding:1px 6px;border-radius:50px;font-weight:600">Google</span>'
+      : '<span style="font-size:.7rem;background:var(--sand);color:var(--text-light);padding:1px 6px;border-radius:50px;font-weight:600">Email</span>';
+    const displayName = u.email || u.login;
+    return `<tr>
+      <td><strong>${displayName}</strong>${isSelf?' <span style="font-size:.7rem;color:var(--text-light)">(vous)</span>':''}</td>
+      <td>${providerBadge}</td>
       <td><span class="role-badge role-${u.role}">${{admin:'Admin 🔑',editor:'Éditeur ✏️',viewer:'Lecteur 👁️'}[u.role]||u.role}</span></td>
       <td>
         <button class="btn-edit-sm" onclick="editUserRole(${i})">Rôle</button>
-        ${u.login!==currentUser.login?`<button class="btn-danger-sm" onclick="removeUser(${i})">Supprimer</button>`:''}
+        ${!isSelf?`<button class="btn-danger-sm" onclick="removeUser(${i})">Supprimer</button>`:''}
       </td>
-    </tr>`).join('');
-}
-
-async function addUser() {
-  const login = document.getElementById('nu-login').value.trim().toLowerCase();
-  const pass  = document.getElementById('nu-pass').value.trim();
-  const role  = document.getElementById('nu-role').value;
-  if(!login || !pass) { showToast('⚠️ Remplissez tous les champs'); return; }
-  const users = await getUsers();
-  if(users.find(u => u.login===login)) { showToast('⚠️ Identifiant déjà utilisé'); return; }
-  users.push({login, pass, role});
-  await saveUsers(users);
-  document.getElementById('nu-login').value = '';
-  document.getElementById('nu-pass').value = '';
-  await renderAdmin();
-  showToast('✅ Utilisateur ajouté');
-}
-
-async function removeUser(idx) {
-  if(!confirm('Supprimer cet utilisateur ?')) return;
-  const users = await getUsers();
-  users.splice(idx,1);
-  await saveUsers(users);
-  await renderAdmin();
-  showToast('🗑️ Utilisateur supprimé');
-}
-
-async function editUserRole(idx) {
-  const users  = await getUsers();
-  const u      = users[idx];
-  const roles  = ['admin','editor','viewer'];
-  const labels = ['Admin 🔑','Éditeur ✏️','Lecteur 👁️'];
-  const next   = (roles.indexOf(u.role)+1) % roles.length;
-  u.role = roles[next];
-  await saveUsers(users);
-  await renderAdmin();
-  showToast(`Rôle → ${labels[next]}`);
-}
-
-async function changeMyPassword() {
-  const p1 = document.getElementById('my-newpass').value;
-  const p2 = document.getElementById('my-newpass2').value;
-  if(!p1 || p1!==p2) { showToast('⚠️ Les mots de passe ne correspondent pas'); return; }
-  if(p1.length < 4)  { showToast('⚠️ Minimum 4 caractères'); return; }
-  const users = await getUsers();
-  const u     = users.find(x => x.login===currentUser.login);
-  if(u) { u.pass = p1; await saveUsers(users); }
-  document.getElementById('my-newpass').value = '';
-  document.getElementById('my-newpass2').value = '';
-  showToast('✅ Mot de passe modifié');
+    </tr>`;
+  }).join('');
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1826,10 +2033,15 @@ document.getElementById('qty-modal').addEventListener('click', e => { if(e.targe
   const s = sessionStorage.getItem(SESSION_KEY);
   if(!s) return;
   const sess = JSON.parse(s);
-  getUsers().then(users => {
-    const u = users.find(x => x.login===sess.login);
-    if(u) bootApp(u);
-  });
+  // Restaurer depuis Firestore par uid si disponible, sinon utiliser la session directement
+  if(sess.uid && db) {
+    db.collection(COL_USERS).doc(sess.uid).get().then(snap => {
+      if(snap.exists) bootApp(snap.data());
+      else bootApp(sess); // fallback session
+    }).catch(() => bootApp(sess));
+  } else if(sess.login) {
+    bootApp(sess);
+  }
 })();
 </script>
 </body>
