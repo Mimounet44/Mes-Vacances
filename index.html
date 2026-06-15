@@ -524,10 +524,27 @@ body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--text);m
 
     <!-- Panel Email (utilisateur) -->
     <div class="login-panel" id="panel-email">
-      <input type="email" id="login-email" placeholder="Adresse e-mail" autocomplete="email">
-      <input type="password" id="login-pass-email" placeholder="Mot de passe">
-      <button class="btn-primary" onclick="doEmailLogin()">Accéder à ma liste</button>
-      <div class="login-error" id="email-error">❌ E-mail ou mot de passe incorrect</div>
+      <div class="login-error" id="email-error"></div>
+      <!-- Sous-onglets -->
+      <div style="display:flex;gap:0;background:var(--sand);border-radius:10px;padding:4px;margin-bottom:16px">
+        <button class="login-tab active" id="subtab-login" onclick="switchSubTab('login')" style="font-size:.78rem">Se connecter</button>
+        <button class="login-tab" id="subtab-register" onclick="switchSubTab('register')" style="font-size:.78rem">Créer un compte</button>
+      </div>
+      <!-- Connexion -->
+      <div id="subpanel-login">
+        <input type="email" id="login-email" placeholder="Adresse e-mail" autocomplete="email">
+        <input type="password" id="login-pass-email" placeholder="Mot de passe">
+        <button class="btn-primary" onclick="doEmailLogin()">Accéder à ma liste</button>
+      </div>
+      <!-- Inscription -->
+      <div id="subpanel-register" style="display:none">
+        <p style="font-size:.78rem;color:var(--text-light);margin-bottom:14px;text-align:left">Créez votre compte puis entrez le code reçu de votre administrateur.</p>
+        <input type="text" id="r-prenom" placeholder="Prénom">
+        <input type="email" id="r-email" placeholder="Adresse e-mail">
+        <input type="password" id="r-pwd" placeholder="Mot de passe (6 min)">
+        <input type="text" id="r-code" placeholder="Code d'invitation (optionnel)" style="text-transform:uppercase;letter-spacing:.08em">
+        <button class="btn-primary" onclick="doRegister()">Créer mon compte</button>
+      </div>
     </div>
 
   </div>
@@ -706,27 +723,24 @@ body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--text);m
         <p style="font-size:.72rem;color:var(--text-light);margin-top:10px" id="last-sync-label">—</p>
       </div>
 
-      <!-- Users -->
+      <!-- Invite Code -->
       <div class="admin-card">
-        <h3>👥 Gestion des utilisateurs</h3>
-        <table class="user-table">
-          <thead><tr><th>Compte</th><th>Connexion</th><th>Rôle</th><th>Actions</th></tr></thead>
-          <tbody id="user-tbody"></tbody>
-        </table>
-        <div style="height:12px"></div>
-        <p style="font-size:.75rem;color:var(--text-light);margin-bottom:10px">➕ Créer un compte utilisateur Email/Mot de passe :</p>
-        <div class="admin-form">
-          <div class="form-field"><label>Adresse e-mail</label><input type="email" id="nu-login" placeholder="prenom@email.com"></div>
-          <div class="form-field"><label>Mot de passe (≥6 car.)</label><input type="password" id="nu-pass" placeholder="••••••"></div>
-          <div class="form-field"><label>Rôle</label>
-            <select id="nu-role">
-              <option value="editor">✏️ Éditeur</option>
-              <option value="viewer">👁️ Lecteur</option>
-              <option value="admin">🔑 Admin</option>
-            </select>
+        <h3>🔗 Inviter des membres</h3>
+        <p style="font-size:.78rem;color:var(--text-light);margin-bottom:12px">Générez un code et partagez-le. La personne le saisit lors de la création de son compte.</p>
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+          <div id="vac-invite-code" style="flex:1;background:var(--sand);border:2px solid var(--sand-dark);border-radius:10px;padding:12px;font-size:1.2rem;font-weight:800;letter-spacing:.2em;text-align:center;color:var(--ocean-dark);font-family:monospace">—</div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <button class="btn-admin" style="padding:10px 14px;font-size:.78rem" onclick="vacGenererCode()">Générer</button>
+            <button class="btn-admin" style="padding:10px 14px;font-size:.78rem;background:var(--ocean-light)" onclick="vacCopierCode()">Copier</button>
           </div>
-          <button class="btn-admin" onclick="addUser()">＋ Créer le compte</button>
         </div>
+        <p style="font-size:.7rem;color:var(--text-light)">⏱ Code valable 48h — un seul code actif à la fois.</p>
+      </div>
+
+      <!-- Members list -->
+      <div class="admin-card">
+        <h3>👥 Membres autorisés</h3>
+        <div id="vac-membres-list"><p style="font-size:.82rem;color:var(--text-light)">Chargement...</p></div>
       </div>
 
       <!-- Password -->
@@ -774,6 +788,15 @@ service cloud.firestore {
         </div>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- ACCOUNT CHOOSER MODAL -->
+<div class="modal-overlay" id="account-modal">
+  <div class="modal" style="text-align:left">
+    <h3 style="margin-bottom:6px">Quel espace ?</h3>
+    <p style="color:var(--text-light);font-size:.82rem;margin-bottom:16px">Vous avez accès à plusieurs espaces. Lequel voulez-vous utiliser ?</p>
+    <div id="account-choices" style="display:flex;flex-direction:column;gap:10px"></div>
   </div>
 </div>
 
@@ -1066,11 +1089,174 @@ function switchLoginTab(tab) {
   document.querySelectorAll('.login-panel').forEach(p => p.classList.remove('active'));
   document.getElementById('tab-' + tab).classList.add('active');
   document.getElementById('panel-' + tab).classList.add('active');
-  // Clear errors
   ['google-error','email-error'].forEach(id => {
     const el = document.getElementById(id);
-    if(el) el.style.display = 'none';
+    if(el) { el.style.display = 'none'; el.textContent = ''; }
   });
+}
+
+function switchSubTab(tab) {
+  document.getElementById('subpanel-login').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('subpanel-register').style.display = tab === 'register' ? 'block' : 'none';
+  document.getElementById('subtab-login').classList.toggle('active', tab === 'login');
+  document.getElementById('subtab-register').classList.toggle('active', tab === 'register');
+  const ee = document.getElementById('email-error');
+  if(ee) { ee.style.display = 'none'; ee.textContent = ''; }
+}
+
+// ── Inscription + code d'invitation ──────────────────────────
+async function doRegister() {
+  const prenom = document.getElementById('r-prenom').value.trim();
+  const email  = document.getElementById('r-email').value.trim();
+  const pwd    = document.getElementById('r-pwd').value;
+  const code   = document.getElementById('r-code').value.trim().toUpperCase();
+  const errEl  = document.getElementById('email-error');
+  errEl.style.display = 'none'; errEl.textContent = '';
+  if(!prenom || !email || !pwd) { errEl.textContent = '\u26a0\ufe0f Remplissez tous les champs'; errEl.style.display='block'; return; }
+  if(pwd.length < 6) { errEl.textContent = '\u26a0\ufe0f Mot de passe trop court (6 min)'; errEl.style.display='block'; return; }
+  try {
+    const result = await auth.createUserWithEmailAndPassword(email, pwd);
+    await result.user.updateProfile({ displayName: prenom });
+    const uid = result.user.uid;
+    let ownerUID = null;
+    if(code) {
+      try {
+        const invSnap = await db.collection('vac_invitations').doc(code).get();
+        if(!invSnap.exists) { errEl.textContent = '\u26a0\ufe0f Code invalide'; errEl.style.display='block'; await auth.signOut(); return; }
+        const inv = invSnap.data();
+        const expires = inv.expires && inv.expires.toDate ? inv.expires.toDate() : new Date(inv.expires);
+        if(expires < new Date()) { errEl.textContent = '\u26a0\ufe0f Code expir\u00e9'; errEl.style.display='block'; await auth.signOut(); return; }
+        if(inv.used) { errEl.textContent = '\u26a0\ufe0f Code d\u00e9j\u00e0 utilis\u00e9'; errEl.style.display='block'; await auth.signOut(); return; }
+        ownerUID = inv.ownerUID;
+        await db.collection(COL_USERS).doc(ownerUID).collection('membres').doc(uid).set({ prenom, email, addedAt: firebase.firestore.FieldValue.serverTimestamp() });
+        await db.collection('vac_invitations').doc(code).update({ used: true, usedBy: uid, usedAt: firebase.firestore.FieldValue.serverTimestamp() });
+        showToast('\u2705 Bienvenue ! Compte li\u00e9 avec succ\u00e8s.');
+      } catch(e2) {
+        errEl.textContent = '\u26a0\ufe0f Erreur code : ' + (e2.message || e2.code);
+        errEl.style.display = 'block'; return;
+      }
+    }
+    const userDoc = { uid, login: prenom, email, role: ownerUID ? 'editor' : 'admin', provider: 'email', ownerUID: ownerUID || null };
+    await db.collection(COL_USERS).doc(uid).set(userDoc);
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify(userDoc));
+    await handleMultiAccount(result.user, userDoc);
+  } catch(e) {
+    errEl.textContent = e.code === 'auth/email-already-in-use' ? '\u26a0\ufe0f Email d\u00e9j\u00e0 utilis\u00e9' : ('\u26a0\ufe0f ' + (e.message || 'Erreur'));
+    errEl.style.display = 'block';
+  }
+}
+
+// ── Système invitation ────────────────────────────────────────
+function vacGenCode() {
+  const c = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = '';
+  for(let i=0;i<6;i++) code += c[Math.floor(Math.random()*c.length)];
+  return code;
+}
+
+async function vacGenererCode() {
+  if(!currentUser || !db) return;
+  const code = vacGenCode();
+  const expires = new Date(Date.now() + 48*3600*1000);
+  await db.collection('vac_invitations').doc(code).set({
+    ownerUID: currentUser.uid,
+    ownerNom: currentUser.login || currentUser.email,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    expires, used: false
+  });
+  await db.collection(COL_USERS).doc(currentUser.uid).collection('invite').doc('active').set({ code, expires });
+  document.getElementById('vac-invite-code').textContent = code;
+  showToast('Code g\u00e9n\u00e9r\u00e9 ! Valable 48h');
+}
+
+async function vacCopierCode() {
+  const code = document.getElementById('vac-invite-code').textContent;
+  if(code === '\u2014') { showToast('G\u00e9n\u00e9rez d\u2019abord un code'); return; }
+  navigator.clipboard.writeText(code).then(() => showToast('Code copi\u00e9 !')).catch(() => showToast('Code : ' + code));
+}
+
+async function vacLoadInviteCode() {
+  if(!currentUser || !db) return;
+  try {
+    const snap = await db.collection(COL_USERS).doc(currentUser.uid).collection('invite').doc('active').get();
+    if(snap.exists) {
+      const d = snap.data();
+      const expires = d.expires && d.expires.toDate ? d.expires.toDate() : new Date(d.expires);
+      if(expires > new Date()) document.getElementById('vac-invite-code').textContent = d.code;
+    }
+  } catch(e) {}
+}
+
+async function vacRenderMembres() {
+  if(!currentUser || !db) return;
+  const list = document.getElementById('vac-membres-list');
+  if(!list) return;
+  try {
+    const snap = await db.collection(COL_USERS).doc(currentUser.uid).collection('membres').get();
+    if(snap.empty) { list.innerHTML = '<p style="font-size:.82rem;color:var(--text-light)">Aucun membre pour l\u2019instant.</p>'; return; }
+    list.innerHTML = snap.docs.map(d => {
+      const m = d.data();
+      const initiales = (m.prenom||'?').slice(0,2).toUpperCase();
+      return '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--sand-dark)">'
+        + '<div style="width:34px;height:34px;border-radius:9px;background:#edf6fa;display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--ocean-dark);font-size:.8rem;flex-shrink:0">' + initiales + '</div>'
+        + '<div style="flex:1"><div style="font-weight:600;font-size:.88rem">' + (m.prenom||'Membre') + '</div><div style="font-size:.72rem;color:var(--text-light)">' + (m.email||'') + '</div></div>'
+        + '<button onclick="vacRetirerMembre(\'' + d.id + '\',\'' + (m.prenom||'').replace(/'/g,'') + '\')" style="padding:6px 12px;background:#fde8e6;color:#c0392b;border:none;border-radius:8px;font-size:.78rem;font-weight:600;cursor:pointer">Retirer</button>'
+        + '</div>';
+    }).join('');
+  } catch(e) { list.innerHTML = '<p style="font-size:.82rem;color:#c0392b">Erreur chargement</p>'; }
+}
+
+async function vacRetirerMembre(uid, prenom) {
+  if(!confirm('Retirer ' + prenom + ' de votre espace ?')) return;
+  await db.collection(COL_USERS).doc(currentUser.uid).collection('membres').doc(uid).delete();
+  try { await db.collection(COL_USERS).doc(uid).update({ ownerUID: firebase.firestore.FieldValue.delete() }); } catch(e) {}
+  showToast(prenom + ' retir\u00e9');
+  vacRenderMembres();
+}
+
+// ── Multi-compte : sélecteur si admin ET membre d'un autre ───
+async function handleMultiAccount(fbUser, userDoc) {
+  const comptes = [];
+  comptes.push({ uid: fbUser.uid, nom: userDoc.login || fbUser.email, label: 'Mon espace (admin)' });
+  if(userDoc.ownerUID) {
+    try {
+      const ownerSnap = await db.collection(COL_USERS).doc(userDoc.ownerUID).get();
+      const ownerNom = ownerSnap.exists ? (ownerSnap.data().login || 'Administrateur') : 'Administrateur';
+      comptes.push({ uid: userDoc.ownerUID, nom: ownerNom, label: 'Espace partag\u00e9' });
+    } catch(e) {
+      comptes.push({ uid: userDoc.ownerUID, nom: 'Administrateur', label: 'Espace partag\u00e9' });
+    }
+  }
+  if(comptes.length === 1) {
+    bootApp(userDoc);
+  } else {
+    const c = document.getElementById('account-choices');
+    c.innerHTML = comptes.map(cp =>
+      '<button onclick="choisirCompteVac(\'' + cp.uid + '\',\'' + fbUser.uid + '\')" '
+      + 'style="width:100%;display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--sand);border:2px solid var(--sand-dark);border-radius:12px;font-family:inherit;cursor:pointer;text-align:left;margin-bottom:4px">'
+      + '<div style="width:40px;height:40px;border-radius:10px;background:var(--ocean-light);display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:.9rem;flex-shrink:0">' + cp.nom.slice(0,2).toUpperCase() + '</div>'
+      + '<div><div style="font-weight:700;font-size:.9rem">' + cp.nom + '</div><div style="font-size:.72rem;color:var(--text-light)">' + cp.label + '</div></div>'
+      + '</button>'
+    ).join('');
+    window._pendingFbUser = fbUser;
+    window._pendingUserDoc = userDoc;
+    document.getElementById('account-modal').classList.add('open');
+  }
+}
+
+async function choisirCompteVac(targetUID, selfUID) {
+  document.getElementById('account-modal').classList.remove('open');
+  const fbUser = window._pendingFbUser;
+  const selfDoc = window._pendingUserDoc;
+  if(targetUID === selfUID) {
+    bootApp(selfDoc);
+  } else {
+    try {
+      const snap = await db.collection(COL_USERS).doc(targetUID).get();
+      const ownerDoc = snap.exists ? snap.data() : { uid: targetUID, login: 'Admin', role: 'editor' };
+      bootApp({ ...selfDoc, uid: targetUID, login: ownerDoc.login, role: 'editor' });
+    } catch(e) { bootApp(selfDoc); }
+  }
 }
 
 // ── Google Login (admin) ──────────────────────────────────────
@@ -1117,9 +1303,9 @@ async function doGoogleLogin() {
       return;
     }
 
-    sessionStorage.setItem(SESSION_KEY, JSON.stringify({ uid: fbUser.uid, login: userDoc.login, email: fbUser.email, role: 'admin', provider: 'google', photoURL: fbUser.photoURL || '' }));
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify({ uid: fbUser.uid, login: userDoc.login, email: fbUser.email, role: 'admin', provider: 'google', photoURL: fbUser.photoURL || '', ownerUID: userDoc.ownerUID || null }));
     loadEl.classList.remove('show');
-    bootApp(userDoc);
+    await handleMultiAccount(fbUser, userDoc);
 
   } catch(e) {
     console.error('Google login:', e);
@@ -1155,8 +1341,8 @@ async function doEmailLogin() {
       if(db) await db.collection(COL_USERS).doc(fbUser.uid).set(userDoc);
     }
 
-    sessionStorage.setItem(SESSION_KEY, JSON.stringify({ uid: fbUser.uid, login: userDoc.login, email, role: userDoc.role, provider: 'email' }));
-    bootApp(userDoc);
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify({ uid: fbUser.uid, login: userDoc.login, email, role: userDoc.role, provider: 'email', ownerUID: userDoc.ownerUID || null }));
+    await handleMultiAccount(fbUser, userDoc);
 
   } catch(e) {
     console.error('Email login:', e);
@@ -1340,6 +1526,12 @@ async function bootApp(u) {
 
   startRealtimeSync();
   setSyncDot(db ? 'green' : 'red');
+
+  // Charger code d'invitation et membres si admin
+  if(u.role === 'admin') {
+    vacLoadInviteCode();
+    vacRenderMembres();
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -2068,6 +2260,8 @@ async function renderAdmin() {
   setSyncDot(db ? 'green' : 'red');
 
   const users = await getUsers();
+  await vacRenderMembres();
+  await vacLoadInviteCode();
   document.getElementById('user-tbody').innerHTML = users.map((u,i) => {
     const isSelf = (u.uid && u.uid === currentUser.uid) || (u.login === currentUser.login);
     const providerBadge = u.provider === 'google'
