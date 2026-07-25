@@ -606,6 +606,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--text);m
         <button class="transport-btn" data-transport="avion" onclick="toggleTransport('avion')"><span class="transport-check">✓</span><span class="emoji">✈️</span><div class="label">Avion</div></button>
         <button class="transport-btn" data-transport="bus" onclick="toggleTransport('bus')"><span class="transport-check">✓</span><span class="emoji">🚌</span><div class="label">Bus</div></button>
         <button class="transport-btn" data-transport="bateau" onclick="toggleTransport('bateau')"><span class="transport-check">✓</span><span class="emoji">⛴️</span><div class="label">Bateau</div></button>
+        <button class="transport-btn" data-transport="remorque" onclick="toggleTransport('remorque')"><span class="transport-check">✓</span><span class="emoji">🚚</span><div class="label">Remorque</div></button>
       </div>
     </div>
 
@@ -870,7 +871,7 @@ const TYPE_LABELS = {
 };
 
 const TRANSPORT_LABELS = {
-  voiture:'🚗 Voiture', train:'🚆 Train', avion:'✈️ Avion', bus:'🚌 Bus', bateau:'⛴️ Bateau'
+  voiture:'🚗 Voiture', train:'🚆 Train', avion:'✈️ Avion', bus:'🚌 Bus', bateau:'⛴️ Bateau', remorque:'🚚 Remorque'
 };
 
 const TYPE_DOCUMENTS = {
@@ -898,7 +899,8 @@ const TRANSPORT_DOCUMENTS = {
   train:[{icon:"🎫",label:"Billets de train"},{icon:"🆔",label:"Carte de réduction"},{icon:"📋",label:"Réservation place"}],
   avion:[{icon:"✈️",label:"Billets d'avion"},{icon:"🆔",label:"Carte d'embarquement"},{icon:"🧳",label:"Étiquettes bagages"}],
   bus:[{icon:"🎫",label:"Billets de bus"},{icon:"🆔",label:"Carte de transport"}],
-  bateau:[{icon:"⛴️",label:"Billet de bateau"},{icon:"🆔",label:"Carte d'embarquement"},{icon:"🚢",label:"Réservation cabine"}]
+  bateau:[{icon:"⛴️",label:"Billet de bateau"},{icon:"🆔",label:"Carte d'embarquement"},{icon:"🚢",label:"Réservation cabine"}],
+  remorque:[{icon:"📄",label:"Carte grise de la remorque"},{icon:"🛡️",label:"Assurance remorque"},{icon:"🚦",label:"Permis remorque (BE) si + 750 kg"},{icon:"🔌",label:"Fiche électrique 7/13 broches"}]
 };
 
 const DEFAULT_CATEGORIES = [
@@ -917,7 +919,11 @@ const DEFAULT_CATEGORIES = [
     {id:'v12',label:"Tenue habillée",types:['croi','etranger','sejour'],qty:0},
     {id:'v13',label:"Combinaison ou veste + pantalon de ski",types:['ski'],qty:0},
     {id:'v14',label:"Gants de ski imperméables",types:['ski'],qty:0},
-    {id:'v15',label:"Bonnet / cache-cou (buff) chaud",types:['ski','montagne'],qty:0}
+    {id:'v15',label:"Bonnet / cache-cou (buff) chaud",types:['ski','montagne'],qty:0},
+    {id:'v16',label:"Gilet / doudoune légère",types:['montagne','ski','campagne','roadtrip','etranger'],qty:0},
+    {id:'v17',label:"Écharpe et gants classiques",types:['ski','montagne','etranger'],qty:0},
+    {id:'v18',label:"Tenue de sport / jogging",types:['tous'],qty:0},
+    {id:'v19',label:"Paréo / kimono de plage",types:['plage','croi'],qty:0}
   ]},
   {id:'chaussures',emoji:'👟',name:'Chaussures',primary:[],items:[
     {id:'ch1',label:"Chaussures de marche / randonnée",types:['montagne','camping','campagne','etranger','roadtrip'],qty:0},
@@ -925,7 +931,9 @@ const DEFAULT_CATEGORIES = [
     {id:'ch3',label:"Chaussures de ville",types:['sejour','etranger','croi'],qty:0},
     {id:'ch4',label:"Chaussures de sport",types:['tous'],qty:0},
     {id:'ch5',label:"Chaussons",types:['camping','location','montagne','ski'],qty:0},
-    {id:'ch6',label:"Chaussures après-ski / bottes fourrées",types:['ski'],qty:0}
+    {id:'ch6',label:"Chaussures après-ski / bottes fourrées",types:['ski'],qty:0},
+    {id:'ch7',label:"Bottes de pluie / chaussures imperméables",types:['camping','campagne','montagne'],qty:0},
+    {id:'ch8',label:"Chaussures d'eau (rochers, activités nautiques)",types:['plage','montagne','croi'],qty:0}
   ]},
   {id:'hygiene',emoji:'🧴',name:'Hygiène & Beauté',primary:[],items:[
     {id:'h1',label:"Brosse à dents + dentifrice",types:['tous'],qty:0},
@@ -941,7 +949,11 @@ const DEFAULT_CATEGORIES = [
     {id:'h11',label:"Brosse / peigne",types:['tous'],qty:0},
     {id:'h12',label:"Cotons / cotons-tiges",types:['tous'],qty:0},
     {id:'h13',label:"Serviettes de bain (x2)",types:['tous'],qty:0},
-    {id:'h14',label:"Serviette de plage / microfibre",types:['plage','camping','croi'],qty:0}
+    {id:'h14',label:"Serviette de plage / microfibre",types:['plage','camping','croi'],qty:0},
+    {id:'h15',label:"Gel hydroalcoolique / lingettes désinfectantes",types:['tous'],qty:0},
+    {id:'h16',label:"Trousse de couture de voyage",types:['tous'],qty:0},
+    {id:'h17',label:"Protections hygiéniques",types:['tous'],qty:0},
+    {id:'h18',label:"Fil dentaire / bain de bouche",types:['tous'],qty:0}
   ]},
   {id:'pharmacie',emoji:'💊',name:'Pharmacie',primary:[],items:[
     {id:'ph1',label:"Médicaments habituels (ordonnance)",types:['tous'],qty:0},
@@ -954,7 +966,12 @@ const DEFAULT_CATEGORIES = [
     {id:'ph8',label:"Thermomètre",types:['tous'],qty:0},
     {id:'ph9',label:"Protection solaire lèvres (SPF50)",types:['montagne','ski','plage','croi'],qty:0},
     {id:'ph10',label:"Sérum physiologique",types:['tous'],qty:0},
-    {id:'ph11',label:"Crème contre les gerçures / froid",types:['ski','montagne'],qty:0}
+    {id:'ph11',label:"Crème contre les gerçures / froid",types:['ski','montagne'],qty:0},
+    {id:'ph12',label:"Lunettes de vue de secours / lentilles + solution",types:['tous'],qty:0},
+    {id:'ph13',label:"Collyre / gouttes oculaires",types:['tous'],qty:0},
+    {id:'ph14',label:"Crème anti-brûlures / après-piqûre",types:['camping','plage','campagne','etranger'],qty:0},
+    {id:'ph15',label:"Bande de contention / genouillère",types:['montagne','ski','roadtrip'],qty:0},
+    {id:'ph16',label:"Carnet de vaccination international",types:['etranger','croi'],qty:0}
   ]},
   {id:'camping_equip',emoji:'⛺',name:'Matériel Camping',primary:['camping'],items:[
     {id:'ce1',label:"Tente + sardines + tendeurs",types:['camping'],qty:0},
@@ -966,7 +983,12 @@ const DEFAULT_CATEGORIES = [
     {id:'ce7',label:"Allume-feu / briquet",types:['camping'],qty:0},
     {id:'ce8',label:"Lampe frontale + piles",types:['camping','montagne'],qty:0},
     {id:'ce9',label:"Guirlande solaire / lanternes",types:['camping'],qty:0},
-    {id:'ce10',label:"Corde à linge + pinces",types:['camping'],qty:0}
+    {id:'ce10',label:"Corde à linge + pinces",types:['camping'],qty:0},
+    {id:'ce11',label:"Auvent / tapis extérieur",types:['camping'],qty:0},
+    {id:'ce12',label:"Douche solaire / poche à eau",types:['camping'],qty:0},
+    {id:'ce13',label:"Batterie solaire / powerstation",types:['camping'],qty:0},
+    {id:'ce14',label:"Kit de réparation tente / rustines",types:['camping'],qty:0},
+    {id:'ce15',label:"Table + chaises pliantes",types:['camping'],qty:0}
   ]},
   {id:'plage_equip',emoji:'🏖️',name:'Équipement Plage',primary:['plage'],items:[
     {id:'pe1',label:"Parasol de plage",types:['plage'],qty:0},
@@ -977,7 +999,10 @@ const DEFAULT_CATEGORIES = [
     {id:'pe6',label:"Masque + tuba",types:['plage','croi'],qty:0},
     {id:'pe7',label:"Palmes",types:['plage','croi'],qty:0},
     {id:'pe8',label:"Matelas gonflable de plage",types:['plage'],qty:0},
-    {id:'pe9',label:"Sac imperméable / waterproof",types:['plage','croi','camping'],qty:0}
+    {id:'pe9',label:"Sac imperméable / waterproof",types:['plage','croi','camping'],qty:0},
+    {id:'pe10',label:"Combinaison / lycra anti-UV",types:['plage'],qty:0},
+    {id:'pe11',label:"Paddle / bouée / kayak gonflable",types:['plage'],qty:0},
+    {id:'pe12',label:"Douche de plage portable / bidon d'eau douce",types:['plage'],qty:0}
   ]},
   {id:'montagne_equip',emoji:'⛰️',name:'Équipement Montagne',primary:['montagne'],items:[
     {id:'me1',label:"Bâtons de randonnée",types:['montagne'],qty:0},
@@ -986,7 +1011,10 @@ const DEFAULT_CATEGORIES = [
     {id:'me4',label:"Gants de montagne",types:['montagne'],qty:0},
     {id:'me5',label:"Bonnet / tour de cou",types:['montagne'],qty:0},
     {id:'me6',label:"Lunettes de glacier (UV)",types:['montagne'],qty:0},
-    {id:'me7',label:"Crampons / guêtres",types:['montagne'],qty:0}
+    {id:'me7',label:"Crampons / guêtres",types:['montagne'],qty:0},
+    {id:'me8',label:"Poncho de pluie",types:['montagne'],qty:0},
+    {id:'me9',label:"Couverture de survie",types:['montagne'],qty:0},
+    {id:'me10',label:"Altimètre / boussole",types:['montagne'],qty:0}
   ]},
   {id:'ski_equip',emoji:'⛷️',name:"Sports d'hiver / Ski",primary:['ski'],items:[
     {id:'sk1',label:"Skis / snowboard + bâtons (perso ou location)",types:['ski'],qty:0},
@@ -998,7 +1026,9 @@ const DEFAULT_CATEGORIES = [
     {id:'sk7',label:"Sac étanche pour vêtements mouillés",types:['ski'],qty:0},
     {id:'sk8',label:"Forfait remontées mécaniques (réservation)",types:['ski'],qty:0},
     {id:'sk9',label:"Assurance ski / rapatriement",types:['ski'],qty:0},
-    {id:'sk10',label:"Protège-poignets (débutants)",types:['ski'],qty:0}
+    {id:'sk10',label:"Protège-poignets (débutants)",types:['ski'],qty:0},
+    {id:'sk11',label:"Sac à dos ski / porte-skis",types:['ski'],qty:0},
+    {id:'sk12',label:"Kit d'entretien / fart pour skis",types:['ski'],qty:0}
   ]},
   {id:'alimentation',emoji:'🍽️',name:'Alimentation & Cuisine',primary:['camping','location','roadtrip'],items:[
     {id:'al1',label:"Gourde réutilisable / bouteille d'eau",types:['tous'],qty:0},
@@ -1010,9 +1040,11 @@ const DEFAULT_CATEGORIES = [
     {id:'al7',label:"Sacs poubelle / sacs congélation",types:['camping','campagne'],qty:0},
     {id:'al8',label:"Thermos boissons chaudes",types:['ski','montagne'],qty:0},
     {id:'al9',label:"Kit café/thé nomade (dosettes, cafetière voyage)",types:['camping','location','roadtrip'],qty:0},
-    {id:'al10',label:"Ouvre-boîte / couteau multifonction cuisine",types:['camping'],qty:0}
+    {id:'al10',label:"Ouvre-boîte / couteau multifonction cuisine",types:['camping'],qty:0},
+    {id:'al11',label:"Réserve d'eau / pastilles de purification",types:['camping','etranger','montagne'],qty:0},
+    {id:'al12',label:"Bouilloire / multicuiseur de voyage",types:['location','sejour'],qty:0}
   ]},
-  {id:'auto',emoji:'🚗',name:'Auto & Route',primary:['roadtrip'],primaryTransports:['voiture'],items:[
+  {id:'auto',emoji:'🚗',name:'Auto, Remorque & Route',primary:['roadtrip'],primaryTransports:['voiture','remorque'],items:[
     {id:'au1',label:"Papiers du véhicule (carte grise, assurance, permis)",types:['tous'],transports:['voiture'],qty:0},
     {id:'au2',label:"Contrôle niveaux (huile, liquide refroidissement, lave-glace)",types:['tous'],transports:['voiture'],qty:0},
     {id:'au3',label:"Pression des pneus + roue de secours / kit anti-crevaison",types:['tous'],transports:['voiture'],qty:0},
@@ -1022,7 +1054,24 @@ const DEFAULT_CATEGORIES = [
     {id:'au7',label:"Chargeur allume-cigare / adaptateur USB",types:['tous'],transports:['voiture'],qty:0},
     {id:'au8',label:"Organiseur de coffre / coussin de voyage",types:['roadtrip','camping'],transports:['voiture'],qty:0},
     {id:'au9',label:"Attestation d'assistance dépannage 24h/24",types:['etranger','roadtrip'],transports:['voiture'],qty:0},
-    {id:'au10',label:"Housses de sièges / tapis de protection",types:['tous'],transports:['voiture'],qty:0}
+    {id:'au10',label:"Housses de sièges / tapis de protection",types:['tous'],transports:['voiture'],qty:0},
+    {id:'au11',label:"Porte-vélos (attelage, hayon ou toit)",types:['tous'],transports:['voiture'],qty:0},
+    {id:'au12',label:"Sangles + antivol pour porte-vélos",types:['tous'],transports:['voiture'],qty:0},
+    {id:'au13',label:"Feux et plaque d'immatriculation de la remorque",types:['tous'],transports:['remorque'],qty:0},
+    {id:'au14',label:"Fiche électrique 7/13 broches + attelage",types:['tous'],transports:['remorque'],qty:0},
+    {id:'au15',label:"Sangles d'arrimage + bâche de remorque",types:['tous'],transports:['remorque'],qty:0},
+    {id:'au16',label:"Cadenas / antivol de remorque",types:['tous'],transports:['remorque'],qty:0},
+    {id:'au17',label:"Roue de secours dédiée à la remorque",types:['tous'],transports:['remorque'],qty:0}
+  ]},
+  {id:'velos',emoji:'🚲',name:'Vélos & Cyclisme',primary:['camping','campagne','roadtrip'],items:[
+    {id:'ve1',label:"Vélos (adultes)",types:['camping','location','campagne','roadtrip','plage'],qty:0},
+    {id:'ve2',label:"Casques vélo adultes",types:['camping','location','campagne','roadtrip','plage'],qty:0},
+    {id:'ve3',label:"Antivols vélos",types:['camping','location','campagne','roadtrip','plage'],qty:0},
+    {id:'ve4',label:"Kit anti-crevaison + pompe à vélo",types:['camping','location','campagne','roadtrip'],qty:0},
+    {id:'ve5',label:"Sacoches / panier vélo",types:['camping','location','campagne','roadtrip'],qty:0},
+    {id:'ve6',label:"Gants / lunettes de vélo",types:['montagne','campagne','roadtrip'],qty:0},
+    {id:'ve7',label:"Remorque ou siège vélo enfant",types:['camping','location','campagne'],qty:0},
+    {id:'ve8',label:"Gilet réfléchissant / éclairage vélo",types:['camping','location','campagne','roadtrip'],qty:0}
   ]},
   {id:'activites',emoji:'🎯',name:'Activités & Loisirs',primary:[],items:[
     {id:'ac1',label:"Livres / liseuse",types:['tous'],qty:0},
@@ -1030,7 +1079,7 @@ const DEFAULT_CATEGORIES = [
     {id:'ac3',label:"Tablette / ordinateur portable",types:['tous'],qty:0},
     {id:'ac4',label:"Casque audio / écouteurs",types:['tous'],qty:0},
     {id:'ac5',label:"Raquettes de plage / badminton",types:['plage','camping','campagne'],qty:0},
-    {id:'ac6',label:"Vélos / trottinettes",types:['camping','location','campagne','roadtrip','plage'],qty:0},
+    {id:'ac6',label:"Trottinettes / rollers / skateboard",types:['camping','location','campagne','roadtrip','plage'],qty:0},
     {id:'ac7',label:"Pétanque",types:['camping','campagne','location','plage'],qty:0},
     {id:'ac8',label:"Frisbee / ballon",types:['plage','camping','campagne','montagne'],qty:0},
     {id:'ac9',label:"Appareil photo + chargeur",types:['tous'],qty:0},
@@ -1043,7 +1092,12 @@ const DEFAULT_CATEGORIES = [
     {id:'en4',label:"Lait maternisé / biberons",types:['tous'],qty:0},
     {id:'en5',label:"Crème solaire bébé",types:['tous'],qty:0},
     {id:'en6',label:"Gilet de sauvetage enfant",types:['plage','croi','camping'],qty:0},
-    {id:'en7',label:"Casque vélo enfant",types:['camping','location','campagne','plage'],qty:0}
+    {id:'en7',label:"Casque vélo enfant",types:['camping','location','campagne','plage'],qty:0},
+    {id:'en8',label:"Chaise haute pliante / rehausseur",types:['tous'],qty:0},
+    {id:'en9',label:"Sac à dos porte-bébé / poussette canne",types:['tous'],qty:0},
+    {id:'en10',label:"Thermomètre bébé + carnet de santé",types:['tous'],qty:0},
+    {id:'en11',label:"Veilleuse / doudou de rechange",types:['tous'],qty:0},
+    {id:'en12',label:"Maillot de bain couche / protège-couche piscine",types:['plage','camping'],qty:0}
   ]},
   {id:'logistique',emoji:'🔧',name:'Logistique & Électronique',primary:[],items:[
     {id:'l1',label:"Chargeurs téléphone / câbles USB-C",types:['tous'],qty:0},
@@ -1055,7 +1109,11 @@ const DEFAULT_CATEGORIES = [
     {id:'l8',label:"GPS / application offline",types:['tous'],qty:0},
     {id:'l9',label:"Adaptateur prise électrique",types:['etranger','croi'],qty:0},
     {id:'l10',label:"Lampe de poche / frontale",types:['tous'],qty:0},
-    {id:'l11',label:"Kit de premiers secours",types:['tous'],qty:0}
+    {id:'l11',label:"Kit de premiers secours",types:['tous'],qty:0},
+    {id:'l12',label:"Housse étanche téléphone",types:['plage','croi','camping'],qty:0},
+    {id:'l13',label:"Clé USB / disque dur sauvegarde photos",types:['tous'],qty:0},
+    {id:'l14',label:"Multi-adaptateur international",types:['etranger','croi'],qty:0},
+    {id:'l15',label:"Enceinte bluetooth portable",types:['camping','plage','campagne'],qty:0}
   ]},
   {id:'maison',emoji:'🏠',name:'Maison avant de partir',primary:[],items:[
     {id:'m1',label:"Arroser les plantes",types:['tous'],qty:0},
@@ -1066,7 +1124,11 @@ const DEFAULT_CATEGORIES = [
     {id:'m6',label:"Sortir les poubelles",types:['tous'],qty:0},
     {id:'m7',label:"Fermer volets / portes",types:['tous'],qty:0},
     {id:'m8',label:"Confier les animaux",types:['tous'],qty:0},
-    {id:'m9',label:"Programmer l'alarme",types:['tous'],qty:0}
+    {id:'m9',label:"Programmer l'alarme",types:['tous'],qty:0},
+    {id:'m10',label:"Couper le chauffe-eau / chauffage",types:['tous'],qty:0},
+    {id:'m11',label:"Relever les compteurs (eau, élec, gaz)",types:['tous'],qty:0},
+    {id:'m12',label:"Mettre le courrier en garde",types:['tous'],qty:0},
+    {id:'m13',label:"Vérifier les détecteurs de fumée",types:['tous'],qty:0}
   ]},
   {id:'divers',emoji:'🎒',name:'Divers',primary:[],items:[
     {id:'d1',label:"Lunettes de rechange",types:['tous'],qty:0},
@@ -1074,7 +1136,12 @@ const DEFAULT_CATEGORIES = [
     {id:'d3',label:"Porte-monnaie / porte-cartes",types:['tous'],qty:0},
     {id:'d4',label:"Couteau suisse / multioutil",types:['camping','montagne','roadtrip'],qty:0},
     {id:'d5',label:"Boules Quies / masque de nuit",types:['tous'],qty:0},
-    {id:'d6',label:"Carnet de voyage / journal",types:['tous'],qty:0}
+    {id:'d6',label:"Carnet de voyage / journal",types:['tous'],qty:0},
+    {id:'d7',label:"Cadenas de voyage (valise, casier)",types:['tous'],qty:0},
+    {id:'d8',label:"Sacs de compression / rangement valise",types:['tous'],qty:0},
+    {id:'d9',label:"Étiquettes bagages personnalisées",types:['tous'],qty:0},
+    {id:'d10',label:"Sac à linge sale",types:['tous'],qty:0},
+    {id:'d11',label:"Argent liquide / petite monnaie locale",types:['etranger','croi','roadtrip'],qty:0}
   ]}
 ];
 
