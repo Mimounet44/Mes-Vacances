@@ -398,6 +398,20 @@ body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--text);m
 .modal-ok{background:var(--ocean);color:#fff}
 .modal-ok:active{background:var(--ocean-dark)}
 
+.share-add-row{display:flex;gap:8px;margin-bottom:12px}
+.share-add-row input{flex:1;padding:12px 14px;border-radius:12px;border:2px solid var(--sand-dark);
+  font-family:inherit;font-size:.85rem;background:var(--sand-light,#faf6ef);color:var(--text)}
+.share-add-row input:focus{outline:none;border-color:var(--ocean)}
+.share-add-btn{width:46px;border-radius:12px;border:none;background:var(--ocean);color:#fff;
+  font-size:1.3rem;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.share-add-btn:active{background:var(--ocean-dark)}
+.share-list{max-height:220px;overflow-y:auto;text-align:left}
+.share-row{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;
+  background:var(--sand);border-radius:10px;margin-bottom:6px;font-size:.82rem;color:var(--text)}
+.share-remove{background:none;border:none;color:var(--coral);font-size:1rem;font-weight:700;
+  cursor:pointer;padding:2px 6px;-webkit-tap-highlight-color:transparent}
+.share-empty{font-size:.8rem;color:var(--text-light);text-align:center;padding:12px 0}
+
 /* ── TOAST ── */
 .toast{position:fixed;bottom:calc(76px + env(safe-area-inset-bottom));left:50%;
   transform:translateX(-50%) translateY(20px);background:rgba(42,33,24,.92);color:#fff;
@@ -799,6 +813,21 @@ service cloud.firestore {
   </div>
 </div>
 
+<div class="modal-overlay" id="share-modal">
+  <div class="modal">
+    <h3 id="share-modal-title">Partager ce voyage</h3>
+    <p>Les personnes ajoutées ci-dessous pourront voir et modifier ce voyage avec leur propre compte.</p>
+    <div class="share-add-row">
+      <input type="email" id="share-email-input" placeholder="email@exemple.com" onkeydown="if(event.key==='Enter')addShareEmail()">
+      <button class="share-add-btn" onclick="addShareEmail()">＋</button>
+    </div>
+    <div id="share-list" class="share-list"></div>
+    <div class="modal-btns" style="margin-top:16px">
+      <button class="modal-ok" style="flex:none;width:100%" onclick="closeShareModal()">Fermer</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -831,10 +860,11 @@ try {
 } catch(e) { console.error('Firebase init:', e); }
 
 // ═══════════════════════════════════════════════════════════════
-//  CONSTANTES FIREBASE — structure PARTAGÉE entre tous les users
-//  trips/{tripId}         → données du voyage (partagé)
-//  app_users/{login}      → comptes utilisateurs
-//  app_meta/trips         → liste des voyages (partagée)
+//  CONSTANTES FIREBASE
+//  trips/{tripId}    → voyage : {state, ownerId, ownerEmail, sharedWith[], name, dates}
+//                      visible/modifiable par le propriétaire (ownerId) ou les invités (sharedWith)
+//  app_users/{uid}   → comptes utilisateurs (profils, rôles)
+//  app_meta/trips    → ancien index global (conservé pour migration, sinon inutilisé)
 // ═══════════════════════════════════════════════════════════════
 const COL_TRIPS   = 'trips';
 const COL_USERS   = 'app_users';
@@ -1460,52 +1490,135 @@ async function bootApp(u) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  TRIPS — stockage PARTAGÉ dans /trips/{tripId} + /app_meta/trips
+//  TRIPS — chaque voyage a un propriétaire (ownerId) + une liste
+//  d'invités (sharedWith[], emails). Visible seulement par eux.
 // ═══════════════════════════════════════════════════════════════
-async function loadTripsMetadata() {
-  if(db) {
-    try {
-      const doc = await db.collection(DOC_META).doc('trips').get();
-      if(doc.exists) return doc.data();
-    } catch(e) { console.error('loadTripsMetadata:', e); }
-  }
-  const local = localStorage.getItem('vac_trips_meta_v3');
-  return local ? JSON.parse(local) : null;
+function tripSummaryFromDoc(doc) {
+  const d = doc.data() || {};
+  return {
+    id: doc.id,
+    name: d.name || (d.state && d.state.dest && d.state.dest.name) || 'Voyage sans nom',
+    dates: d.dates || (d.state && d.state.dest && d.state.dest.dates) || '',
+    ownerId: d.ownerId || null,
+    ownerEmail: d.ownerEmail || '',
+    sharedWith: Array.isArray(d.sharedWith) ? d.sharedWith : []
+  };
 }
 
-async function saveTripsMetadata() {
-  const meta = {currentTripId, list: tripsList};
-  localStorage.setItem('vac_trips_meta_v3', JSON.stringify(meta));
-  if(db) {
+async function queryMyTrips() {
+  if(!db || !currentUser) return [];
+  const uid   = currentUser.uid;
+  const email = (currentUser.email || '').toLowerCase();
+  const results = new Map();
+  try {
+    if(uid) {
+      const ownedSnap = await db.collection(COL_TRIPS).where('ownerId','==',uid).get();
+      ownedSnap.forEach(doc => results.set(doc.id, tripSummaryFromDoc(doc)));
+    }
+    if(email) {
+      const sharedSnap = await db.collection(COL_TRIPS).where('sharedWith','array-contains',email).get();
+      sharedSnap.forEach(doc => results.set(doc.id, tripSummaryFromDoc(doc)));
+    }
+  } catch(e) { console.error('queryMyTrips:', e); }
+  return Array.from(results.values());
+}
+
+// Migration ponctuelle : les voyages créés avant le partage à la carte
+// n'ont pas de ownerId → invisibles avec les nouvelles règles. On les
+// rattache une seule fois (admin uniquement) au créateur courant et on
+// les partage avec tous les comptes existants pour ne rien casser.
+async function migrateLegacyTrips() {
+  if(!db || !currentUser || currentUser.role !== 'admin') return;
+  try {
+    const metaDoc = await db.collection(DOC_META).doc('trips').get();
+    if(!metaDoc.exists) return;
+    const legacyList = (metaDoc.data() && metaDoc.data().list) || [];
+    if(legacyList.length) {
+      const users = await getUsers();
+      const allEmails = users.map(u => (u.email||'').toLowerCase()).filter(Boolean);
+      const batch = db.batch();
+      let changed = false;
+      for(const t of legacyList) {
+        const ref = db.collection(COL_TRIPS).doc(t.id);
+        const snap = await ref.get();
+        if(!snap.exists || snap.data().ownerId) continue;
+        changed = true;
+        batch.set(ref, {
+          ownerId: currentUser.uid,
+          ownerEmail: currentUser.email || '',
+          sharedWith: allEmails,
+          name: t.name || 'Voyage sans nom',
+          dates: t.dates || ''
+        }, {merge:true});
+      }
+      if(changed) await batch.commit();
+    }
+    await db.collection(DOC_META).doc('trips').delete().catch(()=>{});
+  } catch(e) { console.error('migrateLegacyTrips:', e); }
+}
+
+async function createFirstTrip() {
+  const firstId = genId();
+  currentTripId = firstId;
+  const name = 'Mes vacances';
+  const ownerId    = currentUser ? currentUser.uid : null;
+  const ownerEmail = currentUser ? (currentUser.email || '') : '';
+  tripsList = [{id:firstId, name, dates:'', ownerId, ownerEmail, sharedWith:[]}];
+
+  // Migration depuis l'ancienne structure locale (avant Firebase)
+  let migrated = null;
+  const oldLocal = localStorage.getItem('vac_state_v8') || localStorage.getItem('vac_state_v7');
+  if(oldLocal) { try { migrated = JSON.parse(oldLocal); } catch(e){} }
+
+  if(migrated) {
+    applyState(migrated);
+    if(!state.categories || !state.categories.length)
+      state.categories = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+  } else {
+    state = {
+      types:[], transports:[], checked:{}, packed:{}, quantities:{}, collapsed:{},
+      dest:{name:'',dates:'',people:''}, notes:'', reminders:[], map:{lat:null,lng:null,zoom:13},
+      categories: JSON.parse(JSON.stringify(DEFAULT_CATEGORIES))
+    };
+  }
+
+  if(db && currentUser) {
     try {
-      await db.collection(DOC_META).doc('trips').set(meta);
-    } catch(e) { console.error('saveTripsMetadata:', e); }
+      await db.collection(COL_TRIPS).doc(firstId).set({
+        state,
+        ownerId: currentUser.uid,
+        ownerEmail: currentUser.email || '',
+        sharedWith: [],
+        name, dates: '',
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedBy: currentUser.login
+      });
+    } catch(e) { console.error('createFirstTrip:', e); }
   }
 }
 
 async function initTrips() {
-  const meta = await loadTripsMetadata();
+  await migrateLegacyTrips();
+
+  if(db && currentUser) {
+    tripsList = await queryMyTrips();
+    if(tripsList.length) {
+      const cached = localStorage.getItem('vac_last_trip_' + currentUser.uid);
+      currentTripId = (cached && tripsList.find(t => t.id === cached)) ? cached : tripsList[0].id;
+      return;
+    }
+    await createFirstTrip();
+    return;
+  }
+
+  // Hors-ligne / pas de Firebase : repli local mono-voyage
+  const local = localStorage.getItem('vac_trips_meta_v3');
+  const meta = local ? JSON.parse(local) : null;
   if(meta && meta.list && meta.list.length) {
     tripsList     = meta.list;
     currentTripId = meta.currentTripId || meta.list[0].id;
-    if(!tripsList.find(t => t.id === currentTripId))
-      currentTripId = tripsList[0].id;
   } else {
-    // Migration depuis l'ancienne structure par user
-    let migrated = null;
-    const oldLocal = localStorage.getItem('vac_state_v8') || localStorage.getItem('vac_state_v7');
-    if(oldLocal) { try { migrated = JSON.parse(oldLocal); } catch(e){} }
-
-    const firstId = genId();
-    currentTripId = firstId;
-    tripsList = [{id:firstId, name:'Mes vacances', dates:''}];
-    await saveTripsMetadata();
-    if(migrated) {
-      applyState(migrated);
-      if(!state.categories || !state.categories.length)
-        state.categories = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
-      await saveState();
-    }
+    await createFirstTrip();
   }
 }
 
@@ -1514,11 +1627,11 @@ async function switchTrip(tripId) {
   await saveState();
   stopRealtimeSync();
   currentTripId = tripId;
+  if(currentUser) localStorage.setItem('vac_last_trip_' + currentUser.uid, tripId);
   state.categories = [];
   await loadState();
   if(!state.categories || !state.categories.length)
     state.categories = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
-  await saveTripsMetadata();
   refreshUI();
   startRealtimeSync();
   showToast('✈️ ' + (tripsList.find(t=>t.id===tripId)||{}).name);
@@ -1528,15 +1641,25 @@ async function promptNewTrip() {
   const name = prompt('Nom du nouveau voyage :', 'Vacances ' + new Date().getFullYear());
   if(!name) return;
   const id = genId();
-  tripsList.push({id, name, dates:''});
+  const ownerId    = currentUser ? currentUser.uid : null;
+  const ownerEmail = currentUser ? (currentUser.email || '') : '';
+  tripsList.push({id, name, dates:'', ownerId, ownerEmail, sharedWith:[]});
   currentTripId = id;
+  if(currentUser) localStorage.setItem('vac_last_trip_' + currentUser.uid, id);
   state = {
-    types:[], transports:[], checked:{}, quantities:{}, collapsed:{},
+    types:[], transports:[], checked:{}, packed:{}, quantities:{}, collapsed:{},
     dest:{name:'',dates:'',people:''}, notes:'', reminders:[], map:{lat:null,lng:null,zoom:13},
     categories: JSON.parse(JSON.stringify(DEFAULT_CATEGORIES))
   };
-  await saveState();
-  await saveTripsMetadata();
+  if(db) {
+    try {
+      await db.collection(COL_TRIPS).doc(id).set({
+        state, ownerId, ownerEmail, sharedWith:[], name, dates:'',
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedBy: currentUser ? currentUser.login : 'unknown'
+      });
+    } catch(e) { console.error('promptNewTrip:', e); }
+  }
   stopRealtimeSync();
   renderTripSelector();
   refreshUI();
@@ -1547,10 +1670,11 @@ async function promptNewTrip() {
 async function renameCurrentTrip() {
   const trip = tripsList.find(t => t.id === currentTripId);
   if(!trip) return;
+  if(!isTripOwner(trip)) { showToast('⚠️ Seul le créateur peut renommer ce voyage'); return; }
   const name = prompt('Renommer :', trip.name);
   if(!name) return;
   trip.name = name;
-  await saveTripsMetadata();
+  if(db) { try { await db.collection(COL_TRIPS).doc(currentTripId).set({name}, {merge:true}); } catch(e){} }
   renderTripSelector();
   showToast('✏️ ' + name);
 }
@@ -1558,6 +1682,7 @@ async function renameCurrentTrip() {
 async function deleteCurrentTrip() {
   if(tripsList.length <= 1) { showToast('⚠️ Impossible de supprimer le seul voyage'); return; }
   const trip = tripsList.find(t => t.id === currentTripId);
+  if(!isTripOwner(trip)) { showToast('⚠️ Seul le créateur peut supprimer ce voyage'); return; }
   if(!confirm('Supprimer "' + (trip?trip.name:'') + '" ?')) return;
   const delId = currentTripId;
   tripsList = tripsList.filter(t => t.id !== delId);
@@ -1567,28 +1692,92 @@ async function deleteCurrentTrip() {
   showToast('🗑️ Voyage supprimé');
 }
 
+function isTripOwner(trip) {
+  if(!trip) return false;
+  if(!trip.ownerId) return true; // ancien voyage local sans propriétaire défini
+  return currentUser && trip.ownerId === currentUser.uid;
+}
+
 function renderTripSelector() {
   const sel = document.getElementById('trip-selector');
   if(!sel) return;
-  sel.innerHTML = tripsList.map(t =>
-    `<option value="${t.id}" ${t.id===currentTripId?'selected':''}> ✈️ ${t.name}${t.dates?' · '+t.dates:''}</option>`
-  ).join('');
+  sel.innerHTML = tripsList.map(t => {
+    const shared = !isTripOwner(t) ? '🔗 ' : (t.sharedWith && t.sharedWith.length ? '👥 ' : '');
+    return `<option value="${t.id}" ${t.id===currentTripId?'selected':''}> ✈️ ${shared}${t.name}${t.dates?' · '+t.dates:''}</option>`;
+  }).join('');
 }
 
 function showTripMenu() {
   const existing = document.getElementById('trip-menu-popup');
   if(existing){ existing.remove(); return; }
+  const trip = tripsList.find(t => t.id === currentTripId);
+  const owner = isTripOwner(trip);
   const menu = document.createElement('div');
   menu.id = 'trip-menu-popup';
   menu.className = 'trip-menu';
   menu.innerHTML = `
-    <button onclick="renameCurrentTrip();closeTripMenu()">✏️ Renommer ce voyage</button>
+    ${owner ? '<button onclick="renameCurrentTrip();closeTripMenu()">✏️ Renommer ce voyage</button>' : ''}
     <button onclick="promptNewTrip();closeTripMenu()">➕ Nouveau voyage</button>
-    <button class="danger" onclick="deleteCurrentTrip();closeTripMenu()">🗑️ Supprimer</button>`;
+    ${owner ? '<button onclick="openShareModal();closeTripMenu()">🔗 Partager ce voyage</button>' : ''}
+    ${owner ? '<button class="danger" onclick="deleteCurrentTrip();closeTripMenu()">🗑️ Supprimer</button>' : ''}`;
   document.body.appendChild(menu);
   setTimeout(() => document.addEventListener('click', closeTripMenu, {once:true}), 100);
 }
 function closeTripMenu(){ const m=document.getElementById('trip-menu-popup'); if(m) m.remove(); }
+
+// ── Partage à la carte ──────────────────────────────────────────
+function openShareModal() {
+  const trip = tripsList.find(t => t.id === currentTripId);
+  if(!isTripOwner(trip)) { showToast('⚠️ Seul le créateur peut gérer le partage'); return; }
+  renderShareModal();
+  document.getElementById('share-modal').classList.add('open');
+}
+function closeShareModal() { document.getElementById('share-modal').classList.remove('open'); }
+
+function renderShareModal() {
+  const trip = tripsList.find(t => t.id === currentTripId);
+  const list = (trip && trip.sharedWith) || [];
+  document.getElementById('share-modal-title').textContent = 'Partager « ' + (trip?trip.name:'') + ' »';
+  const listEl = document.getElementById('share-list');
+  listEl.innerHTML = list.length
+    ? list.map(email => `<div class="share-row">
+        <span>${email}</span>
+        <button class="share-remove" onclick="removeShareEmail('${email}')">✕</button>
+      </div>`).join('')
+    : '<p class="share-empty">Pas encore partagé. Ce voyage n\'est visible que par vous.</p>';
+}
+
+async function addShareEmail() {
+  const input = document.getElementById('share-email-input');
+  const email = input.value.trim().toLowerCase();
+  if(!email || !email.includes('@')) { showToast('⚠️ Adresse e-mail invalide'); return; }
+  const trip = tripsList.find(t => t.id === currentTripId);
+  if(!trip) return;
+  if(!trip.sharedWith) trip.sharedWith = [];
+  if(trip.sharedWith.includes(email)) { showToast('ℹ️ Déjà partagé avec cette adresse'); return; }
+  trip.sharedWith.push(email);
+  input.value = '';
+  if(db) {
+    try { await db.collection(COL_TRIPS).doc(currentTripId).set({sharedWith: trip.sharedWith}, {merge:true}); }
+    catch(e) { console.error('addShareEmail:', e); }
+  }
+  renderShareModal();
+  renderTripSelector();
+  showToast('✅ Partagé avec ' + email);
+}
+
+async function removeShareEmail(email) {
+  const trip = tripsList.find(t => t.id === currentTripId);
+  if(!trip || !trip.sharedWith) return;
+  trip.sharedWith = trip.sharedWith.filter(e => e !== email);
+  if(db) {
+    try { await db.collection(COL_TRIPS).doc(currentTripId).set({sharedWith: trip.sharedWith}, {merge:true}); }
+    catch(e) { console.error('removeShareEmail:', e); }
+  }
+  renderShareModal();
+  renderTripSelector();
+  showToast('🗑️ Accès retiré');
+}
 
 // ═══════════════════════════════════════════════════════════════
 //  STATE SAVE / LOAD — stockage dans /trips/{tripId} (partagé)
@@ -1614,15 +1803,17 @@ async function saveState() {
   // Sauvegarde locale immédiate
   localStorage.setItem('vac_trip_' + currentTripId, JSON.stringify(state));
 
-  // Sauvegarde Firebase (partagée → tous les utilisateurs voient les changements)
+  // Sauvegarde Firebase — écriture fusionnée : ne touche pas ownerId/sharedWith
   if(db && currentTripId) {
     setSyncDot('orange');
     try {
-      await db.collection(COL_TRIPS).doc(currentTripId).set({
+      const payload = {
         state,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
         updatedBy: currentUser ? currentUser.login : 'unknown'
-      });
+      };
+      if(trip) { payload.name = trip.name; payload.dates = trip.dates; }
+      await db.collection(COL_TRIPS).doc(currentTripId).set(payload, {merge:true});
       setSyncDot('green');
       const lbl = document.getElementById('last-sync-label');
       if(lbl) lbl.textContent = '✅ Dernière sync : ' + new Date().toLocaleTimeString('fr-FR');
@@ -1632,7 +1823,6 @@ async function saveState() {
     }
   }
 
-  saveTripsMetadata();
   updateProgress();
   updateDocumentsList();
 }
@@ -2295,6 +2485,7 @@ function saveQty() {
   closeQtyModal(); saveState();
 }
 document.getElementById('qty-modal').addEventListener('click', e => { if(e.target===document.getElementById('qty-modal')) closeQtyModal(); });
+document.getElementById('share-modal').addEventListener('click', e => { if(e.target===document.getElementById('share-modal')) closeShareModal(); });
 
 // ═══════════════════════════════════════════════════════════════
 //  AUTO BOOT (session persistée)
