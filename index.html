@@ -408,11 +408,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--text);m
 
 /* ── PRINT ── */
 @media print {
-  #login-screen,#app .app-nav,.mobile-nav,.action-bar,.add-row,.item-delete,
-  .type-grid,.dest-section,.progress-section,.types-selected-bar,
-  .transport-section,.documents-section,.map-section,.calendar-section,
-  .reminders-section,.notes-section,.btn-sm,.btn-logout,.trip-selector-wrap,#sync-dot{display:none!important}
-  .page{display:block!important;padding:0}
+  #login-screen,#app .app-nav,.mobile-nav,#sync-dot{display:none!important}
+  .page{display:none!important}
+  #page-ma-liste{display:block!important;padding:0}
+  #page-ma-liste .action-bar{display:none!important}
   body{background:#fff}
 }
 
@@ -633,8 +632,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--text);m
 
     <div class="progress-section">
       <div class="progress-header">
-        <h3>🎒 Avancement</h3>
-        <span class="progress-count" id="prog-count">0 / 0 articles</span>
+        <h3>🎒 Sélection</h3>
+        <span class="progress-count" id="prog-count">0 / 0 sélectionnés</span>
       </div>
       <div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-bar" style="width:0%"></div></div>
     </div>
@@ -668,7 +667,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--text);m
   <div class="page" id="page-ma-liste">
     <div class="action-bar" style="margin-top:8px">
       <button class="btn-sm accent" onclick="window.print()">🖨️ Imprimer</button>
-      <button class="btn-sm" onclick="uncheckAll()">↩️ Tout décocher</button>
+      <button class="btn-sm" onclick="uncheckPacked()">↩️ Tout décocher</button>
     </div>
     <div id="mylist-content"></div>
   </div>
@@ -852,7 +851,7 @@ let saveDebounceTimer = null;
 let isSyncing = false;
 
 let state = {
-  types:[], transports:[], categories:[], checked:{}, quantities:{}, collapsed:{},
+  types:[], transports:[], categories:[], checked:{}, packed:{}, quantities:{}, collapsed:{},
   dest:{name:'',dates:'',people:''}, notes:'', reminders:[], map:{lat:null,lng:null,zoom:13}
 };
 
@@ -1666,6 +1665,7 @@ function applyState(s) {
   state.types      = s.types      || [];
   state.transports = s.transports || [];
   state.checked    = s.checked    || {};
+  state.packed     = s.packed     || {};
   state.quantities = s.quantities || {};
   state.collapsed  = s.collapsed  || {};
   state.dest       = s.dest       || {name:'',dates:'',people:''};
@@ -2066,9 +2066,8 @@ function toggleCat(catId) {
 
 function toggleItem(itemId, cb) {
   state.checked[itemId] = cb.checked;
+  if(!cb.checked) delete state.packed[itemId];
   document.getElementById('row-'+itemId)?.classList.toggle('checked', cb.checked);
-  const ml = document.getElementById('mlrow-'+itemId);
-  if(ml) ml.classList.toggle('checked', cb.checked);
   saveState();
   refreshCatCount(itemId);
 }
@@ -2078,6 +2077,20 @@ function toggleItemClick(itemId) {
   if(!cb) return;
   cb.checked = !cb.checked;
   toggleItem(itemId, cb);
+}
+
+function togglePacked(itemId, cb) {
+  state.packed[itemId] = cb.checked;
+  document.getElementById('mlrow-'+itemId)?.classList.toggle('checked', cb.checked);
+  saveState();
+  updateMylistProgress();
+}
+
+function toggleMylistItemClick(itemId) {
+  const cb = document.querySelector(`#mlrow-${itemId} input[type=checkbox]`);
+  if(!cb) return;
+  cb.checked = !cb.checked;
+  togglePacked(itemId, cb);
 }
 
 function refreshCatCount(itemId) {
@@ -2117,6 +2130,7 @@ function deleteItem(itemId) {
   if(currentUser && currentUser.role==='viewer') return;
   state.categories.forEach(c => { c.items = c.items.filter(i => i.id!==itemId); });
   delete state.checked[itemId];
+  delete state.packed[itemId];
   delete state.quantities[itemId];
   document.getElementById('row-'+itemId)?.remove();
   saveState(); updateProgress(); showToast('🗑️ Supprimé');
@@ -2126,7 +2140,7 @@ function updateProgress() {
   let total=0, done=0;
   state.categories.forEach(c => c.items.filter(itemVisible).forEach(i => { total++; if(state.checked[i.id]) done++; }));
   const pct = total ? Math.round(done/total*100) : 0;
-  document.getElementById('prog-count').textContent = `${done} / ${total} articles (${pct}%)`;
+  document.getElementById('prog-count').textContent = `${done} / ${total} sélectionnés (${pct}%)`;
   document.getElementById('prog-bar').style.width = pct + '%';
 }
 
@@ -2135,15 +2149,22 @@ function collapseAll(){ state.categories.forEach(c => { state.collapsed[c.id]=tr
 
 function uncheckAll() {
   state.checked = {};
+  state.packed = {};
   document.querySelectorAll('.item-row').forEach(r => r.classList.remove('checked'));
   document.querySelectorAll('.item-row input[type=checkbox]').forEach(cb => cb.checked=false);
+  saveState(); showToast('↩️ Tout décoché');
+}
+
+function uncheckPacked() {
+  state.packed = {};
+  renderMyList();
   saveState(); showToast('↩️ Tout décoché');
 }
 
 function resetAll() {
   if(!confirm('Remettre toute la liste à zéro ?')) return;
   state.categories = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
-  state.checked = {}; state.quantities = {};
+  state.checked = {}; state.quantities = {}; state.packed = {};
   renderAll(); saveState(); showToast('🔄 Réinitialisé');
 }
 
@@ -2153,6 +2174,15 @@ function resetAll() {
 function renderMyList() {
   const wrap = document.getElementById('mylist-content');
   const d    = state.dest;
+
+  let selectedTotal = 0, packedDone = 0;
+  visibleCategoriesSorted().forEach(({cat}) => {
+    cat.items.filter(itemVisible).filter(i => state.checked[i.id]).forEach(i => {
+      selectedTotal++; if(state.packed[i.id]) packedDone++;
+    });
+  });
+  const pct = selectedTotal ? Math.round(packedDone/selectedTotal*100) : 0;
+
   let html = `<div class="mylist-header">
     <h2>🎒 Ma liste de vacances</h2>
     <div class="meta">
@@ -2163,6 +2193,16 @@ function renderMyList() {
     </div>
   </div>`;
 
+  if(selectedTotal) {
+    html += `<div class="progress-section mylist-progress">
+      <div class="progress-header">
+        <h3>✅ Préparé</h3>
+        <span class="progress-count" id="mylist-prog-count">${packedDone} / ${selectedTotal} préparés (${pct}%)</span>
+      </div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="mylist-prog-bar" style="width:${pct}%"></div></div>
+    </div>`;
+  }
+
   let hasAny = false;
   visibleCategoriesSorted().forEach(({cat}) => {
     const vis = cat.items.filter(itemVisible).filter(i => state.checked[i.id]);
@@ -2171,9 +2211,10 @@ function renderMyList() {
     html += `<div class="mylist-cat"><h3><span>${cat.emoji}</span> ${cat.name}</h3>`;
     vis.forEach(i => {
       const qty = state.quantities[i.id] || 0;
-      html += `<div class="mylist-item ${state.checked[i.id]?'checked':''}" id="mlrow-${i.id}">
-        <input type="checkbox" ${state.checked[i.id]?'checked':''} onchange="toggleItem('${i.id}',this)">
-        <span>${i.label}</span>
+      const isPacked = !!state.packed[i.id];
+      html += `<div class="mylist-item ${isPacked?'checked':''}" id="mlrow-${i.id}">
+        <input type="checkbox" ${isPacked?'checked':''} onchange="togglePacked('${i.id}',this)">
+        <span onclick="toggleMylistItemClick('${i.id}')">${i.label}</span>
         ${qty>0?`<span class="mylist-qty">x${qty}</span>`:''}
       </div>`;
     });
@@ -2186,6 +2227,18 @@ function renderMyList() {
     <p style="font-size:.8rem;color:var(--text);white-space:pre-wrap">${state.notes}</p></div>`;
 
   wrap.innerHTML = html;
+}
+
+function updateMylistProgress() {
+  let selectedTotal = 0, packedDone = 0;
+  state.categories.forEach(c => c.items.filter(itemVisible).filter(i => state.checked[i.id]).forEach(i => {
+    selectedTotal++; if(state.packed[i.id]) packedDone++;
+  }));
+  const pct = selectedTotal ? Math.round(packedDone/selectedTotal*100) : 0;
+  const countEl = document.getElementById('mylist-prog-count');
+  const barEl   = document.getElementById('mylist-prog-bar');
+  if(countEl) countEl.textContent = `${packedDone} / ${selectedTotal} préparés (${pct}%)`;
+  if(barEl)   barEl.style.width = pct + '%';
 }
 
 // ═══════════════════════════════════════════════════════════════
