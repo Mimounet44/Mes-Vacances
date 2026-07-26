@@ -1227,47 +1227,20 @@ async function doGoogleLogin() {
   errEl.style.display  = 'none';
   loadEl.classList.add('show');
 
+  const provider = new firebase.auth.GoogleAuthProvider();
+  provider.setCustomParameters({ prompt: 'select_account' });
+
+  // Sur mobile, la redirection est bien plus fiable que la popup
+  // (Safari iOS bloque/casse souvent les popups et leur sessionStorage).
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
   try {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    provider.setCustomParameters({ prompt: 'select_account' });
+    if(isMobile) {
+      await auth.signInWithRedirect(provider);
+      return; // la page se recharge ; la suite est traitée par checkGoogleRedirectResult()
+    }
     const result = await auth.signInWithPopup(provider);
-    const fbUser = result.user;
-
-    // Chercher / créer le compte admin dans Firestore
-    let userDoc = null;
-    if(db) {
-      const snap = await db.collection(COL_USERS).doc(fbUser.uid).get();
-      if(snap.exists) {
-        userDoc = snap.data();
-      } else {
-        // Premier admin Google : créer le compte
-        userDoc = {
-          uid: fbUser.uid,
-          login: fbUser.displayName || fbUser.email,
-          email: fbUser.email,
-          role: 'admin',
-          provider: 'google',
-          photoURL: fbUser.photoURL || ''
-        };
-        await db.collection(COL_USERS).doc(fbUser.uid).set(userDoc);
-      }
-    } else {
-      // Hors ligne : accord admin de base
-      userDoc = { uid: fbUser.uid, login: fbUser.displayName || fbUser.email, email: fbUser.email, role: 'admin', provider: 'google' };
-    }
-
-    if(userDoc.role !== 'admin') {
-      await auth.signOut();
-      errEl.textContent = '❌ Ce compte Google n\'a pas les droits administrateur.';
-      errEl.style.display = 'block';
-      loadEl.classList.remove('show');
-      return;
-    }
-
-    sessionStorage.setItem(SESSION_KEY, JSON.stringify({ uid: fbUser.uid, login: userDoc.login, email: fbUser.email, role: 'admin', provider: 'google', photoURL: fbUser.photoURL || '' }));
-    loadEl.classList.remove('show');
-    bootApp(userDoc);
-
+    await completeGoogleSignIn(result.user, errEl, loadEl);
   } catch(e) {
     console.error('Google login:', e);
     loadEl.classList.remove('show');
@@ -1276,6 +1249,65 @@ async function doGoogleLogin() {
       errEl.style.display = 'block';
     }
   }
+}
+
+// Logique commune (popup desktop + retour de redirection mobile) :
+// cherche/crée le profil Firestore, vérifie le rôle admin, ouvre la session.
+async function completeGoogleSignIn(fbUser, errEl, loadEl) {
+  let userDoc = null;
+  if(db) {
+    const snap = await db.collection(COL_USERS).doc(fbUser.uid).get();
+    if(snap.exists) {
+      userDoc = snap.data();
+    } else {
+      // Premier admin Google : créer le compte
+      userDoc = {
+        uid: fbUser.uid,
+        login: fbUser.displayName || fbUser.email,
+        email: fbUser.email,
+        role: 'admin',
+        provider: 'google',
+        photoURL: fbUser.photoURL || ''
+      };
+      await db.collection(COL_USERS).doc(fbUser.uid).set(userDoc);
+    }
+  } else {
+    // Hors ligne : accord admin de base
+    userDoc = { uid: fbUser.uid, login: fbUser.displayName || fbUser.email, email: fbUser.email, role: 'admin', provider: 'google' };
+  }
+
+  if(userDoc.role !== 'admin') {
+    await auth.signOut();
+    if(errEl) { errEl.textContent = '❌ Ce compte Google n\'a pas les droits administrateur.'; errEl.style.display = 'block'; }
+    if(loadEl) loadEl.classList.remove('show');
+    return;
+  }
+
+  sessionStorage.setItem(SESSION_KEY, JSON.stringify({ uid: fbUser.uid, login: userDoc.login, email: fbUser.email, role: 'admin', provider: 'google', photoURL: fbUser.photoURL || '' }));
+  if(loadEl) loadEl.classList.remove('show');
+  bootApp(userDoc);
+}
+
+// Traite le retour d'un signInWithRedirect (mobile). Appelé une fois au chargement de la page.
+async function checkGoogleRedirectResult() {
+  const errEl  = document.getElementById('google-error');
+  const loadEl = document.getElementById('google-loading');
+  try {
+    const result = await auth.getRedirectResult();
+    if(result && result.user) {
+      if(loadEl) loadEl.classList.add('show');
+      await completeGoogleSignIn(result.user, errEl, loadEl);
+      return true;
+    }
+  } catch(e) {
+    console.error('getRedirectResult:', e);
+    if(loadEl) loadEl.classList.remove('show');
+    if(e.code && e.code !== 'auth/no-auth-event' && errEl) {
+      errEl.textContent = '❌ ' + (e.message || 'Erreur de connexion Google (retour de redirection)');
+      errEl.style.display = 'block';
+    }
+  }
+  return false;
 }
 
 // ── Email / Password Login (utilisateurs) ────────────────────
@@ -2309,7 +2341,7 @@ function addItem(catId) {
   const addRow = body.querySelector('.add-row');
   const div    = document.createElement('div');
   div.innerHTML = renderItemHTML(item);
-  body.insertBefore(div.firstChild, addRow);
+  body.insertBefore(div.firstElementChild, addRow);
   saveState();
   refreshCatCount(item.id);
   showToast('✅ Article ajouté');
@@ -2488,9 +2520,12 @@ document.getElementById('qty-modal').addEventListener('click', e => { if(e.targe
 document.getElementById('share-modal').addEventListener('click', e => { if(e.target===document.getElementById('share-modal')) closeShareModal(); });
 
 // ═══════════════════════════════════════════════════════════════
-//  AUTO BOOT (session persistée)
+//  AUTO BOOT (session persistée + retour de redirection Google)
 // ═══════════════════════════════════════════════════════════════
-(function() {
+(async function() {
+  const handled = await checkGoogleRedirectResult();
+  if(handled) return; // completeGoogleSignIn a déjà démarré l'appli
+
   const s = sessionStorage.getItem(SESSION_KEY);
   if(!s) return;
   const sess = JSON.parse(s);
