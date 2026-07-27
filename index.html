@@ -1220,29 +1220,61 @@ function switchLoginTab(tab) {
   });
 }
 
+// ── Détection navigateur intégré (in-app webview) ──────────────
+// Ces navigateurs (Messages, Instagram, Facebook, TikTok, LINE, WeChat…)
+// cassent systématiquement l'auth Google, popup ET redirection confondues.
+// On prévient l'utilisateur au lieu de tenter une connexion vouée à l'échec.
+function isInAppBrowser() {
+  const ua = navigator.userAgent || '';
+  return /FBAN|FBAV|Instagram|Line\/|MicroMessenger|TikTok|GSA\/|WhatsApp|Twitter|LinkedInApp/i.test(ua)
+    || (/iPhone|iPad|iPod/.test(ua) && !/Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS/.test(ua));
+}
+
 // ── Google Login (admin) ──────────────────────────────────────
+// Stratégie : popup en premier choix, y compris sur Safari iPhone —
+// c'est en réalité la méthode la plus fiable là-bas. La redirection
+// (signInWithRedirect) n'est utilisée qu'en repli si la popup est
+// bloquée ou non supportée par le navigateur, car sur Safari iOS
+// l'ITP casse souvent silencieusement le retour de redirection.
 async function doGoogleLogin() {
   const errEl  = document.getElementById('google-error');
   const loadEl = document.getElementById('google-loading');
   errEl.style.display  = 'none';
-  loadEl.classList.add('show');
 
+  if(isInAppBrowser()) {
+    errEl.textContent = '❌ Ce navigateur intégré (Messages, Instagram, etc.) bloque la connexion Google. Ouvrez cette page dans Safari ou Chrome.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  loadEl.classList.add('show');
   const provider = new firebase.auth.GoogleAuthProvider();
   provider.setCustomParameters({ prompt: 'select_account' });
 
-  // Sur mobile, la redirection est bien plus fiable que la popup
-  // (Safari iOS bloque/casse souvent les popups et leur sessionStorage).
-  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
   try {
-    if(isMobile) {
-      await auth.signInWithRedirect(provider);
-      return; // la page se recharge ; la suite est traitée par checkGoogleRedirectResult()
-    }
     const result = await auth.signInWithPopup(provider);
     await completeGoogleSignIn(result.user, errEl, loadEl);
   } catch(e) {
-    console.error('Google login:', e);
+    console.error('Google login (popup):', e);
+
+    const shouldFallbackToRedirect =
+      e.code === 'auth/popup-blocked' ||
+      e.code === 'auth/operation-not-supported-in-this-environment' ||
+      e.code === 'auth/cancelled-popup-request';
+
+    if(shouldFallbackToRedirect) {
+      try {
+        await auth.signInWithRedirect(provider);
+        return; // la page se recharge ; la suite est traitée par checkGoogleRedirectResult()
+      } catch(e2) {
+        console.error('Google login (redirect fallback):', e2);
+        loadEl.classList.remove('show');
+        errEl.textContent = '❌ ' + (e2.message || 'Erreur de connexion Google');
+        errEl.style.display = 'block';
+        return;
+      }
+    }
+
     loadEl.classList.remove('show');
     if(e.code !== 'auth/popup-closed-by-user') {
       errEl.textContent = '❌ ' + (e.message || 'Erreur de connexion Google');
@@ -1251,7 +1283,7 @@ async function doGoogleLogin() {
   }
 }
 
-// Logique commune (popup desktop + retour de redirection mobile) :
+// Logique commune (popup + retour de redirection en repli) :
 // cherche/crée le profil Firestore, vérifie le rôle admin, ouvre la session.
 async function completeGoogleSignIn(fbUser, errEl, loadEl) {
   let userDoc = null;
@@ -1288,7 +1320,7 @@ async function completeGoogleSignIn(fbUser, errEl, loadEl) {
   bootApp(userDoc);
 }
 
-// Traite le retour d'un signInWithRedirect (mobile). Appelé une fois au chargement de la page.
+// Traite le retour d'un signInWithRedirect (repli). Appelé une fois au chargement de la page.
 async function checkGoogleRedirectResult() {
   const errEl  = document.getElementById('google-error');
   const loadEl = document.getElementById('google-loading');
@@ -2520,7 +2552,7 @@ document.getElementById('qty-modal').addEventListener('click', e => { if(e.targe
 document.getElementById('share-modal').addEventListener('click', e => { if(e.target===document.getElementById('share-modal')) closeShareModal(); });
 
 // ═══════════════════════════════════════════════════════════════
-//  AUTO BOOT (session persistée + retour de redirection Google)
+//  AUTO BOOT (session persistée + retour de redirection Google en repli)
 // ═══════════════════════════════════════════════════════════════
 (async function() {
   const handled = await checkGoogleRedirectResult();
