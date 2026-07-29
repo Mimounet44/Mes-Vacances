@@ -421,6 +421,58 @@ body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--text);m
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 /* ── PRINT ── */
+/* ── BUDGET (préfixe bud- pour éviter toute collision avec les styles existants) ── */
+:root{--plum:#8f5a82;--teal:#3f8f8a;--olive:#9a8a3f;--slate:#6a7a8a}
+.bud-dash-grid{display:grid;grid-template-columns:190px 1fr;gap:24px;background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;margin:8px 0 16px}
+.bud-donut-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+.bud-donut{width:150px;height:150px;border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center}
+.bud-donut::after{content:'';position:absolute;width:64%;height:64%;border-radius:50%;background:var(--white)}
+.bud-donut-center{position:relative;z-index:2;text-align:center}
+.bud-donut-center b{font-size:1.15rem;display:block;color:var(--ocean-dark)}
+.bud-donut-center span{font-size:.65rem;color:var(--text-light)}
+.bud-stats-col{display:flex;flex-direction:column;justify-content:center;gap:10px}
+.bud-stat-row{display:flex;align-items:center;justify-content:space-between;padding:11px 15px;background:var(--sand);border-radius:var(--radius-sm)}
+.bud-stat-row .label{font-size:.8rem;color:var(--text-light)}
+.bud-stat-row .value{font-size:1.1rem;font-weight:700}
+.bud-stat-row.over .value{color:var(--coral)}
+.bud-stat-row.ok .value{color:var(--green)}
+.bud-cat-grid{display:flex;flex-direction:column;gap:12px}
+.bud-cat-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.bud-cat-head{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.bud-cat-dot{width:13px;height:13px;border-radius:50%;flex-shrink:0}
+.bud-cat-head-info{flex:1;min-width:0}
+.bud-cat-head-info .name{font-weight:600;font-size:.9rem}
+.bud-cat-head-info .sub{font-size:.71rem;color:var(--text-light)}
+.bud-cat-amounts b{font-size:.92rem;white-space:nowrap}
+.bud-cat-chevron{transition:transform .25s;color:var(--text-light);flex-shrink:0}
+.bud-cat-card.open .bud-cat-chevron{transform:rotate(180deg)}
+.bud-cat-progress-track{height:6px;background:var(--sand);border-radius:5px;margin:0 16px 12px;overflow:hidden}
+.bud-cat-progress-fill{height:100%;border-radius:5px;transition:width .4s ease}
+.bud-cat-body{display:none;padding:0 16px 16px;border-top:1px solid var(--sand-dark)}
+.bud-cat-card.open .bud-cat-body{display:block;animation:fadeIn .25s ease both}
+.bud-planned-row{display:flex;align-items:center;gap:10px;margin:12px 0}
+.bud-planned-row label{font-size:.76rem;color:var(--text-light);white-space:nowrap}
+.bud-planned-row input{width:110px;padding:8px 10px;border:2px solid var(--sand-dark);border-radius:8px;font-family:inherit;font-size:.84rem}
+.bud-expense-list{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+.bud-expense-item{display:flex;align-items:center;gap:10px;padding:9px 11px;background:var(--sand);border-radius:10px;font-size:.8rem}
+.bud-expense-item .exp-label{flex:1;min-width:0}
+.bud-expense-item .exp-label strong{display:block;font-size:.83rem}
+.bud-expense-item .exp-label span{font-size:.68rem;color:var(--text-light)}
+.bud-expense-item .exp-amount{font-weight:700;white-space:nowrap}
+.bud-icon-btn{background:none;border:none;font-size:.84rem;padding:4px 6px;border-radius:6px;color:var(--text-light);cursor:pointer}
+.bud-icon-btn:hover{background:var(--sand-dark)}
+.bud-add-exp-btn{width:100%;margin-top:10px;padding:10px;background:none;border:2px dashed var(--sand-dark);border-radius:10px;font-size:.79rem;color:var(--ocean-dark);font-weight:600;cursor:pointer}
+.bud-add-exp-btn:hover{border-color:var(--ocean-light);background:var(--sand)}
+.bud-empty-exp{font-size:.77rem;color:var(--text-light);text-align:center;padding:10px 0}
+.bud-modal-field label{font-size:.75rem;color:var(--text-light);display:block;margin:10px 0 5px;text-align:left}
+.bud-modal-field input,.bud-modal-field select{width:100%;padding:11px 12px;border:2px solid var(--sand-dark);border-radius:var(--radius-sm);font-family:inherit;font-size:.88rem}
+.bud-modal-delete{background:none;border:none;color:var(--coral);text-decoration:underline;font-weight:500;font-size:.77rem;text-align:center;margin-top:12px;width:100%;padding:6px;cursor:pointer}
+.readonly-mode-budget .bud-add-exp-btn,.readonly-mode-budget .bud-icon-btn,.readonly-mode-budget .bud-planned-row input{display:none!important}
+@media(max-width:640px){
+  .bud-dash-grid{grid-template-columns:1fr;text-align:center}
+  .bud-donut-wrap{margin:0 auto}
+}
+
 @media print {
   #login-screen,#app .app-nav,.mobile-nav,#sync-dot{display:none!important}
   .page{display:none!important}
@@ -559,6 +611,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--text);m
     <button class="mobile-nav-btn" onclick="showPage('ma-liste')" id="mobile-btn-ma-liste">
       <span class="icon">🎒</span><span>Ma Liste</span>
     </button>
+    <button class="mobile-nav-btn" onclick="showPage('budget')" id="mobile-btn-budget">
+      <span class="icon">💶</span><span>Budget</span>
+    </button>
     <button class="mobile-nav-btn" onclick="showPage('calendrier')" id="mobile-btn-calendrier">
       <span class="icon">📅</span><span>Calendrier</span>
     </button>
@@ -579,6 +634,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--text);m
       <div class="nav-tabs">
         <button class="nav-tab active" onclick="showPage('liste-prep')">📋 Préparation</button>
         <button class="nav-tab" onclick="showPage('ma-liste')">🎒 Ma Liste</button>
+        <button class="nav-tab" onclick="showPage('budget')">💶 Budget</button>
         <button class="nav-tab" onclick="showPage('calendrier')">📅 Calendrier</button>
         <button class="nav-tab admin-tab" id="tab-admin" onclick="showPage('admin')" style="display:none">⚙️ Réglages</button>
       </div>
@@ -685,6 +741,21 @@ body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--text);m
       <button class="btn-sm" onclick="uncheckPacked()">↩️ Tout décocher</button>
     </div>
     <div id="mylist-content"></div>
+  </div>
+
+  <!-- PAGE BUDGET -->
+  <div class="page" id="page-budget">
+    <div class="bud-dash-grid">
+      <div class="bud-donut-wrap">
+        <div class="bud-donut" id="bud-donut"><div class="bud-donut-center"><b id="bud-donut-total">0 €</b><span>dépensés</span></div></div>
+      </div>
+      <div class="bud-stats-col">
+        <div class="bud-stat-row"><span class="label">💰 Budget prévu</span><span class="value" id="bud-stat-planned">0 €</span></div>
+        <div class="bud-stat-row"><span class="label">🧾 Dépensé</span><span class="value" id="bud-stat-spent">0 €</span></div>
+        <div class="bud-stat-row" id="bud-stat-remaining-row"><span class="label">✅ Restant</span><span class="value" id="bud-stat-remaining">0 €</span></div>
+      </div>
+    </div>
+    <div class="bud-cat-grid" id="bud-cat-grid"></div>
   </div>
 
   <!-- PAGE CALENDRIER -->
@@ -828,6 +899,39 @@ service cloud.firestore {
   </div>
 </div>
 
+<!-- MODAL DEPENSE BUDGET -->
+<div class="modal-overlay" id="expense-modal">
+  <div class="modal">
+    <h3 id="expense-modal-title">Ajouter une dépense</h3>
+    <input type="hidden" id="exp-id">
+    <div class="bud-modal-field">
+      <label>Catégorie</label>
+      <select id="exp-cat"></select>
+    </div>
+    <div class="bud-modal-field">
+      <label>Libellé</label>
+      <input type="text" id="exp-label" placeholder="Ex : Courses Carrefour">
+    </div>
+    <div class="bud-modal-field">
+      <label>Montant (€)</label>
+      <input type="number" id="exp-amount" step="0.01" min="0" placeholder="0.00">
+    </div>
+    <div class="bud-modal-field">
+      <label>Date</label>
+      <input type="date" id="exp-date">
+    </div>
+    <div class="bud-modal-field">
+      <label>Payé par (optionnel)</label>
+      <input type="text" id="exp-who" placeholder="Ex : Yves">
+    </div>
+    <div class="modal-btns" style="margin-top:16px">
+      <button class="modal-cancel" onclick="closeExpenseModal()">Annuler</button>
+      <button class="modal-ok" onclick="saveExpenseModal()">Enregistrer</button>
+    </div>
+    <button class="bud-modal-delete" id="expense-delete-btn" style="display:none" onclick="deleteExpenseModal()">Supprimer cette dépense</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -890,6 +994,22 @@ let calendarInstance = null;
 let mapInstance = null;
 let mapMarkers = [];
 let qtyModalItemId = null, qtyModalCurrent = 1;
+
+// ── BUDGET ──
+const BUD_CATS = [
+  {id:'heberg',     icon:'🏡', label:'Hébergement / Location', color:'var(--ocean)'},
+  {id:'nourriture', icon:'🛒', label:'Nourriture / Marchés',    color:'var(--green)'},
+  {id:'resto',      icon:'🍽️', label:'Restaurants / Extra',     color:'var(--coral)'},
+  {id:'transport',  icon:'🚗', label:'Transport',               color:'var(--mountain)'},
+  {id:'loisirs',    icon:'🎯', label:'Loisirs & Jeux',          color:'var(--sun)'},
+  {id:'casino',     icon:'🎰', label:'Casino',                  color:'var(--plum)'},
+  {id:'cadeaux',    icon:'🎁', label:'Cadeaux / Souvenirs',     color:'var(--teal)'},
+  {id:'enfants',    icon:'🧒', label:'Enfants',                 color:'var(--olive)'},
+  {id:'divers',     icon:'📦', label:'Divers / Imprévus',       color:'var(--slate)'}
+];
+let budget = defaultBudget();
+let openBudCatId = null;
+let budgetSaveDebounceTimer = null;
 
 // ═══════════════════════════════════════════════════════════════
 //  DATA
@@ -1523,6 +1643,7 @@ async function bootApp(u) {
 
   await initTrips();
   await loadState();
+  await loadBudget();
 
   if(!state.categories || !state.categories.length)
     state.categories = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
@@ -1531,6 +1652,7 @@ async function bootApp(u) {
   renderTypeButtons();
   renderTransportButtons();
   renderAll();
+  renderBudgetAll();
   updateDocumentsList();
   updateProgress();
   updateTypesBar();
@@ -1547,6 +1669,7 @@ async function bootApp(u) {
   if(u.role === 'viewer') {
     document.getElementById('cat-grid').classList.add('readonly-mode');
     document.getElementById('main-action-bar').style.display = 'none';
+    document.getElementById('bud-cat-grid').classList.add('readonly-mode-budget');
   }
 
   startRealtimeSync();
@@ -1646,10 +1769,13 @@ async function createFirstTrip() {
     };
   }
 
+  budget = defaultBudget();
+
   if(db && currentUser) {
     try {
       await db.collection(COL_TRIPS).doc(firstId).set({
         state,
+        budget,
         ownerId: currentUser.uid,
         ownerEmail: currentUser.email || '',
         sharedWith: [],
@@ -1694,6 +1820,7 @@ async function switchTrip(tripId) {
   if(currentUser) localStorage.setItem('vac_last_trip_' + currentUser.uid, tripId);
   state.categories = [];
   await loadState();
+  await loadBudget();
   if(!state.categories || !state.categories.length)
     state.categories = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
   refreshUI();
@@ -1715,10 +1842,11 @@ async function promptNewTrip() {
     dest:{name:'',dates:'',people:''}, notes:'', reminders:[], map:{lat:null,lng:null,zoom:13},
     categories: JSON.parse(JSON.stringify(DEFAULT_CATEGORIES))
   };
+  budget = defaultBudget();
   if(db) {
     try {
       await db.collection(COL_TRIPS).doc(id).set({
-        state, ownerId, ownerEmail, sharedWith:[], name, dates:'',
+        state, budget, ownerId, ownerEmail, sharedWith:[], name, dates:'',
         updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
         updatedBy: currentUser ? currentUser.login : 'unknown'
       });
@@ -1752,6 +1880,7 @@ async function deleteCurrentTrip() {
   tripsList = tripsList.filter(t => t.id !== delId);
   if(db) { try { await db.collection(COL_TRIPS).doc(delId).delete(); } catch(e){} }
   localStorage.removeItem('vac_trip_' + delId);
+  localStorage.removeItem('vac_budget_' + delId);
   await switchTrip(tripsList[0].id);
   showToast('🗑️ Voyage supprimé');
 }
@@ -1931,6 +2060,261 @@ function applyState(s) {
 }
 
 // ═══════════════════════════════════════════════════════════════
+//  BUDGET — nouveau champ "budget" du document trips/{tripId},
+//  toujours écrit en merge:true : ne touche jamais à .state, ownerId,
+//  sharedWith, name ou dates. Utilise budgetUpdatedAt/budgetUpdatedBy
+//  (distincts de updatedAt/updatedBy) pour ne pas interférer avec
+//  l'indicateur de sync de la liste de préparation.
+// ═══════════════════════════════════════════════════════════════
+function defaultBudget() {
+  const categories = {};
+  BUD_CATS.forEach(c => categories[c.id] = {planned:0});
+  return {categories, expenses:[], currency:'EUR'};
+}
+
+function applyBudget(b) {
+  const merged = defaultBudget();
+  if(b && b.categories) {
+    BUD_CATS.forEach(c => { if(b.categories[c.id]) merged.categories[c.id].planned = Number(b.categories[c.id].planned) || 0; });
+  }
+  merged.expenses = (b && Array.isArray(b.expenses)) ? b.expenses : [];
+  budget = merged;
+}
+
+function fmtMoney(n) {
+  return (Number(n)||0).toLocaleString('fr-FR', {style:'currency', currency:'EUR', maximumFractionDigits:2});
+}
+
+function budgetCanEdit() { return currentUser && currentUser.role !== 'viewer'; }
+
+async function loadBudget() {
+  if(!currentTripId) return;
+  if(db) {
+    try {
+      const doc = await db.collection(COL_TRIPS).doc(currentTripId).get();
+      if(doc.exists) {
+        applyBudget(doc.data().budget);
+        localStorage.setItem('vac_budget_' + currentTripId, JSON.stringify(budget));
+        return;
+      }
+    } catch(e) { console.error('loadBudget Firebase:', e); }
+  }
+  const local = localStorage.getItem('vac_budget_' + currentTripId);
+  if(local) { try { applyBudget(JSON.parse(local)); } catch(e){} }
+  else { budget = defaultBudget(); }
+}
+
+async function saveBudget() {
+  localStorage.setItem('vac_budget_' + currentTripId, JSON.stringify(budget));
+  if(!db || !currentTripId) return;
+  setSyncDot('orange');
+  isSyncing = true;
+  try {
+    await db.collection(COL_TRIPS).doc(currentTripId).set({
+      budget,
+      budgetUpdatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      budgetUpdatedBy: currentUser ? currentUser.login : 'unknown'
+    }, {merge:true});
+    setSyncDot('green');
+  } catch(e) {
+    console.error('saveBudget Firebase:', e);
+    setSyncDot('red');
+    showToast('⚠️ Échec de la synchronisation du budget');
+  }
+  setTimeout(()=>{ isSyncing = false; }, 300);
+}
+
+function debouncedSaveBudget() {
+  clearTimeout(budgetSaveDebounceTimer);
+  budgetSaveDebounceTimer = setTimeout(saveBudget, 600);
+}
+
+function budgetTotalPlanned() {
+  return BUD_CATS.reduce((s,c) => s + (budget.categories[c.id].planned || 0), 0);
+}
+function budgetSpentByCat(catId) {
+  return budget.expenses.filter(e => e.cat === catId).reduce((s,e) => s + (Number(e.amount)||0), 0);
+}
+function budgetTotalSpent() {
+  return budget.expenses.reduce((s,e) => s + (Number(e.amount)||0), 0);
+}
+
+function renderBudgetAll() {
+  if(!document.getElementById('bud-cat-grid')) return;
+  renderBudgetDashboard();
+  renderBudgetCategories();
+}
+
+function renderBudgetDashboard() {
+  const planned = budgetTotalPlanned();
+  const spent = budgetTotalSpent();
+  const remaining = planned - spent;
+
+  document.getElementById('bud-stat-planned').textContent = fmtMoney(planned);
+  document.getElementById('bud-stat-spent').textContent = fmtMoney(spent);
+  document.getElementById('bud-stat-remaining').textContent = fmtMoney(remaining);
+  const remRow = document.getElementById('bud-stat-remaining-row');
+  remRow.className = 'bud-stat-row ' + (remaining < 0 ? 'over' : 'ok');
+
+  document.getElementById('bud-donut-total').textContent = fmtMoney(spent);
+
+  const donut = document.getElementById('bud-donut');
+  if(spent <= 0) {
+    donut.style.background = 'conic-gradient(var(--sand-dark) 0 360deg)';
+    return;
+  }
+  let acc = 0;
+  const stops = [];
+  BUD_CATS.forEach(c => {
+    const val = budgetSpentByCat(c.id);
+    if(val <= 0) return;
+    const start = acc / spent * 360;
+    acc += val;
+    const end = acc / spent * 360;
+    stops.push(`${c.color} ${start}deg ${end}deg`);
+  });
+  donut.style.background = `conic-gradient(${stops.join(', ')})`;
+}
+
+function renderBudgetCategories() {
+  const grid = document.getElementById('bud-cat-grid');
+  grid.innerHTML = BUD_CATS.map(c => {
+    const planned = budget.categories[c.id].planned || 0;
+    const spent = budgetSpentByCat(c.id);
+    const pct = planned > 0 ? Math.min(100, (spent/planned)*100) : (spent > 0 ? 100 : 0);
+    const over = planned > 0 && spent > planned;
+    const isOpen = openBudCatId === c.id;
+    const exps = budget.expenses.filter(e => e.cat === c.id).sort((a,b) => (b.date||'').localeCompare(a.date||''));
+
+    const expenseRows = exps.length ? exps.map(e => `
+      <div class="bud-expense-item">
+        <div class="exp-label">
+          <strong>${escapeBudHtml(e.label || 'Sans libellé')}</strong>
+          <span>${e.date ? formatBudDate(e.date) : ''}${e.who ? ' · ' + escapeBudHtml(e.who) : ''}</span>
+        </div>
+        <div class="exp-amount">${fmtMoney(e.amount)}</div>
+        ${budgetCanEdit() ? `<button class="bud-icon-btn" onclick="openExpenseModal('${c.id}','${e.id}')" title="Modifier">✏️</button>` : ''}
+      </div>
+    `).join('') : '<div class="bud-empty-exp">Aucune dépense enregistrée</div>';
+
+    return `
+      <div class="bud-cat-card ${isOpen ? 'open' : ''}" id="bud-cat-card-${c.id}">
+        <div class="bud-cat-head" onclick="toggleBudCat('${c.id}')">
+          <span class="bud-cat-dot" style="background:${c.color}"></span>
+          <div class="bud-cat-head-info">
+            <div class="name">${c.icon} ${c.label}</div>
+            <div class="sub">${fmtMoney(spent)} sur ${fmtMoney(planned)}${over ? ' · dépassement' : ''}</div>
+          </div>
+          <div class="bud-cat-amounts">
+            <b style="${over ? 'color:var(--coral)' : ''}">${fmtMoney(spent)}</b>
+          </div>
+          <span class="bud-cat-chevron">▾</span>
+        </div>
+        <div class="bud-cat-progress-track">
+          <div class="bud-cat-progress-fill" style="width:${pct}%;background:${over ? 'var(--coral)' : c.color}"></div>
+        </div>
+        <div class="bud-cat-body">
+          <div class="bud-planned-row">
+            <label>Budget prévu</label>
+            <input type="number" min="0" step="0.01" value="${planned}" ${budgetCanEdit() ? '' : 'disabled'}
+              onchange="updateBudgetPlanned('${c.id}', this.value)">
+          </div>
+          <div class="bud-expense-list">${expenseRows}</div>
+          ${budgetCanEdit() ? `<button class="bud-add-exp-btn" onclick="openExpenseModal('${c.id}')">＋ Ajouter une dépense</button>` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function escapeBudHtml(s) {
+  return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function formatBudDate(iso) {
+  try { return new Date(iso + 'T00:00:00').toLocaleDateString('fr-FR', {day:'2-digit', month:'short'}); }
+  catch(e) { return iso; }
+}
+
+function toggleBudCat(catId) {
+  openBudCatId = (openBudCatId === catId) ? null : catId;
+  renderBudgetCategories();
+}
+
+function updateBudgetPlanned(catId, value) {
+  if(!budgetCanEdit()) return;
+  budget.categories[catId].planned = Math.max(0, Number(value) || 0);
+  renderBudgetDashboard();
+  debouncedSaveBudget();
+}
+
+function openExpenseModal(catId, expenseId) {
+  if(!budgetCanEdit()) return;
+  const select = document.getElementById('exp-cat');
+  select.innerHTML = BUD_CATS.map(c => `<option value="${c.id}">${c.icon} ${c.label}</option>`).join('');
+  select.value = catId;
+
+  const deleteBtn = document.getElementById('expense-delete-btn');
+
+  if(expenseId) {
+    const exp = budget.expenses.find(e => e.id === expenseId);
+    document.getElementById('expense-modal-title').textContent = 'Modifier la dépense';
+    document.getElementById('exp-id').value = expenseId;
+    document.getElementById('exp-label').value = exp ? exp.label || '' : '';
+    document.getElementById('exp-amount').value = exp ? exp.amount || '' : '';
+    document.getElementById('exp-date').value = exp ? exp.date || '' : '';
+    document.getElementById('exp-who').value = exp ? exp.who || '' : '';
+    deleteBtn.style.display = 'block';
+  } else {
+    document.getElementById('expense-modal-title').textContent = 'Ajouter une dépense';
+    document.getElementById('exp-id').value = '';
+    document.getElementById('exp-label').value = '';
+    document.getElementById('exp-amount').value = '';
+    document.getElementById('exp-date').value = new Date().toISOString().slice(0,10);
+    document.getElementById('exp-who').value = '';
+    deleteBtn.style.display = 'none';
+  }
+  document.getElementById('expense-modal').classList.add('open');
+}
+
+function closeExpenseModal() {
+  document.getElementById('expense-modal').classList.remove('open');
+}
+
+function saveExpenseModal() {
+  const id = document.getElementById('exp-id').value;
+  const cat = document.getElementById('exp-cat').value;
+  const label = document.getElementById('exp-label').value.trim();
+  const amount = Number(document.getElementById('exp-amount').value) || 0;
+  const date = document.getElementById('exp-date').value;
+  const who = document.getElementById('exp-who').value.trim();
+
+  if(!label || amount <= 0) { showToast('⚠️ Indiquez un libellé et un montant'); return; }
+
+  if(id) {
+    const exp = budget.expenses.find(e => e.id === id);
+    if(exp) { exp.cat = cat; exp.label = label; exp.amount = amount; exp.date = date; exp.who = who; }
+  } else {
+    budget.expenses.push({ id: 'e' + Date.now().toString(36) + Math.random().toString(36).slice(2,6), cat, label, amount, date, who });
+  }
+  openBudCatId = cat;
+  closeExpenseModal();
+  renderBudgetAll();
+  saveBudget();
+  showToast('✅ Dépense enregistrée');
+}
+
+function deleteExpenseModal() {
+  const id = document.getElementById('exp-id').value;
+  if(!id) return;
+  budget.expenses = budget.expenses.filter(e => e.id !== id);
+  closeExpenseModal();
+  renderBudgetAll();
+  saveBudget();
+  showToast('🗑️ Dépense supprimée');
+}
+
+// ═══════════════════════════════════════════════════════════════
 //  REALTIME SYNC — écoute /trips/{tripId} → tous les users voient les mises à jour
 // ═══════════════════════════════════════════════════════════════
 function startRealtimeSync() {
@@ -1942,22 +2326,36 @@ function startRealtimeSync() {
     .onSnapshot(doc => {
       // Ignorer le premier snapshot (c'est notre propre écriture initiale)
       if(isFirstSnapshot) { isFirstSnapshot = false; return; }
-      if(!doc.exists || !doc.data().state) return;
+      if(!doc.exists) return;
+      const data = doc.data();
 
-      const remote   = doc.data().state;
-      const updatedBy = doc.data().updatedBy || '';
+      // ── State (liste de préparation) — logique inchangée ──
+      if(data.state) {
+        const remote   = data.state;
+        const updatedBy = data.updatedBy || '';
 
-      // Ne pas ré-appliquer si c'est nous qui avons écrit
-      if(updatedBy === (currentUser ? currentUser.login : '') && !isSyncing) return;
+        // Ne pas ré-appliquer si c'est nous qui avons écrit
+        if(updatedBy !== (currentUser ? currentUser.login : '') || isSyncing) {
+          applyState(remote);
+          localStorage.setItem('vac_trip_' + currentTripId, JSON.stringify(state));
+          refreshUI(true); // true = vient d'un autre appareil
 
-      applyState(remote);
-      localStorage.setItem('vac_trip_' + currentTripId, JSON.stringify(state));
-      refreshUI(true); // true = vient d'un autre appareil
+          setSyncDot('green');
+          const lbl = document.getElementById('last-sync-label');
+          if(lbl) lbl.textContent = '🔄 Reçu depuis ' + updatedBy + ' — ' + new Date().toLocaleTimeString('fr-FR');
+          showToast('🔄 Mis à jour par ' + (updatedBy || 'un autre appareil'));
+        }
+      }
 
-      setSyncDot('green');
-      const lbl = document.getElementById('last-sync-label');
-      if(lbl) lbl.textContent = '🔄 Reçu depuis ' + updatedBy + ' — ' + new Date().toLocaleTimeString('fr-FR');
-      showToast('🔄 Mis à jour par ' + (updatedBy || 'un autre appareil'));
+      // ── Budget — même principe, avec son propre updatedBy ──
+      if(data.budget) {
+        const budgetUpdatedBy = data.budgetUpdatedBy || '';
+        if(budgetUpdatedBy !== (currentUser ? currentUser.login : '') || isSyncing) {
+          applyBudget(data.budget);
+          localStorage.setItem('vac_budget_' + currentTripId, JSON.stringify(budget));
+          renderBudgetAll();
+        }
+      }
     }, err => {
       console.error('onSnapshot error:', err);
       setSyncDot('red');
@@ -1984,6 +2382,7 @@ async function forceSync() {
 // ═══════════════════════════════════════════════════════════════
 function refreshUI(fromRemote) {
   renderAll();
+  renderBudgetAll();
   renderTypeButtons();
   renderTransportButtons();
   updateTypesBar();
@@ -2014,6 +2413,7 @@ function showPage(id) {
   window.scrollTo({top:0, behavior:'smooth'});
   if(id === 'ma-liste')  renderMyList();
   if(id === 'admin')     renderAdmin();
+  if(id === 'budget')    renderBudgetAll();
   if(id === 'calendrier'){ renderFullCalendar(); renderFullReminders(); }
 }
 
