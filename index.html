@@ -373,7 +373,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--text);m
 .sync-status-bar .dot.red{background:#ef4444}
 
 /* ── MODAL ── */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(42,33,24,.45);z-index:500;
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(42,33,24,.45);z-index:1500;
   align-items:flex-end;justify-content:center}
 @media(min-width:480px){.modal-overlay{align-items:center}}
 .modal-overlay.open{display:flex}
@@ -422,7 +422,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--text);m
 
 /* ── PRINT ── */
 /* ── BUDGET (préfixe bud- pour éviter toute collision avec les styles existants) ── */
-:root{--plum:#8f5a82;--teal:#3f8f8a;--olive:#9a8a3f;--slate:#6a7a8a}
+:root{--plum:#8f5a82;--teal:#3f8f8a;--olive:#9a8a3f;--slate:#6a7a8a;--indigo:#4f5f8a}
 .bud-dash-grid{display:grid;grid-template-columns:190px 1fr;gap:24px;background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;margin:8px 0 16px}
 .bud-donut-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
 .bud-donut{width:150px;height:150px;border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center}
@@ -1001,6 +1001,7 @@ const BUD_CATS = [
   {id:'nourriture', icon:'🛒', label:'Nourriture / Marchés',    color:'var(--green)'},
   {id:'resto',      icon:'🍽️', label:'Restaurants / Extra',     color:'var(--coral)'},
   {id:'transport',  icon:'🚗', label:'Transport',               color:'var(--mountain)'},
+  {id:'liquidite',  icon:'💵', label:'Liquidités / Retraits',   color:'var(--indigo)'},
   {id:'loisirs',    icon:'🎯', label:'Loisirs & Jeux',          color:'var(--sun)'},
   {id:'casino',     icon:'🎰', label:'Casino',                  color:'var(--plum)'},
   {id:'cadeaux',    icon:'🎁', label:'Cadeaux / Souvenirs',     color:'var(--teal)'},
